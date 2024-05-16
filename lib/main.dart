@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:valineups/login_and_guest.dart';
+import 'package:valineups/screens/login_and_guest.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false, // Debug yazısını kaldırma
-      home: const LoginAndGuest(),
+      home: const LoginAndGuestScreen(),
     );
   }
 }
