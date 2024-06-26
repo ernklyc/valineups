@@ -13,61 +13,76 @@ class LoginAndGuestScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double mediaQueryWidth = MediaQuery.of(context).size.width;
+    final double mediaQueryHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: ProjectColor().darkGrey,
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: Padding(
-              padding: ProjectEdgeInsets().buttonVertical,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Expanded(
-                      child: Image.asset(AuthPageText().loginGuestPageCover)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          Image(
+            image: AssetImage(AuthPageText().loginGuestPageCover),
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+            filterQuality: FilterQuality.high,
+          ),
+          Container(
+            height: mediaQueryHeight,
+            width: mediaQueryHeight,
+            color: ProjectColor().darkGrey.withOpacity(0.3),
+          ),
+          Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: ProjectEdgeInsets().buttonVertical,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      CustomText(
-                        txt: AuthPageText().va,
-                        txtColor: ProjectColor().customWhite,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomText(
+                            txt: AuthPageText().va,
+                            txtColor: ProjectColor().customWhite,
+                          ),
+                          CustomText(
+                            txt: AuthPageText().l,
+                            txtColor: ProjectColor().valoRed,
+                          ),
+                          CustomText(
+                            txt: AuthPageText().ineups,
+                            txtColor: ProjectColor().customWhite,
+                          ),
+                        ],
                       ),
-                      CustomText(
-                        txt: AuthPageText().l,
-                        txtColor: ProjectColor().valoRed,
+                      SizedBox(height: mediaQueryWidth / 30),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomButton(
+                            image: AuthPageText().googleAuth,
+                            buttonTxt: AuthPageText().google,
+                          ),
+                          CustomButton(
+                            image: AuthPageText().anonimAuth,
+                            buttonTxt: AuthPageText().anonim,
+                          ),
+                        ],
                       ),
-                      CustomText(
-                        txt: AuthPageText().ineups,
-                        txtColor: ProjectColor().customWhite,
+                      SizedBox(height: mediaQueryWidth / 30),
+                      Text(
+                        AuthPageText().infoText,
+                        style: TextStyle(
+                          color: ProjectColor().hintGrey,
+                          fontSize: 11.0,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
-                  SizedBox(height: mediaQueryWidth / 30),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CustomButton(
-                        image: AuthPageText().googleAuth,
-                        buttonTxt: AuthPageText().google,
-                      ),
-                      CustomButton(
-                        image: AuthPageText().anonimAuth,
-                        buttonTxt: AuthPageText().anonim,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: mediaQueryWidth / 30),
-                  Text(
-                    AuthPageText().infoText,
-                    style: TextStyle(
-                      color: ProjectColor().hintGrey,
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -78,7 +93,6 @@ class LoginAndGuestScreen extends StatelessWidget {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setBool('seenOnboarding', true);
             Navigator.pushReplacement(
-              // ignore: use_build_context_synchronously
               context,
               MaterialPageRoute(
                 builder: (context) => const OnboardingScreen(),

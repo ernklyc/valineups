@@ -6,8 +6,7 @@ class AuthPageText {
   final String googleAuth = "assets/images/googleAuth.png";
   final String anonimAuth = "assets/images/anonimAuth.png";
 
-  final String loginGuestPageCover = "assets/images/valoAjan.gif";
-
+  final String loginGuestPageCover = "assets/images/valoAgent.gif";
   final String infoText = "Valorant Unofficial Fan App";
 
   final String google = "Google";
