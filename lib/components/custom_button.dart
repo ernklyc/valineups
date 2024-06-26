@@ -5,11 +5,13 @@ import 'package:valineups/utils/constants.dart';
 class CustomButton extends StatelessWidget {
   final String image;
   final String buttonTxt;
+  final Function()? onPressed;
 
   const CustomButton({
     super.key,
     required this.image,
     required this.buttonTxt,
+    this.onPressed,
   });
 
   @override
@@ -22,10 +24,10 @@ class CustomButton extends StatelessWidget {
         height: authWidthButton / 9,
         decoration: BoxDecoration(
           color: ProjectColor().valoRed,
-          borderRadius: Decorations().circular8,
+          borderRadius: ProjectBorderRadius().circular8,
         ),
         child: InkWell(
-          onTap: () {},
+          onTap: onPressed,
           overlayColor: WidgetStateProperty.all(ProjectColor().transparent),
           child: Padding(
             padding: ProjectEdgeInsets().loginAndGuestPageButtonText,

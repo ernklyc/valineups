@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProjectColor {
-  final Color darkGrey = const Color(0xff1F1F1F);
+  final Color darkGrey = const Color.fromARGB(255, 29, 29, 29);
   final Color transparent = Colors.transparent;
   final Color customWhite = const Color(0xFFFFFBF5);
   final Color valoRed = const Color(0xFFD13739);

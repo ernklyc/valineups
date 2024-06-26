@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/screens/login_and_guest.dart';
+import 'package:valineups/screens/onboarding_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
+
+  runApp(MyApp(seenOnboarding: seenOnboarding));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  final bool seenOnboarding;
+
+  // ignore: use_key_in_widget_constructors
+  const MyApp({required this.seenOnboarding});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'VALINEUPS',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      debugShowCheckedModeBanner: false, // Debug yazısını kaldırma
-      home: const LoginAndGuestScreen(),
+      debugShowCheckedModeBanner: false,
+      home: seenOnboarding ? const LoginAndGuestScreen() : const OnboardingScreen(),
     );
   }
 }
