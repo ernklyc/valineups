@@ -28,7 +28,7 @@ class LoginAndGuestScreen extends StatelessWidget {
           Container(
             height: mediaQueryHeight,
             width: mediaQueryHeight,
-            color: ProjectColor().darkGrey.withOpacity(0.3),
+            color: ProjectColor().darkGrey.withOpacity(0.65),
           ),
           Column(
             children: [
@@ -93,6 +93,7 @@ class LoginAndGuestScreen extends StatelessWidget {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setBool('seenOnboarding', true);
             Navigator.pushReplacement(
+              // ignore: use_build_context_synchronously
               context,
               MaterialPageRoute(
                 builder: (context) => const OnboardingScreen(),
