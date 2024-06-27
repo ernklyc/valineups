@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "460791088203",
+    "project_id": "valineups-2024",
+    "storage_bucket": "valineups-2024.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:460791088203:android:554efef6188e586332b9ce",
+        "android_client_info": {
+          "package_name": "com.example.myap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBV101K1bu6YNYp4Uz6J71jDlL00A75p_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

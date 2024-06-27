@@ -64,6 +64,10 @@ class LoginAndGuestScreen extends StatelessWidget {
                             buttonTxt: AuthPageText().google,
                           ),
                           CustomButton(
+                            image: AuthPageText().mailAuth,
+                            buttonTxt: AuthPageText().mail,
+                          ),
+                          CustomButton(
                             image: AuthPageText().anonimAuth,
                             buttonTxt: AuthPageText().anonim,
                           ),
