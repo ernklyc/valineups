@@ -7,6 +7,7 @@ class ProjectEdgeInsets {
   final EdgeInsets buttonVertical = const EdgeInsets.symmetric(vertical: 50.0);
 
   final EdgeInsets loginAndGuestPageButtonText = const EdgeInsets.all(8.0);
+  final EdgeInsets mapsItem = const EdgeInsets.all(8.0);
 
   final EdgeInsets onBoardingText = const EdgeInsets.only(left: 16, right: 16);
 

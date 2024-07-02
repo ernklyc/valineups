@@ -35,3 +35,33 @@ class OnBoardingScreen {
   final String discussionDesc =
       "Stratejilerini paylaş ve diğer oyuncularla sohbet et. Ortak sohbet alanımızda fikir alışverişi yap ve yeni arkadaşlar edin. Birlikte güçlüyüz!";
 }
+
+class MapList {
+  final List<String> entries = <String>[
+    'BIND',
+    'HAVEN',
+    'SPLIT',
+    'ASCENT',
+    'ICEBOX',
+    'BREEZE',
+    'FRACTURE',
+    'PEARL',
+    'LOTUS',
+    'SUNSET',
+    'ABYSS',
+  ];
+
+  final List<String> map = <String>[
+    'assets/images/maps/Bind.png',
+    'assets/images/maps/Haven.png',
+    'assets/images/maps/Split.png',
+    'assets/images/maps/Ascent.png',
+    'assets/images/maps/Icebox.png',
+    'assets/images/maps/Breeze.png',
+    'assets/images/maps/Fracture.png',
+    'assets/images/maps/Pearl.png',
+    'assets/images/maps/Lotus.png',
+    'assets/images/maps/Sunset.png',
+    'assets/images/maps/Abyss.png',
+  ];
+}

@@ -11,14 +11,16 @@ class _AgentsState extends State<Agents> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const <Widget>[
-          Text(
-            'AGENTS',
-            style: TextStyle(fontSize: 30),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const <Widget>[
+            Text(
+              'AGENTS',
+              style: TextStyle(fontSize: 30),
+            ),
+          ],
+        ),
       ),
     );
   }

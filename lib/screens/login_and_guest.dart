@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/bottom_nav_bar.dart';
+import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/utils/constants.dart';
 import 'onboarding_screen.dart';
 import 'package:valineups/components/custom_button.dart';
-import 'package:valineups/components/custom_text.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/styles/project_color.dart';
 
@@ -39,23 +39,7 @@ class LoginAndGuestScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CustomText(
-                            txt: AuthPageText().va,
-                            txtColor: ProjectColor().customWhite,
-                          ),
-                          CustomText(
-                            txt: AuthPageText().l,
-                            txtColor: ProjectColor().valoRed,
-                          ),
-                          CustomText(
-                            txt: AuthPageText().ineups,
-                            txtColor: ProjectColor().customWhite,
-                          ),
-                        ],
-                      ),
+                      const ValineupsText(),
                       SizedBox(height: mediaQueryWidth / 30),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
