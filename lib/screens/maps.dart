@@ -4,9 +4,14 @@ import 'package:valineups/localization/strings.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
 
-class Maps extends StatelessWidget {
+class Maps extends StatefulWidget {
   const Maps({super.key});
 
+  @override
+  State<Maps> createState() => _MapsState();
+}
+
+class _MapsState extends State<Maps> {
   @override
   Widget build(BuildContext context) {
     final double mediaQueryWidth = MediaQuery.of(context).size.width;

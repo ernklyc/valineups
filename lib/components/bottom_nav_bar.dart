@@ -6,7 +6,7 @@ import 'package:valineups/screens/profile.dart';
 import 'package:valineups/styles/project_color.dart';
 
 class PageControl extends StatefulWidget {
-  const PageControl({Key? key}) : super(key: key);
+  const PageControl({super.key});
 
   @override
   State<PageControl> createState() => _PageControlState();
@@ -26,7 +26,7 @@ class _PageControlState extends State<PageControl> {
             _currentIndex = newIndex;
           });
         },
-        children: [
+        children: const [
           Maps(),
           Agents(),
           Chat(),
@@ -39,9 +39,9 @@ class _PageControlState extends State<PageControl> {
         selectedItemColor: ProjectColor().white,
         unselectedItemColor: ProjectColor().hintGrey,
         unselectedLabelStyle:
-            TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+            const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
         selectedLabelStyle:
-            TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(
