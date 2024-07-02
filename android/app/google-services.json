@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:460791088203:android:554efef6188e586332b9ce",
+        "mobilesdk_app_id": "1:460791088203:android:7902fe52bb53613532b9ce",
         "android_client_info": {
-          "package_name": "com.example.myap"
+          "package_name": "com.example.valineups"
         }
       },
       "oauth_client": [],

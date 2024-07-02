@@ -11,7 +11,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
 
@@ -20,14 +20,12 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final bool seenOnboarding;
-
   // ignore: use_key_in_widget_constructors
   const MyApp({required this.seenOnboarding});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false, // Debug yazısını kaldırır
       home: seenOnboarding
           ? const LoginAndGuestScreen()
           : const OnboardingScreen(),

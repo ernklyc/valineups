@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:valineups/components/bottom_nav_bar.dart';
 import 'package:valineups/utils/constants.dart';
 import 'onboarding_screen.dart';
 import 'package:valineups/components/custom_button.dart';
@@ -15,7 +16,7 @@ class LoginAndGuestScreen extends StatelessWidget {
     final double mediaQueryWidth = MediaQuery.of(context).size.width;
     final double mediaQueryHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: ProjectColor().darkGrey,
+      backgroundColor: ProjectColor().dark,
       body: Stack(
         children: [
           Image(
@@ -28,7 +29,7 @@ class LoginAndGuestScreen extends StatelessWidget {
           Container(
             height: mediaQueryHeight,
             width: mediaQueryHeight,
-            color: ProjectColor().darkGrey.withOpacity(0.65),
+            color: ProjectColor().dark.withOpacity(0.65),
           ),
           Column(
             children: [
@@ -60,13 +61,21 @@ class LoginAndGuestScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CustomButton(
-                            image: AuthPageText().googleAuth,
-                            buttonTxt: AuthPageText().google,
-                          ),
-                          CustomButton(
-                            image: AuthPageText().mailAuth,
-                            buttonTxt: AuthPageText().mail,
-                          ),
+                              image: AuthPageText().googleAuth,
+                              buttonTxt: AuthPageText().google,
+                              onPressed: () async {
+                                Navigator.pushReplacement(
+                                  // ignore: use_build_context_synchronously
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const PageControl(),
+                                  ),
+                                );
+                              }),
+                          // CustomButton(
+                          //   image: AuthPageText().mailAuth,
+                          //   buttonTxt: AuthPageText().mail,
+                          // ),
                           CustomButton(
                             image: AuthPageText().anonimAuth,
                             buttonTxt: AuthPageText().anonim,
