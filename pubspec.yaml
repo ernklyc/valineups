@@ -13,6 +13,7 @@ dependencies:
   firebase_core: ^3.1.1
   flutter:
     sdk: flutter
+  flutter_native_splash: ^2.4.0
   lottie: ^3.1.2
   shared_preferences: ^2.2.3
 
@@ -20,12 +21,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-  flutter_native_splash: ^2.4.0
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/splash.png
     - assets/images/maps/Bind.png
     - assets/images/maps/Haven.png
     - assets/images/maps/Split.png
@@ -44,7 +45,8 @@ flutter:
         - asset: assets/fonts/valo-font.ttf
 
 flutter_native_splash:
-  color: "#1F1F1F"
-  image: assets/images/splash.png
   android: true
   ios: true
+  web: false
+  color: "#131313"
+  image: assets/splash.png
