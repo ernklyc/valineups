@@ -26,7 +26,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+
     - assets/splash.png
+
     - assets/images/maps/Bind.png
     - assets/images/maps/Haven.png
     - assets/images/maps/Split.png
@@ -38,6 +40,7 @@ flutter:
     - assets/images/maps/Lotus.png
     - assets/images/maps/Sunset.png
     - assets/images/maps/Abyss.png
+    
     - assets/images/agents/Brimstone.png
     - assets/images/agents/Viper.png
     - assets/images/agents/Omen.png

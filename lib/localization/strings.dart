@@ -5,14 +5,12 @@ class AuthPageText {
   final String ineups = "INEUPS";
 
   final String googleAuth = "assets/images/googleAuth.png";
-  final String mailAuth = "assets/images/mailAuth.png";
   final String anonimAuth = "assets/images/anonimAuth.png";
 
   final String loginGuestPageCover = "assets/images/valoAgent.gif";
   final String infoText = "Valorant Unofficial Fan App";
 
   final String google = "Google";
-  final String mail = "Mail  ";
   final String anonim = "Anonim";
 }
 
@@ -122,7 +120,8 @@ class AgentList {
     'assets/images/agents/Iso.png',
     'assets/images/agents/Clove.png',
   ];
-//----------------------------------------------------------------
+
+  //----------------------------------------------------------------
   final Map<String, List<Map<String, dynamic>>> agentMaps = {
     'BRIMSTONE': [
       {
@@ -145,40 +144,11 @@ class AgentList {
       },
       {
         'name': 'Split',
-        'side': 'C',
+        'side': 'A',
         'images': [
           'assets/images/maps/Split.png',
           'assets/images/maps/Split.png',
           'assets/images/maps/Split.png'
-        ]
-      },
-    ],
-    'VIPER': [
-      {
-        'name': 'Bind',
-        'side': 'A',
-        'images': [
-          'assets/images/maps/Bind.png',
-          'assets/images/maps/Bind.png',
-          'assets/images/maps/Bind.png'
-        ]
-      },
-      {
-        'name': 'Icebox',
-        'side': 'B',
-        'images': [
-          'assets/images/maps/Icebox.png',
-          'assets/images/maps/Icebox.png',
-          'assets/images/maps/Icebox.png'
-        ]
-      },
-      {
-        'name': 'Breeze',
-        'side': 'C',
-        'images': [
-          'assets/images/maps/Breeze.png',
-          'assets/images/maps/Breeze.png',
-          'assets/images/maps/Breeze.png'
         ]
       },
     ],
