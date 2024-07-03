@@ -129,6 +129,13 @@ class _AgentPageState extends State<AgentPage> {
     {'name': 'Abyss', 'image': 'assets/images/maps/Abyss.png'},
   ];
 
+  final List<Map<String, String>> sides = [
+    {'name': 'Side', 'image': ''},
+    {'name': 'A', 'image': 'assets/images/sides/A.png'},
+    {'name': 'B', 'image': 'assets/images/sides/B.png'},
+    {'name': 'C', 'image': 'assets/images/sides/C.png'},
+  ];
+
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredMaps = widget.maps.where((map) {
@@ -198,14 +205,13 @@ class _AgentPageState extends State<AgentPage> {
                                     child: Container(
                                       width: MediaQuery.of(context).size.width /
                                           1.1,
-                                      height:
-                                          MediaQuery.of(context).size.height,
+                                      height: 150,
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
                                           image: AssetImage(
                                             map['image']!,
                                           ),
-                                          fit: BoxFit.fitWidth,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),
@@ -214,7 +220,7 @@ class _AgentPageState extends State<AgentPage> {
                                 Container(
                                   width:
                                       MediaQuery.of(context).size.width / 1.1,
-                                  height: MediaQuery.of(context).size.height,
+                                  height: 150,
                                   color: ProjectColor().dark.withOpacity(0.5),
                                 ),
                                 Text(
@@ -245,8 +251,8 @@ class _AgentPageState extends State<AgentPage> {
                     height: 0,
                   ),
                   value: selectedSide,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   alignment: Alignment.center,
+                  elevation: 10,
                   icon: const Icon(Icons.arrow_drop_down_rounded),
                   dropdownColor: ProjectColor().dark,
                   onChanged: (String? newValue) {
@@ -254,16 +260,62 @@ class _AgentPageState extends State<AgentPage> {
                       selectedSide = newValue!;
                     });
                   },
-                  items: <String>['Side', 'A', 'B', 'C']
-                      .map<DropdownMenuItem<String>>((String value) {
+                  items: sides.map<DropdownMenuItem<String>>((side) {
                     return DropdownMenuItem<String>(
-                      value: value,
-                      child: Center(
-                        child: Text(
-                          value,
-                          style: TextStyle(color: ProjectColor().white),
-                        ),
-                      ),
+                      value: side['name']!,
+                      child: side['name'] == 'Side'
+                          ? Center(
+                              child: Text(
+                                side['name']!,
+                                style: TextStyle(color: ProjectColor().white),
+                              ),
+                            )
+                          : Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        ProjectBorderRadius().circular12,
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width /
+                                          1.1,
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                            side['image']!,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.1,
+                                  height: 150,
+                                  color: ProjectColor().dark.withOpacity(0.5),
+                                ),
+                                Text(
+                                  side['name']!,
+                                  style: TextStyle(
+                                    shadows: [
+                                      Shadow(
+                                        color: ProjectColor().white,
+                                        blurRadius: 50,
+                                      ),
+                                    ],
+                                    color: ProjectColor().white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
                     );
                   }).toList(),
                 ),
