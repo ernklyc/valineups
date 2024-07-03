@@ -142,7 +142,6 @@ class AgentList {
         ]
       },
     ],
-    // Diğer ajanlar için benzer şekilde ekleyebilirsiniz...
   };
 }
 //----------------------------------------------------------------
