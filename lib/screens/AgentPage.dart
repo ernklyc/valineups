@@ -31,7 +31,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: ProjectColor().dark,
       body: Stack(
         children: [
           PageView.builder(
@@ -51,7 +51,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                     return Center(
                       child: Text(
                         'Image not available',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: ProjectColor().white),
                       ),
                     );
                   },
@@ -63,7 +63,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
             top: 40,
             left: 20,
             child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
+              icon: Icon(Icons.arrow_back, color: ProjectColor().white),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -81,8 +81,10 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                   width: _currentPage == index ? 12 : 10,
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
-                    color: _currentPage == index ? Colors.white : Colors.grey,
-                    borderRadius: BorderRadius.circular(12),
+                    color: _currentPage == index
+                        ? ProjectColor().white
+                        : ProjectColor().hintGrey,
+                    borderRadius: ProjectBorderRadius().circular12,
                   ),
                 );
               }),
