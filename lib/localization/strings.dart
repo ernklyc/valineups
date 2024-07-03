@@ -1,3 +1,4 @@
+//----------------------------------------------------------------
 class AuthPageText {
   final String va = "VA";
   final String l = "L";
@@ -36,6 +37,7 @@ class OnBoardingScreen {
       "Stratejilerini paylaş ve diğer oyuncularla sohbet et. Ortak sohbet alanımızda fikir alışverişi yap ve yeni arkadaşlar edin. Birlikte güçlüyüz!";
 }
 
+//----------------------------------------------------------------
 class MapList {
   final List<String> entries = <String>[
     'BIND',
@@ -120,4 +122,67 @@ class AgentList {
     'assets/images/agents/Iso.png',
     'assets/images/agents/Clove.png',
   ];
+//----------------------------------------------------------------
+  final Map<String, List<Map<String, dynamic>>> agentMaps = {
+    'BRIMSTONE': [
+      {
+        'name': 'Bind',
+        'side': 'A',
+        'images': [
+          'assets/images/maps/Bind.png',
+          'assets/images/maps/Bind.png',
+          'assets/images/maps/Bind.png'
+        ]
+      },
+      {
+        'name': 'Haven',
+        'side': 'B',
+        'images': [
+          'assets/images/maps/Haven.png',
+          'assets/images/maps/Haven.png',
+          'assets/images/maps/Haven.png'
+        ]
+      },
+      {
+        'name': 'Split',
+        'side': 'C',
+        'images': [
+          'assets/images/maps/Split.png',
+          'assets/images/maps/Split.png',
+          'assets/images/maps/Split.png'
+        ]
+      },
+    ],
+    'VIPER': [
+      {
+        'name': 'Bind',
+        'side': 'A',
+        'images': [
+          'assets/images/maps/Bind.png',
+          'assets/images/maps/Bind.png',
+          'assets/images/maps/Bind.png'
+        ]
+      },
+      {
+        'name': 'Icebox',
+        'side': 'B',
+        'images': [
+          'assets/images/maps/Icebox.png',
+          'assets/images/maps/Icebox.png',
+          'assets/images/maps/Icebox.png'
+        ]
+      },
+      {
+        'name': 'Breeze',
+        'side': 'C',
+        'images': [
+          'assets/images/maps/Breeze.png',
+          'assets/images/maps/Breeze.png',
+          'assets/images/maps/Breeze.png'
+        ]
+      },
+    ],
+    // Diğer ajanlar için benzer şekilde ekleyebilirsiniz...
+  };
 }
+//----------------------------------------------------------------

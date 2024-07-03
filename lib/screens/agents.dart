@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/localization/strings.dart';
+import 'package:valineups/screens/AgentPage.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
 
@@ -45,48 +46,63 @@ class _AgentsState extends State<Agents> {
                 (BuildContext context, int index) {
                   return Padding(
                     padding: ProjectEdgeInsets().mapsItem,
-                    child: ClipRRect(
-                      borderRadius: ProjectBorderRadius().circular12,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: mediaQueryHeight / 2,
-                            height: mediaQueryHeight / 2,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(AgentList().agents[index]),
-                                fit: BoxFit.cover,
-                              ),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AgentPage(
+                              agentName: AgentList().entries[index],
+                              agentImage: AgentList().agents[index],
+                              maps: AgentList()
+                                  .agentMaps[AgentList().entries[index]]!,
                             ),
                           ),
-                          Container(
-                            width: mediaQueryHeight / 2,
-                            height: mediaQueryHeight / 2,
-                            color: ProjectColor().dark.withOpacity(0.3),
-                          ),
-                          Positioned(
-                            bottom: 10,
-                            left: 10,
-                            right: 10,
-                            child: Text(
-                              AgentList().entries[index],
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                shadows: [
-                                  Shadow(
-                                    color: ProjectColor().dark,
-                                    blurRadius: 50,
-                                  ),
-                                ],
-                                color: ProjectColor().white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 3,
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius: ProjectBorderRadius().circular12,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: mediaQueryHeight / 2,
+                              height: mediaQueryHeight / 2,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(AgentList().agents[index]),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                            Container(
+                              width: mediaQueryHeight / 2,
+                              height: mediaQueryHeight / 2,
+                              color: ProjectColor().dark.withOpacity(0.3),
+                            ),
+                            Positioned(
+                              bottom: 10,
+                              left: 10,
+                              right: 10,
+                              child: Text(
+                                AgentList().entries[index],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  shadows: [
+                                    Shadow(
+                                      color: ProjectColor().dark,
+                                      blurRadius: 50,
+                                    ),
+                                  ],
+                                  color: ProjectColor().white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 3,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
