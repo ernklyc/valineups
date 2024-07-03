@@ -27,7 +27,13 @@ flutter:
   assets:
     - assets/images/
 
-    - assets/splash.png
+    - assets/images/loginScreen/anonimAuth.png
+    - assets/images/loginScreen/googleAuth.png
+    - assets/images/loginScreen/valoAgent.gif
+
+    - assets/images/onBoardingScreen/ajan.png
+    - assets/images/onBoardingScreen/bomba.png
+    - assets/images/onBoardingScreen/discussions.png
 
     - assets/images/maps/Bind.png
     - assets/images/maps/Haven.png
@@ -40,7 +46,7 @@ flutter:
     - assets/images/maps/Lotus.png
     - assets/images/maps/Sunset.png
     - assets/images/maps/Abyss.png
-    
+
     - assets/images/agents/Brimstone.png
     - assets/images/agents/Viper.png
     - assets/images/agents/Omen.png
@@ -76,4 +82,4 @@ flutter_native_splash:
   ios: true
   web: false
   color: "#131313"
-  image: assets/splash.png
+  image: assets/splash/splash.png
