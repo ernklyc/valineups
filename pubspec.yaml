@@ -27,50 +27,73 @@ flutter:
   assets:
     - assets/images/
 
-    - assets/images/loginScreen/anonimAuth.png
-    - assets/images/loginScreen/googleAuth.png
-    - assets/images/loginScreen/valoAgent.gif
+    - assets/images/loginScreen/
 
-    - assets/images/onBoardingScreen/ajan.png
-    - assets/images/onBoardingScreen/bomba.png
-    - assets/images/onBoardingScreen/discussions.png
+    - assets/images/onBoardingScreen/
 
-    - assets/images/maps/Bind.png
-    - assets/images/maps/Haven.png
-    - assets/images/maps/Split.png
-    - assets/images/maps/Ascent.png
-    - assets/images/maps/Icebox.png
-    - assets/images/maps/Breeze.png
-    - assets/images/maps/Fracture.png
-    - assets/images/maps/Pearl.png
-    - assets/images/maps/Lotus.png
-    - assets/images/maps/Sunset.png
-    - assets/images/maps/Abyss.png
+    - assets/images/maps/
 
-    - assets/images/agents/Brimstone.png
-    - assets/images/agents/Viper.png
-    - assets/images/agents/Omen.png
-    - assets/images/agents/Killjoy.png
-    - assets/images/agents/Cypher.png
-    - assets/images/agents/Sova.png
-    - assets/images/agents/Sage.png
-    - assets/images/agents/Phoenix.png
-    - assets/images/agents/Jett.png
-    - assets/images/agents/Reyna.png
-    - assets/images/agents/Raze.png
-    - assets/images/agents/Breach.png
-    - assets/images/agents/Skye.png
-    - assets/images/agents/Yoru.png
-    - assets/images/agents/Astra.png
-    - assets/images/agents/KAYO.png
-    - assets/images/agents/Chamber.png
-    - assets/images/agents/Neon.png
-    - assets/images/agents/Fade.png
-    - assets/images/agents/Harbor.png
-    - assets/images/agents/Gekko.png
-    - assets/images/agents/Deadlock.png
-    - assets/images/agents/Iso.png
-    - assets/images/agents/Clove.png
+    - assets/images/agents/
+
+    # Lineups BRIMSTONE
+
+    # Lineups VIPER
+
+    # Lineups OMEN
+
+    # Lineups KILLJOY
+    - assets/images/lineups/KILLJOY/BIND/
+    - assets/images/lineups/KILLJOY/HAVEN/
+    - assets/images/lineups/KILLJOY/SPLIT/
+    - assets/images/lineups/KILLJOY/ASCENT/
+    - assets/images/lineups/KILLJOY/ICEBOX/
+    - assets/images/lineups/KILLJOY/BREEZE/
+    - assets/images/lineups/KILLJOY/FRACTURE/
+    - assets/images/lineups/KILLJOY/PEARL/
+    - assets/images/lineups/KILLJOY/LOTUS/
+    - assets/images/lineups/KILLJOY/SUNSET/
+    - assets/images/lineups/KILLJOY/ABYSS/
+
+    # Lineups CYPHER
+
+    # Lineups SOVA
+
+    # Lineups SAGE
+
+    # Lineups PHOENIX
+
+    # Lineups JETT
+
+    # Lineups REYNA
+
+    # Lineups RAZE
+
+    # Lineups BREACH
+
+    # Lineups SKYE
+
+    # Lineups YORU
+
+    # Lineups ASTRA
+
+    # Lineups KAY/O
+
+    # Lineups CHAMBER
+
+    # Lineups NEON
+
+    # Lineups FADE
+
+    # Lineups HARBOR
+
+    # Lineups GEKKO
+
+    # Lineups DEADLOCK
+
+    # Lineups ISO
+
+    # Lineups CLOVE
+
 
   fonts:
     - family: valo-font

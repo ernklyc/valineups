@@ -27,8 +27,8 @@ class _PageControlState extends State<PageControl> {
           });
         },
         children: const [
-          Maps(),
           Agents(),
+          Maps(),
           Chat(),
           Profile(),
         ],
@@ -45,12 +45,12 @@ class _PageControlState extends State<PageControl> {
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: "MAPS",
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.people),
             label: "AGENTS",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            label: "MAPS",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),

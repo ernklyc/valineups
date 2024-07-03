@@ -122,32 +122,14 @@ class AgentList {
 
   //----------------------------------------------------------------
   final Map<String, List<Map<String, dynamic>>> agentMaps = {
-    'BRIMSTONE': [
-      {
-        'name': 'Bind',
-        'side': 'A',
-        'images': [
-          'assets/images/maps/Bind.png',
-          'assets/images/maps/Bind.png',
-          'assets/images/maps/Bind.png'
-        ]
-      },
+    'KILLJOY': [
       {
         'name': 'Haven',
-        'side': 'B',
+        'side': 'C',
         'images': [
-          'assets/images/maps/Haven.png',
-          'assets/images/maps/Haven.png',
-          'assets/images/maps/Haven.png'
-        ]
-      },
-      {
-        'name': 'Split',
-        'side': 'A',
-        'images': [
-          'assets/images/maps/Split.png',
-          'assets/images/maps/Split.png',
-          'assets/images/maps/Split.png'
+          'assets/images/lineups/KILLJOY/HAVEN/1.png',
+          'assets/images/lineups/KILLJOY/HAVEN/2.png',
+          'assets/images/lineups/KILLJOY/HAVEN/3.png',
         ]
       },
     ],
