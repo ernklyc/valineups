@@ -186,7 +186,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       width: _currentPage == index ? 12 : 10,
       margin: ProjectEdgeInsets().horizontal4,
       decoration: BoxDecoration(
-        color: _currentPage == index ? Colors.blue : Colors.grey,
+        color: _currentPage == index ? Colors.white : Colors.grey,
         borderRadius: ProjectBorderRadius().circular12,
       ),
     );

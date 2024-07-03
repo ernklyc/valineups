@@ -124,7 +124,7 @@ class AgentList {
   final Map<String, List<Map<String, dynamic>>> agentMaps = {
     'KILLJOY': [
       {
-        'name': 'Haven',
+        'name': 'HAVEN',
         'side': 'C',
         'images': [
           'assets/images/lineups/KILLJOY/HAVEN/1.png',

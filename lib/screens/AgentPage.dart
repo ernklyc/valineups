@@ -1,11 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:valineups/styles/project_color.dart';
+import 'package:valineups/utils/constants.dart';
 
-class FullScreenImageViewer extends StatelessWidget {
+class FullScreenImageViewer extends StatefulWidget {
   final List<String> images;
 
   const FullScreenImageViewer({Key? key, required this.images})
       : super(key: key);
+
+  @override
+  _FullScreenImageViewerState createState() => _FullScreenImageViewerState();
+}
+
+class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
+  int _currentPage = 0;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +35,17 @@ class FullScreenImageViewer extends StatelessWidget {
       body: Stack(
         children: [
           PageView.builder(
-            itemCount: images.length,
+            controller: _pageController,
+            itemCount: widget.images.length,
+            onPageChanged: (int page) {
+              setState(() {
+                _currentPage = page;
+              });
+            },
             itemBuilder: (context, index) {
               return Center(
                 child: Image.asset(
-                  images[index],
+                  widget.images[index],
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Center(
@@ -43,13 +70,22 @@ class FullScreenImageViewer extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: 40,
-            right: 20,
-            child: IconButton(
-              icon: Icon(Icons.zoom_out_map, color: Colors.white),
-              onPressed: () {
-                // Zoom functionality or other actions can be implemented here
-              },
+            bottom: 20,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(widget.images.length, (index) {
+                return Container(
+                  height: 10,
+                  width: _currentPage == index ? 12 : 10,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: _currentPage == index ? Colors.white : Colors.grey,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                );
+              }),
             ),
           ),
         ],
@@ -75,16 +111,31 @@ class AgentPage extends StatefulWidget {
 }
 
 class _AgentPageState extends State<AgentPage> {
-  String selectedMap = 'All';
-  String selectedSide = 'All';
+  String selectedMap = 'Maps';
+  String selectedSide = 'Side';
+
+  final List<Map<String, String>> maps = [
+    {'name': 'Maps', 'image': ''},
+    {'name': 'BIND', 'image': 'assets/images/maps/Bind.png'},
+    {'name': 'HAVEN', 'image': 'assets/images/maps/Haven.png'},
+    {'name': 'SPLIT', 'image': 'assets/images/maps/Split.png'},
+    {'name': 'ASCENT', 'image': 'assets/images/maps/Ascent.png'},
+    {'name': 'ICEBOX', 'image': 'assets/images/maps/Icebox.png'},
+    {'name': 'BREEZE', 'image': 'assets/images/maps/Breeze.png'},
+    {'name': 'FRACTURE', 'image': 'assets/images/maps/Fracture.png'},
+    {'name': 'PEARL', 'image': 'assets/images/maps/Pearl.png'},
+    {'name': 'LOTUS', 'image': 'assets/images/maps/Lotus.png'},
+    {'name': 'SUNSET', 'image': 'assets/images/maps/Sunset.png'},
+    {'name': 'Abyss', 'image': 'assets/images/maps/Abyss.png'},
+  ];
 
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredMaps = widget.maps.where((map) {
-      if (selectedMap != 'All' && map['name'] != selectedMap) {
+      if (selectedMap != 'Maps' && map['name'] != selectedMap) {
         return false;
       }
-      if (selectedSide != 'All' && map['side'] != selectedSide) {
+      if (selectedSide != 'Side' && map['side'] != selectedSide) {
         return false;
       }
       return true;
@@ -108,43 +159,114 @@ class _AgentPageState extends State<AgentPage> {
       backgroundColor: ProjectColor().dark,
       body: Column(
         children: [
-          Row(
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              DropdownButton<String>(
-                value: selectedMap,
-                dropdownColor: ProjectColor().dark,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedMap = newValue!;
-                  });
-                },
-                items: <String>['All', 'Bind', 'Haven', 'Split', 'Icebox']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value,
-                        style: TextStyle(color: ProjectColor().white)),
-                  );
-                }).toList(),
+              Center(
+                child: DropdownButton<String>(
+                  underline: Container(
+                    height: 0,
+                  ),
+                  value: selectedMap,
+                  alignment: Alignment.center,
+                  elevation: 10,
+                  icon: const Icon(Icons.arrow_drop_down_rounded),
+                  dropdownColor: ProjectColor().dark,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedMap = newValue!;
+                    });
+                  },
+                  items: maps.map<DropdownMenuItem<String>>((map) {
+                    return DropdownMenuItem<String>(
+                      value: map['name']!,
+                      child: map['name'] == 'Maps'
+                          ? Center(
+                              child: Text(
+                                map['name']!,
+                                style: TextStyle(color: ProjectColor().white),
+                              ),
+                            )
+                          : Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        ProjectBorderRadius().circular12,
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width /
+                                          1.1,
+                                      height:
+                                          MediaQuery.of(context).size.height,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                            map['image']!,
+                                          ),
+                                          fit: BoxFit.fitWidth,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.1,
+                                  height: MediaQuery.of(context).size.height,
+                                  color: ProjectColor().dark.withOpacity(0.5),
+                                ),
+                                Text(
+                                  map['name']!,
+                                  style: TextStyle(
+                                    shadows: [
+                                      Shadow(
+                                        color: ProjectColor().white,
+                                        blurRadius: 50,
+                                      ),
+                                    ],
+                                    color: ProjectColor().white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    );
+                  }).toList(),
+                ),
               ),
-              SizedBox(width: 20),
-              DropdownButton<String>(
-                value: selectedSide,
-                dropdownColor: ProjectColor().dark,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSide = newValue!;
-                  });
-                },
-                items: <String>['All', 'A', 'B', 'C']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value,
-                        style: TextStyle(color: ProjectColor().white)),
-                  );
-                }).toList(),
+              const SizedBox(width: 10),
+              Center(
+                child: DropdownButton<String>(
+                  underline: Container(
+                    height: 0,
+                  ),
+                  value: selectedSide,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  alignment: Alignment.center,
+                  icon: const Icon(Icons.arrow_drop_down_rounded),
+                  dropdownColor: ProjectColor().dark,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedSide = newValue!;
+                    });
+                  },
+                  items: <String>['Side', 'A', 'B', 'C']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Center(
+                        child: Text(
+                          value,
+                          style: TextStyle(color: ProjectColor().white),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
             ],
           ),
