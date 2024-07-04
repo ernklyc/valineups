@@ -55,7 +55,6 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    // Örneğin, 8 haneli bir kullanıcı adı oluşturmak için:
     String guestUserName = generateGuestUserName(6);
 
     return MaterialApp(
@@ -76,7 +75,6 @@ class _ProfileState extends State<Profile> {
                   IconButton(
                     onPressed: () {},
                     icon: FaIcon(
-                      // ignore: deprecated_member_use
                       FontAwesomeIcons.earth,
                       color: ProjectColor().white,
                       size: 20,
@@ -93,7 +91,6 @@ class _ProfileState extends State<Profile> {
                       );
                     },
                     icon: FaIcon(
-                      // ignore: deprecated_member_use
                       FontAwesomeIcons.signOutAlt,
                       color: ProjectColor().white,
                       size: 20,
@@ -113,14 +110,15 @@ class _ProfileState extends State<Profile> {
                       width: 70,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     guestUserName,
                     style: TextStyle(
-                        color: ProjectColor().white,
-                        fontSize: 16,
-                        letterSpacing: 2,
-                        fontWeight: FontWeight.bold),
+                      color: ProjectColor().white,
+                      fontSize: 16,
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Divider(
@@ -157,7 +155,7 @@ class _ProfileState extends State<Profile> {
                       );
                     },
                     child: Card(
-                      margin: EdgeInsets.all(8.0),
+                      margin: const EdgeInsets.all(8.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -166,7 +164,7 @@ class _ProfileState extends State<Profile> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ClipRRect(
-                            borderRadius: BorderRadius.vertical(
+                            borderRadius: const BorderRadius.vertical(
                                 top: Radius.circular(12.0)),
                             child: Image.asset(
                               map['images'][0],
@@ -203,7 +201,7 @@ class _ProfileState extends State<Profile> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Text(
                                   "Side: ${map['side']}",
                                   style: TextStyle(
