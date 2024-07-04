@@ -79,14 +79,10 @@ class _ProfileState extends State<Profile> {
                       // ignore: deprecated_member_use
                       FontAwesomeIcons.earth,
                       color: ProjectColor().white,
-                      size: 22,
+                      size: 20,
                     ),
                   ),
-                  const Expanded(
-                    child: Center(
-                      child: ValineupsText(),
-                    ),
-                  ),
+                  const ValineupsText(),
                   IconButton(
                     onPressed: () {
                       Navigator.push(
@@ -100,25 +96,21 @@ class _ProfileState extends State<Profile> {
                       // ignore: deprecated_member_use
                       FontAwesomeIcons.signOutAlt,
                       color: ProjectColor().white,
-                      size: 22,
+                      size: 20,
                     ),
                   ),
                 ],
               ),
             ),
             SliverToBoxAdapter(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.width / 20,
-              ),
-            ),
-            SliverToBoxAdapter(
               child: Column(
                 children: [
+                  const SizedBox(height: 20),
                   ClipOval(
                     child: RandomAvatar(
                       DateTime.now().toIso8601String(),
-                      height: 100,
-                      width: 100,
+                      height: 70,
+                      width: 70,
                     ),
                   ),
                   SizedBox(height: 10),
@@ -126,19 +118,16 @@ class _ProfileState extends State<Profile> {
                     guestUserName,
                     style: TextStyle(
                         color: ProjectColor().white,
-                        fontSize: 20,
+                        fontSize: 16,
                         letterSpacing: 2,
                         fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   Divider(
-                    color:
-                        ProjectColor().white.withOpacity(0.5), // Çizginin rengi
-                    thickness: 2, // Çizginin kalınlığı
-                    indent: 20.0, // Çizginin sol boşluğu
-                    endIndent: 20.0, // Çizginin sağ boşluğu
+                    color: ProjectColor().white.withOpacity(0.2),
+                    thickness: 2,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   Text(
                     "SAVED LINEUPS",
                     style: TextStyle(
@@ -148,7 +137,7 @@ class _ProfileState extends State<Profile> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

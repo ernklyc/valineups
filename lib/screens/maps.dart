@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/styles/project_color.dart';
@@ -48,8 +49,9 @@ class _MapsState extends State<Maps> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Icon(
-                        Icons.arrow_back,
+                      child: FaIcon(
+                        // ignore: deprecated_member_use
+                        FontAwesomeIcons.times,
                         color: ProjectColor().white,
                       ),
                     ),
