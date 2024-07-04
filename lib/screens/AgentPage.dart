@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
 import 'package:valineups/components/lineups_maps.dart';
 import 'package:valineups/components/sides.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
+import 'dart:convert';
 
 class AgentPage extends StatefulWidget {
   final String agentName;
@@ -24,6 +26,44 @@ class AgentPage extends StatefulWidget {
 class _AgentPageState extends State<AgentPage> {
   String selectedMap = 'Maps';
   String selectedSide = 'Side';
+  List<Map<String, dynamic>> savedMaps = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedMaps();
+  }
+
+  Future<void> _loadSavedMaps() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedMapsString = prefs.getString('savedMaps');
+    if (savedMapsString != null) {
+      setState(() {
+        savedMaps =
+            List<Map<String, dynamic>>.from(json.decode(savedMapsString));
+      });
+    }
+  }
+
+  Future<void> _saveMap(Map<String, dynamic> map) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      savedMaps.add(map);
+    });
+    await prefs.setString('savedMaps', json.encode(savedMaps));
+  }
+
+  Future<void> _removeMap(Map<String, dynamic> map) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      savedMaps.removeWhere((savedMap) => savedMap['name'] == map['name']);
+    });
+    await prefs.setString('savedMaps', json.encode(savedMaps));
+  }
+
+  bool _isSaved(Map<String, dynamic> map) {
+    return savedMaps.any((savedMap) => savedMap['name'] == map['name']);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -251,13 +291,34 @@ class _AgentPageState extends State<AgentPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                map['name'],
-                                style: TextStyle(
-                                  color: ProjectColor().white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    map['name'],
+                                    style: TextStyle(
+                                      color: ProjectColor().white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      _isSaved(map)
+                                          ? Icons.bookmark
+                                          : Icons.bookmark_border,
+                                      color: ProjectColor().white,
+                                    ),
+                                    onPressed: () {
+                                      if (_isSaved(map)) {
+                                        _removeMap(map);
+                                      } else {
+                                        _saveMap(map);
+                                      }
+                                    },
+                                  ),
+                                ],
                               ),
                               SizedBox(height: 4),
                               Text(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/bottom_nav_bar.dart';
 import 'package:valineups/components/valineups_text.dart';
+import 'package:valineups/screens/agents.dart';
 import 'package:valineups/utils/constants.dart';
 import 'onboarding_screen.dart';
 import 'package:valineups/components/custom_button.dart';
@@ -61,9 +62,17 @@ class LoginAndGuestScreen extends StatelessWidget {
                           //   buttonTxt: AuthPageText().mail,
                           // ),
                           CustomButton(
-                            image: AuthPageText().anonimAuth,
-                            buttonTxt: AuthPageText().anonim,
-                          ),
+                              image: AuthPageText().anonimAuth,
+                              buttonTxt: AuthPageText().anonim,
+                              onPressed: () async {
+                                Navigator.pushReplacement(
+                                  // ignore: use_build_context_synchronously
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const PageControl(),
+                                  ),
+                                );
+                              }),
                         ],
                       ),
                       SizedBox(height: mediaQueryWidth / 30),

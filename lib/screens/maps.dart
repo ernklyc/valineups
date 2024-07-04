@@ -39,7 +39,7 @@ class _MapsState extends State<Maps> {
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: ProjectColor().white,
+                  color: ProjectColor().valoRed,
                   borderRadius: ProjectBorderRadius().circular12,
                 ),
                 child: Column(
@@ -49,8 +49,8 @@ class _MapsState extends State<Maps> {
                         Navigator.of(context).pop();
                       },
                       child: Icon(
-                        Icons.close,
-                        color: ProjectColor().dark,
+                        Icons.arrow_back,
+                        color: ProjectColor().white,
                       ),
                     ),
                   ],
