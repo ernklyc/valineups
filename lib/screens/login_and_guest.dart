@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/bottom_nav_bar.dart';
 import 'package:valineups/components/valineups_text.dart';
-import 'package:valineups/screens/agents.dart';
 import 'package:valineups/utils/constants.dart';
 import 'onboarding_screen.dart';
 import 'package:valineups/components/custom_button.dart';
@@ -57,13 +56,14 @@ class LoginAndGuestScreen extends StatelessWidget {
                                   ),
                                 );
                               }),
+                          // CustomButton(
+                          //   image: AuthPageText().mailAuth,
+                          //   buttonTxt: AuthPageText().mail,
+                          // ),
                           CustomButton(
                               image: AuthPageText().anonimAuth,
                               buttonTxt: AuthPageText().anonim,
                               onPressed: () async {
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-                                await prefs.setBool('isAnonymous', true);
                                 Navigator.pushReplacement(
                                   // ignore: use_build_context_synchronously
                                   context,
