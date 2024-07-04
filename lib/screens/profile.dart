@@ -132,8 +132,9 @@ class _ProfileState extends State<Profile> {
                   ),
                   const SizedBox(height: 10),
                   Divider(
-                    color: ProjectColor().white, // Çizginin rengi
-                    thickness: 3, // Çizginin kalınlığı
+                    color:
+                        ProjectColor().white.withOpacity(0.5), // Çizginin rengi
+                    thickness: 2, // Çizginin kalınlığı
                     indent: 20.0, // Çizginin sol boşluğu
                     endIndent: 20.0, // Çizginin sağ boşluğu
                   ),
