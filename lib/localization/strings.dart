@@ -63,6 +63,20 @@ class MapList {
     'assets/images/maps/Sunset.png',
     'assets/images/maps/Abyss.png',
   ];
+
+  final List<String> mapsWiki = <String>[
+    'assets/images/mapsWiki/BIND.png',
+    'assets/images/mapsWiki/HAVEN.png',
+    'assets/images/mapsWiki/SPLIT.png',
+    'assets/images/mapsWiki/ASCENT.png',
+    'assets/images/mapsWiki/ICEBOX.png',
+    'assets/images/mapsWiki/BREEZE.png',
+    'assets/images/mapsWiki/FRACTURE.png',
+    'assets/images/mapsWiki/PEARL.png',
+    'assets/images/mapsWiki/LOTUS.png',
+    'assets/images/mapsWiki/SUNSET.png',
+    'assets/images/mapsWiki/ABYSS.png',
+  ];
 }
 
 class AgentList {
@@ -119,6 +133,8 @@ class AgentList {
     'assets/images/agents/Iso.png',
     'assets/images/agents/Clove.png',
   ];
+
+  //----------------------------------------------------------------
 
   //----------------------------------------------------------------
   final List<Map<String, String>> sides = [
