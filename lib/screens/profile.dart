@@ -133,9 +133,19 @@ class _ProfileState extends State<Profile> {
                   const SizedBox(height: 10),
                   Divider(
                     color: ProjectColor().white, // Çizginin rengi
-                    thickness: 1.0, // Çizginin kalınlığı
+                    thickness: 3, // Çizginin kalınlığı
                     indent: 20.0, // Çizginin sol boşluğu
                     endIndent: 20.0, // Çizginin sağ boşluğu
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "SAVED LINEUPS",
+                    style: TextStyle(
+                      color: ProjectColor().white,
+                      fontSize: 20,
+                      letterSpacing: 5,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 10),
                 ],

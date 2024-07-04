@@ -57,14 +57,13 @@ class LoginAndGuestScreen extends StatelessWidget {
                                   ),
                                 );
                               }),
-                          // CustomButton(
-                          //   image: AuthPageText().mailAuth,
-                          //   buttonTxt: AuthPageText().mail,
-                          // ),
                           CustomButton(
                               image: AuthPageText().anonimAuth,
                               buttonTxt: AuthPageText().anonim,
                               onPressed: () async {
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setBool('isAnonymous', true);
                                 Navigator.pushReplacement(
                                   // ignore: use_build_context_synchronously
                                   context,

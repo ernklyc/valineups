@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/screens/agents.dart';
 import 'package:valineups/screens/chat.dart';
 import 'package:valineups/screens/maps.dart';
@@ -13,64 +14,73 @@ class PageControl extends StatefulWidget {
 }
 
 class _PageControlState extends State<PageControl> {
-  int _currentIndex = 0;
-  final PageController _pageController = PageController(initialPage: 0);
+  int _selectedIndex = 0;
+  bool isAnonymous = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAnonymousStatus();
+  }
+
+  Future<void> _checkAnonymousStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isAnonymous = prefs.getBool('isAnonymous') ?? false;
+    });
+  }
+
+  void _onItemTapped(int index) {
+    if (isAnonymous && index == 1) {
+      // Anonim kullanıcı chat sayfasına erişemez
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Anonim kullanıcılar chat sayfasını kullanamaz.')),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
+
+  static const List<Widget> _widgetOptions = <Widget>[
+    Agents(),
+    Maps(),
+    Chat(),
+    Profile(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (newIndex) {
-          setState(() {
-            _currentIndex = newIndex;
-          });
-        },
-        children: const [
-          Agents(),
-          Maps(),
-          Chat(),
-          Profile(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
+      appBar: AppBar(
+        title: const Text('Page Control'),
         backgroundColor: ProjectColor().dark,
-        selectedItemColor: ProjectColor().white,
-        unselectedItemColor: ProjectColor().hintGrey,
-        unselectedLabelStyle:
-            const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-        selectedLabelStyle:
-            const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        currentIndex: _currentIndex,
-        items: const [
+      ),
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
-            label: "AGENTS",
+            label: 'Agents',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: "MAPS",
+            icon: Icon(Icons.people),
+            label: 'Maps',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),
-            label: "CHAT",
+            label: 'Chat',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: "PROFILE",
+            label: 'Profile',
           ),
         ],
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-            _pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.ease,
-            );
-          });
-        },
+        currentIndex: _selectedIndex,
+        selectedItemColor: ProjectColor().valoRed,
+        onTap: _onItemTapped,
       ),
     );
   }
