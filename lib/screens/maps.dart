@@ -77,16 +77,6 @@ class _MapsState extends State<Maps> {
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            SliverAppBar(
-              backgroundColor: ProjectColor().dark,
-              floating: true,
-              snap: true,
-              pinned: false,
-              flexibleSpace: const FlexibleSpaceBar(
-                centerTitle: true,
-                title: ValineupsText(),
-              ),
-            ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {

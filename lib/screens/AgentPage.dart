@@ -13,11 +13,11 @@ class AgentPage extends StatefulWidget {
   final List<Map<String, dynamic>> maps;
 
   const AgentPage({
-    Key? key,
+    super.key,
     required this.agentName,
     required this.agentImage,
     required this.maps,
-  }) : super(key: key);
+  });
 
   @override
   _AgentPageState createState() => _AgentPageState();
@@ -268,7 +268,7 @@ class _AgentPageState extends State<AgentPage> {
                     );
                   },
                   child: Card(
-                    margin: EdgeInsets.all(8.0),
+                    margin: const EdgeInsets.all(8.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
                     ),
@@ -278,7 +278,7 @@ class _AgentPageState extends State<AgentPage> {
                       children: [
                         ClipRRect(
                           borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(12.0)),
+                              const BorderRadius.vertical(top: Radius.circular(12.0)),
                           child: Image.asset(
                             map['images'][0],
                             fit: BoxFit.cover,
@@ -320,7 +320,7 @@ class _AgentPageState extends State<AgentPage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
                                 "Side: ${map['side']}",
                                 style: TextStyle(

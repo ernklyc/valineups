@@ -4,8 +4,7 @@ import 'package:valineups/styles/project_color.dart';
 class FullScreenImageViewer extends StatefulWidget {
   final List<String> images;
 
-  const FullScreenImageViewer({Key? key, required this.images})
-      : super(key: key);
+  const FullScreenImageViewer({super.key, required this.images});
 
   @override
   _FullScreenImageViewerState createState() => _FullScreenImageViewerState();

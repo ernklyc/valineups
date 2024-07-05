@@ -25,16 +25,6 @@ class _AgentsState extends State<Agents> {
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            SliverAppBar(
-              backgroundColor: ProjectColor().dark,
-              floating: true,
-              snap: true,
-              pinned: false,
-              flexibleSpace: const FlexibleSpaceBar(
-                centerTitle: true,
-                title: ValineupsText(),
-              ),
-            ),
             SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: mediaQueryWidth > 600 ? 3 : 2,

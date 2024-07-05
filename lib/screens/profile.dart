@@ -5,7 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
-import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/screens/login_and_guest.dart';
 import 'package:valineups/styles/project_color.dart';
 
@@ -46,17 +45,8 @@ class _ProfileState extends State<Profile> {
     await prefs.setString('savedMaps', json.encode(savedMaps));
   }
 
-  String generateGuestUserName(int length) {
-    final random = Random();
-    final int maxRandomValue = pow(10, length).toInt() - 1;
-    final int randomNumber = random.nextInt(maxRandomValue);
-    return 'guest${randomNumber.toString().padLeft(length, '0')}';
-  }
-
   @override
   Widget build(BuildContext context) {
-    String guestUserName = generateGuestUserName(6);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -64,78 +54,24 @@ class _ProfileState extends State<Profile> {
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            SliverAppBar(
-              backgroundColor: ProjectColor().dark,
-              floating: true,
-              snap: true,
-              pinned: false,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: FaIcon(
-                      FontAwesomeIcons.earth,
-                      color: ProjectColor().white,
-                      size: 20,
-                    ),
-                  ),
-                  const ValineupsText(),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginAndGuestScreen(),
-                        ),
-                      );
-                    },
-                    icon: FaIcon(
-                      FontAwesomeIcons.signOutAlt,
-                      color: ProjectColor().white,
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-            ),
             SliverToBoxAdapter(
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
-                  ClipOval(
-                    child: RandomAvatar(
-                      DateTime.now().toIso8601String(),
-                      height: 70,
-                      width: 70,
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 32.0,
+                      bottom: 16.0,
+                    ),
+                    child: Text(
+                      "SAVED LINEUPS",
+                      style: TextStyle(
+                        color: ProjectColor().white,
+                        fontSize: 20,
+                        letterSpacing: 5,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    guestUserName,
-                    style: TextStyle(
-                      color: ProjectColor().white,
-                      fontSize: 16,
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Divider(
-                    color: ProjectColor().white.withOpacity(0.2),
-                    thickness: 2,
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "SAVED LINEUPS",
-                    style: TextStyle(
-                      color: ProjectColor().white,
-                      fontSize: 20,
-                      letterSpacing: 5,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
                 ],
               ),
             ),
