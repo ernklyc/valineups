@@ -1,13 +1,20 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/screens/agents.dart';
+import 'package:valineups/screens/agent_info.dart';
 import 'package:valineups/screens/chat.dart';
+import 'package:valineups/screens/level_border.dart';
 import 'package:valineups/screens/login_and_guest.dart';
 import 'package:valineups/screens/maps.dart';
+import 'package:valineups/screens/player_card.dart';
 import 'package:valineups/screens/profile.dart';
+import 'package:valineups/screens/rank.dart';
+import 'package:valineups/screens/sprey.dart';
+import 'package:valineups/screens/wapon.dart';
 import 'package:valineups/styles/project_color.dart';
 
 class ControlPage extends StatefulWidget {
@@ -22,12 +29,6 @@ class _ControlPageState extends State<ControlPage> {
   int _selectedIndex = 0;
 
   final PageController _pageController = PageController(initialPage: 0);
-
-  static const List<Widget> _pages = <Widget>[
-    Center(child: Text('Ana Sayfa')),
-    Center(child: Text('Profil')),
-    Center(child: Text('Ayarlar')),
-  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -101,6 +102,106 @@ class _ControlPageState extends State<ControlPage> {
               ),
             ),
             ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.userAlt,
+                color: ProjectColor().white,
+              ),
+              title: Text(
+                'Agents Info',
+                style: TextStyle(
+                  color: ProjectColor().white,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AgentsList()));
+              },
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.rankingStar,
+                color: ProjectColor().white,
+              ),
+              title: Text(
+                'Rank Tiers',
+                style: TextStyle(
+                  color: ProjectColor().white,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CompetitiveTiersScreen()));
+              },
+            ),
+            ListTile(
+              leading: FaIcon(FontAwesomeIcons.borderStyle,
+                  color: ProjectColor().white),
+              title: Text(
+                'Level Boders',
+                style: TextStyle(
+                  color: ProjectColor().white,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LevelBorderListScreen()));
+              },
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.idCard,
+                color: ProjectColor().white,
+              ),
+              title: Text(
+                'Player Cards',
+                style: TextStyle(
+                  color: ProjectColor().white,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PlayerCardsScreen()));
+              },
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.sprayCan,
+                color: ProjectColor().white,
+              ),
+              title: Text(
+                'Sprays',
+                style: TextStyle(
+                  color: ProjectColor().white,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SprayListScreen()));
+              },
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.gun,
+                color: ProjectColor().white,
+              ),
+              title: Text(
+                'Wapon',
+                style: TextStyle(
+                  color: ProjectColor().white,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => WeaponsPage()));
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.logout, color: ProjectColor().white),
               title: Text(
                 'logout',
@@ -156,8 +257,8 @@ class _ControlPageState extends State<ControlPage> {
             label: "CHAT",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "PROFILE",
+            icon: Icon(Icons.bookmark),
+            label: "SAVED",
           ),
         ],
         onTap: (index) {
