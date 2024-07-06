@@ -5,6 +5,8 @@ import 'package:shimmer/shimmer.dart';
 import 'package:valineups/styles/project_color.dart';
 
 class AgentsList extends StatefulWidget {
+  const AgentsList({super.key});
+
   @override
   _AgentsListState createState() => _AgentsListState();
 }
@@ -153,7 +155,7 @@ class _AgentsListState extends State<AgentsList> {
 class AgentDetail extends StatefulWidget {
   final dynamic agent;
 
-  AgentDetail({required this.agent});
+  const AgentDetail({super.key, required this.agent});
 
   @override
   _AgentDetailState createState() => _AgentDetailState();
@@ -169,7 +171,7 @@ class _AgentDetailState extends State<AgentDetail> {
   }
 
   Future<void> _loadAgentDetails() async {
-    await Future.delayed(Duration(seconds: 2)); // Simulate network delay
+    await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
     setState(() {
       _loading = false;
     });
@@ -212,25 +214,25 @@ class _AgentDetailState extends State<AgentDetail> {
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     Container(
                       width: 200,
                       height: 24.0,
                       color: Colors.white,
                     ),
-                    SizedBox(height: 8.0),
+                    const SizedBox(height: 8.0),
                     Container(
                       width: double.infinity,
                       height: 16.0,
                       color: Colors.white,
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     Container(
                       width: 100,
                       height: 20.0,
                       color: Colors.white,
                     ),
-                    SizedBox(height: 8.0),
+                    const SizedBox(height: 8.0),
                     Expanded(
                       child: ListView.builder(
                         itemCount: 4,
@@ -292,7 +294,7 @@ class _AgentDetailState extends State<AgentDetail> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(child: Image.network(widget.agent['fullPortrait'])),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Text(
                     widget.agent['displayName'],
                     style: TextStyle(
@@ -301,7 +303,7 @@ class _AgentDetailState extends State<AgentDetail> {
                       color: ProjectColor().white,
                     ),
                   ),
-                  SizedBox(height: 8.0),
+                  const SizedBox(height: 8.0),
                   Text(
                     widget.agent['description'],
                     style: TextStyle(
@@ -309,7 +311,7 @@ class _AgentDetailState extends State<AgentDetail> {
                       color: ProjectColor().white.withOpacity(0.7),
                     ),
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Text(
                     'Yetenekler:',
                     style: TextStyle(

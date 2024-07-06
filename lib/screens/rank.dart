@@ -3,10 +3,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,12 +16,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: CompetitiveTiersScreen(),
+      home: const CompetitiveTiersScreen(),
     );
   }
 }
 
 class CompetitiveTiersScreen extends StatefulWidget {
+  const CompetitiveTiersScreen({super.key});
+
   @override
   _CompetitiveTiersScreenState createState() => _CompetitiveTiersScreenState();
 }
@@ -30,18 +34,23 @@ class _CompetitiveTiersScreenState extends State<CompetitiveTiersScreen> {
   @override
   void initState() {
     super.initState();
-    _futureTiers = fetchTiers();
+    // UUID'yi burada belirtiyoruz
+    _futureTiers = fetchTiers('03621f52-342b-cf4e-4f86-9350a49c6d04');
   }
 
-  Future<List<Tier>> fetchTiers() async {
+  Future<List<Tier>> fetchTiers(String uuid) async {
     final response = await http
         .get(Uri.parse('https://valorant-api.com/v1/competitivetiers'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<Tier> tiers = [];
-      for (var tier in data['data'][0]['tiers']) {
-        tiers.add(Tier.fromJson(tier));
+      for (var tier in data['data']) {
+        if (tier['uuid'] == uuid) {
+          for (var t in tier['tiers']) {
+            tiers.add(Tier.fromJson(t));
+          }
+        }
       }
       return tiers;
     } else {
@@ -53,22 +62,22 @@ class _CompetitiveTiersScreenState extends State<CompetitiveTiersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Valorant Competitive Tiers'),
+        title: const Text('Valorant Competitive Tiers'),
       ),
       body: FutureBuilder<List<Tier>>(
         future: _futureTiers,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No data available'));
+            return const Center(child: Text('No data available'));
           }
 
           final tiers = snapshot.data!;
           return GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               crossAxisSpacing: 8.0,
               mainAxisSpacing: 8.0,
@@ -78,7 +87,7 @@ class _CompetitiveTiersScreenState extends State<CompetitiveTiersScreen> {
             itemBuilder: (context, index) {
               final tier = tiers[index];
               return Card(
-                margin: EdgeInsets.all(8.0),
+                margin: const EdgeInsets.all(8.0),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -86,12 +95,12 @@ class _CompetitiveTiersScreenState extends State<CompetitiveTiersScreen> {
                       Expanded(
                         child: tier.largeIcon != null
                             ? Image.network(tier.largeIcon!)
-                            : SizedBox.shrink(),
+                            : const SizedBox.shrink(),
                       ),
-                      SizedBox(height: 8.0),
+                      const SizedBox(height: 8.0),
                       Text(
                         tier.tierName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                         ),

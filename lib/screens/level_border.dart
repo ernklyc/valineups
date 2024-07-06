@@ -46,6 +46,8 @@ Future<List<LevelBorder>> fetchLevelBorders() async {
 }
 
 class LevelBorderListScreen extends StatefulWidget {
+  const LevelBorderListScreen({super.key});
+
   @override
   _LevelBorderListScreenState createState() => _LevelBorderListScreenState();
 }
@@ -63,7 +65,7 @@ class _LevelBorderListScreenState extends State<LevelBorderListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Level Borders'),
+        title: const Text('Level Borders'),
       ),
       body: Center(
         child: FutureBuilder<List<LevelBorder>>(
@@ -76,7 +78,7 @@ class _LevelBorderListScreenState extends State<LevelBorderListScreen> {
                 itemBuilder: (context, index) {
                   final levelBorder = data[index];
                   return Card(
-                    margin: EdgeInsets.all(8.0),
+                    margin: const EdgeInsets.all(8.0),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
@@ -88,15 +90,15 @@ class _LevelBorderListScreenState extends State<LevelBorderListScreen> {
                             width: double.infinity,
                             fit: BoxFit.contain,
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
                             levelBorder.displayName,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text('Starting Level: ${levelBorder.startingLevel}'),
                         ],
                       ),
@@ -108,7 +110,7 @@ class _LevelBorderListScreenState extends State<LevelBorderListScreen> {
               return Text("${snapshot.error}");
             }
 
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           },
         ),
       ),
@@ -117,10 +119,12 @@ class _LevelBorderListScreenState extends State<LevelBorderListScreen> {
 }
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -128,7 +132,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LevelBorderListScreen(),
+      home: const LevelBorderListScreen(),
     );
   }
 }

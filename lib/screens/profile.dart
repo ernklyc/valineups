@@ -1,11 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
-import 'package:valineups/screens/login_and_guest.dart';
 import 'package:valineups/styles/project_color.dart';
 
 class Profile extends StatefulWidget {

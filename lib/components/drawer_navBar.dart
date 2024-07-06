@@ -15,6 +15,7 @@ import 'package:valineups/screens/profile.dart';
 import 'package:valineups/screens/rank.dart';
 import 'package:valineups/screens/sprey.dart';
 import 'package:valineups/screens/wapon.dart';
+import 'package:valineups/screens/wapon_skins.dart';
 import 'package:valineups/styles/project_color.dart';
 
 class ControlPage extends StatefulWidget {
@@ -113,8 +114,10 @@ class _ControlPageState extends State<ControlPage> {
                 ),
               ),
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AgentsList()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AgentsList()));
               },
             ),
             ListTile(
@@ -132,7 +135,7 @@ class _ControlPageState extends State<ControlPage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => CompetitiveTiersScreen()));
+                        builder: (context) => const CompetitiveTiersScreen()));
               },
             ),
             ListTile(
@@ -148,7 +151,7 @@ class _ControlPageState extends State<ControlPage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => LevelBorderListScreen()));
+                        builder: (context) => const LevelBorderListScreen()));
               },
             ),
             ListTile(
@@ -166,7 +169,7 @@ class _ControlPageState extends State<ControlPage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => PlayerCardsScreen()));
+                        builder: (context) => const PlayerCardsScreen()));
               },
             ),
             ListTile(
@@ -181,8 +184,10 @@ class _ControlPageState extends State<ControlPage> {
                 ),
               ),
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SprayListScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SprayListScreen()));
               },
             ),
             ListTile(
@@ -197,8 +202,28 @@ class _ControlPageState extends State<ControlPage> {
                 ),
               ),
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => WeaponsPage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const WeaponsPage()));
+              },
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.gun,
+                color: ProjectColor().white,
+              ),
+              title: Text(
+                'Wapon Skins',
+                style: TextStyle(
+                  color: ProjectColor().white,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => WeaponSkinsScreen()));
               },
             ),
             ListTile(

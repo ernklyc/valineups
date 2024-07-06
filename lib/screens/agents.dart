@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/screens/AgentPage.dart';
 import 'package:valineups/styles/project_color.dart';

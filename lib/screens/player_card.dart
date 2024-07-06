@@ -3,10 +3,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,12 +16,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: PlayerCardsScreen(),
+      home: const PlayerCardsScreen(),
     );
   }
 }
 
 class PlayerCardsScreen extends StatefulWidget {
+  const PlayerCardsScreen({super.key});
+
   @override
   _PlayerCardsScreenState createState() => _PlayerCardsScreenState();
 }
@@ -51,12 +55,12 @@ class _PlayerCardsScreenState extends State<PlayerCardsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Valorant Player Cards'),
+        title: const Text('Valorant Player Cards'),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 1080 / 1920,
               ),
@@ -78,7 +82,7 @@ class _PlayerCardsScreenState extends State<PlayerCardsScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           card['displayName'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),

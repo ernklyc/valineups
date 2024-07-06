@@ -52,7 +52,7 @@ class LoginAndGuestScreen extends StatelessWidget {
                                   // ignore: use_build_context_synchronously
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ControlPage(),
+                                    builder: (context) => const ControlPage(),
                                   ),
                                 );
                               }),
@@ -68,7 +68,7 @@ class LoginAndGuestScreen extends StatelessWidget {
                                   // ignore: use_build_context_synchronously
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ControlPage(),
+                                    builder: (context) => const ControlPage(),
                                   ),
                                 );
                               }),

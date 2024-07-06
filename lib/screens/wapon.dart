@@ -3,10 +3,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,12 +16,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: WeaponsPage(),
+      home: const WeaponsPage(),
     );
   }
 }
 
 class WeaponsPage extends StatefulWidget {
+  const WeaponsPage({super.key});
+
   @override
   _WeaponsPageState createState() => _WeaponsPageState();
 }
@@ -50,16 +54,16 @@ class _WeaponsPageState extends State<WeaponsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Valorant Weapons'),
+        title: const Text('Valorant Weapons'),
       ),
       body: weapons.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
               itemCount: weapons.length,
               itemBuilder: (context, index) {
                 final weapon = weapons[index];
                 return Card(
-                  margin: EdgeInsets.all(8.0),
+                  margin: const EdgeInsets.all(8.0),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -71,15 +75,15 @@ class _WeaponsPageState extends State<WeaponsPage> {
                           width: double.infinity,
                           fit: BoxFit.contain,
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           weapon['displayName'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                             'Cost: ${weapon['shopData'] != null ? weapon['shopData']['cost'].toString() : 'N/A'}'),
                       ],

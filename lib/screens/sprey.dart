@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -12,12 +14,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SprayListScreen(),
+      home: const SprayListScreen(),
     );
   }
 }
 
 class SprayListScreen extends StatefulWidget {
+  const SprayListScreen({super.key});
+
   @override
   _SprayListScreenState createState() => _SprayListScreenState();
 }
@@ -48,12 +52,12 @@ class _SprayListScreenState extends State<SprayListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Valorant Sprays'),
+        title: const Text('Valorant Sprays'),
       ),
       body: sprays.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 0.7, // Kartların boyutu
               ),
