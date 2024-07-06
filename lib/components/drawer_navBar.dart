@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
@@ -80,8 +79,8 @@ class _ControlPageState extends State<ControlPage> {
           children: <Widget>[
             DrawerHeader(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 20),
                   ClipOval(
                     child: RandomAvatar(
                       DateTime.now().toIso8601String(),
@@ -102,17 +101,9 @@ class _ControlPageState extends State<ControlPage> {
                 ],
               ),
             ),
-            ListTile(
-              leading: FaIcon(
-                FontAwesomeIcons.userAlt,
-                color: ProjectColor().white,
-              ),
-              title: Text(
-                'Agents Info',
-                style: TextStyle(
-                  color: ProjectColor().white,
-                ),
-              ),
+            _createDrawerItem(
+              icon: FontAwesomeIcons.userAlt,
+              text: 'Agents Info',
               onTap: () {
                 Navigator.push(
                     context,
@@ -120,17 +111,9 @@ class _ControlPageState extends State<ControlPage> {
                         builder: (context) => const AgentsList()));
               },
             ),
-            ListTile(
-              leading: FaIcon(
-                FontAwesomeIcons.rankingStar,
-                color: ProjectColor().white,
-              ),
-              title: Text(
-                'Rank Tiers',
-                style: TextStyle(
-                  color: ProjectColor().white,
-                ),
-              ),
+            _createDrawerItem(
+              icon: FontAwesomeIcons.rankingStar,
+              text: 'Rank Tiers',
               onTap: () {
                 Navigator.push(
                     context,
@@ -138,15 +121,9 @@ class _ControlPageState extends State<ControlPage> {
                         builder: (context) => const CompetitiveTiersScreen()));
               },
             ),
-            ListTile(
-              leading: FaIcon(FontAwesomeIcons.borderStyle,
-                  color: ProjectColor().white),
-              title: Text(
-                'Level Boders',
-                style: TextStyle(
-                  color: ProjectColor().white,
-                ),
-              ),
+            _createDrawerItem(
+              icon: FontAwesomeIcons.borderStyle,
+              text: 'Level Borders',
               onTap: () {
                 Navigator.push(
                     context,
@@ -154,17 +131,9 @@ class _ControlPageState extends State<ControlPage> {
                         builder: (context) => const LevelBorderListScreen()));
               },
             ),
-            ListTile(
-              leading: FaIcon(
-                FontAwesomeIcons.idCard,
-                color: ProjectColor().white,
-              ),
-              title: Text(
-                'Player Cards',
-                style: TextStyle(
-                  color: ProjectColor().white,
-                ),
-              ),
+            _createDrawerItem(
+              icon: FontAwesomeIcons.idCard,
+              text: 'Player Cards',
               onTap: () {
                 Navigator.push(
                     context,
@@ -172,17 +141,9 @@ class _ControlPageState extends State<ControlPage> {
                         builder: (context) => const PlayerCardsScreen()));
               },
             ),
-            ListTile(
-              leading: FaIcon(
-                FontAwesomeIcons.sprayCan,
-                color: ProjectColor().white,
-              ),
-              title: Text(
-                'Sprays',
-                style: TextStyle(
-                  color: ProjectColor().white,
-                ),
-              ),
+            _createDrawerItem(
+              icon: FontAwesomeIcons.sprayCan,
+              text: 'Sprays',
               onTap: () {
                 Navigator.push(
                     context,
@@ -190,17 +151,9 @@ class _ControlPageState extends State<ControlPage> {
                         builder: (context) => const SprayListScreen()));
               },
             ),
-            ListTile(
-              leading: FaIcon(
-                FontAwesomeIcons.gun,
-                color: ProjectColor().white,
-              ),
-              title: Text(
-                'Wapon',
-                style: TextStyle(
-                  color: ProjectColor().white,
-                ),
-              ),
+            _createDrawerItem(
+              icon: FontAwesomeIcons.gun,
+              text: 'Weapon',
               onTap: () {
                 Navigator.push(
                     context,
@@ -208,17 +161,9 @@ class _ControlPageState extends State<ControlPage> {
                         builder: (context) => const WeaponsPage()));
               },
             ),
-            ListTile(
-              leading: FaIcon(
-                FontAwesomeIcons.gun,
-                color: ProjectColor().white,
-              ),
-              title: Text(
-                'Wapon Skins',
-                style: TextStyle(
-                  color: ProjectColor().white,
-                ),
-              ),
+            _createDrawerItem(
+              icon: FontAwesomeIcons.gun,
+              text: 'Weapon Skins',
               onTap: () {
                 Navigator.push(
                     context,
@@ -226,14 +171,9 @@ class _ControlPageState extends State<ControlPage> {
                         builder: (context) => WeaponSkinsScreen()));
               },
             ),
-            ListTile(
-              leading: Icon(Icons.logout, color: ProjectColor().white),
-              title: Text(
-                'logout',
-                style: TextStyle(
-                  color: ProjectColor().white,
-                ),
-              ),
+            _createDrawerItem(
+              icon: Icons.logout,
+              text: 'Logout',
               onTap: () {
                 Navigator.push(
                     context,
@@ -297,6 +237,25 @@ class _ControlPageState extends State<ControlPage> {
           });
         },
       ),
+    );
+  }
+
+  Widget _createDrawerItem(
+      {required IconData icon,
+      required String text,
+      required GestureTapCallback onTap}) {
+    return ListTile(
+      leading: FaIcon(
+        icon,
+        color: ProjectColor().white,
+      ),
+      title: Text(
+        text,
+        style: TextStyle(
+          color: ProjectColor().white,
+        ),
+      ),
+      onTap: onTap,
     );
   }
 }
