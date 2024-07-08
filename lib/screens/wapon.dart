@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:http/http.dart' as http;
+import 'package:valineups/styles/fonts.dart';
 import 'dart:convert';
+
+import 'package:valineups/styles/project_color.dart';
 
 void main() {
   runApp(const MyApp());
@@ -53,39 +57,98 @@ class _WeaponsPageState extends State<WeaponsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ProjectColor().dark,
       appBar: AppBar(
-        title: const Text('Valorant Weapons'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_outlined,
+              color: ProjectColor().white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ProjectColor().dark,
+        title: Text(
+          'WEAPONS',
+          style: TextStyle(
+            fontFamily: Fonts().valFonts,
+            color: ProjectColor().white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
       ),
       body: weapons.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
+          : Swiper(
+              loop: true,
+              viewportFraction: 0.35,
+              scale: 1,
+              scrollDirection: Axis.vertical,
+              physics: const BouncingScrollPhysics(),
               itemCount: weapons.length,
               itemBuilder: (context, index) {
                 final weapon = weapons[index];
                 return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  color: ProjectColor().valoRed,
                   margin: const EdgeInsets.all(8.0),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
+                        const SizedBox(height: 8),
                         Image.network(
                           weapon['displayIcon'],
-                          height: 80,
+                          fit: BoxFit.fitWidth,
                           width: double.infinity,
-                          fit: BoxFit.contain,
+                          height: 200,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          weapon['displayName'],
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                        Positioned(
+                          bottom: 30,
+                          left: 10,
+                          child: Text(
+                            weapon['displayName'],
+                            style: TextStyle(
+                              fontFamily: Fonts().valFonts,
+                              shadows: [
+                                Shadow(
+                                  color: ProjectColor().dark,
+                                  blurRadius: 20,
+                                ),
+                              ],
+                              color: ProjectColor().white,
+                              fontSize: 54,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2,
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                            'Cost: ${weapon['shopData'] != null ? weapon['shopData']['cost'].toString() : 'N/A'}'),
+                        Positioned(
+                          bottom: 15,
+                          left: 10,
+                          child: Text(
+                            'Cost: ${weapon['shopData'] != null ? weapon['shopData']['cost'].toString() : 'N/A'}',
+                            style: TextStyle(
+                              fontFamily: Fonts().valFonts,
+                              shadows: [
+                                Shadow(
+                                  color: ProjectColor().dark,
+                                  blurRadius: 30,
+                                ),
+                              ],
+                              color: ProjectColor().white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

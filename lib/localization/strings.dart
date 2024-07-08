@@ -50,6 +50,20 @@ class MapList {
     'ABYSS',
   ];
 
+  final List<String> location = <String>[
+    'Rabat, Morocco',
+    'Thimphu, Bhutan',
+    'Tokyo, Japan',
+    'Venice, Italy',
+    'Bennett Island, Russia',
+    'Bermuda Triangle, Atlantic Ocean',
+    'Santa Fe County, New Mexico, USA',
+    'Lisbon, Portugal',
+    'Western Ghats, India',
+    'Los Angeles, California, USA',
+    'Sør-Jan, Jan Mayen, Norway',
+  ];
+
   final List<String> map = <String>[
     'assets/images/maps/Bind.png',
     'assets/images/maps/Haven.png',

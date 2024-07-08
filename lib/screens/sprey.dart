@@ -2,22 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Valorant Sprays',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const SprayListScreen(),
-    );
-  }
-}
+import 'package:valineups/styles/fonts.dart';
+import 'package:valineups/styles/project_color.dart';
 
 class SprayListScreen extends StatefulWidget {
   const SprayListScreen({super.key});
@@ -51,8 +37,28 @@ class _SprayListScreenState extends State<SprayListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ProjectColor().dark,
       appBar: AppBar(
-        title: const Text('Valorant Sprays'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_outlined,
+              color: ProjectColor().white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ProjectColor().dark,
+        title: Text(
+          'SPREYS',
+          style: TextStyle(
+            fontFamily: Fonts().valFonts,
+            color: ProjectColor().white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
       ),
       body: sprays.isEmpty
           ? const Center(child: CircularProgressIndicator())
@@ -64,23 +70,35 @@ class _SprayListScreenState extends State<SprayListScreen> {
               itemCount: sprays.length,
               itemBuilder: (context, index) {
                 final spray = sprays[index];
-                return Card(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Image.network(
-                          spray.fullIcon ?? spray.displayIcon,
-                          fit: BoxFit.fitWidth,
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    color: ProjectColor().valoRed,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Image.network(
+                            spray.fullIcon ?? spray.displayIcon,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          spray.displayName,
-                          textAlign: TextAlign.center,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            spray.truncatedDisplayName,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: Fonts().valFonts,
+                              color: ProjectColor().white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
@@ -109,5 +127,11 @@ class Spray {
       displayIcon: json['displayIcon'],
       fullIcon: json['fullIcon'],
     );
+  }
+
+  String get truncatedDisplayName {
+    return displayName.length > 5
+        ? '${displayName.substring(0, 5)}...'
+        : displayName;
   }
 }

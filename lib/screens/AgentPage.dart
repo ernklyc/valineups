@@ -78,20 +78,6 @@ class _AgentPageState extends State<AgentPage> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        foregroundColor: ProjectColor().white,
-        backgroundColor: ProjectColor().dark,
-        title: Text(
-          widget.agentName,
-          style: TextStyle(
-            color: ProjectColor().white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 5,
-          ),
-        ),
-        centerTitle: true,
-      ),
       backgroundColor: ProjectColor().dark,
       body: Column(
         children: [
@@ -277,8 +263,8 @@ class _AgentPageState extends State<AgentPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius:
-                              const BorderRadius.vertical(top: Radius.circular(12.0)),
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12.0)),
                           child: Image.asset(
                             map['images'][0],
                             fit: BoxFit.cover,

@@ -1,12 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/screens/agents.dart';
-import 'package:valineups/screens/agent_info.dart';
 import 'package:valineups/screens/chat.dart';
-import 'package:valineups/screens/level_border.dart';
 import 'package:valineups/screens/login_and_guest.dart';
 import 'package:valineups/screens/maps.dart';
 import 'package:valineups/screens/player_card.dart';
@@ -15,6 +12,7 @@ import 'package:valineups/screens/rank.dart';
 import 'package:valineups/screens/sprey.dart';
 import 'package:valineups/screens/wapon.dart';
 import 'package:valineups/screens/wapon_skins.dart';
+import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 
 class ControlPage extends StatefulWidget {
@@ -26,13 +24,16 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPageState extends State<ControlPage> {
   int _currentIndex = 0;
-  int _selectedIndex = 0;
-
   final PageController _pageController = PageController(initialPage: 0);
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      _currentIndex = index;
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     });
   }
 
@@ -43,17 +44,26 @@ class _ControlPageState extends State<ControlPage> {
     return 'guest${randomNumber.toString().padLeft(length, '0')}';
   }
 
+  String shortenName(String name, int maxLength) {
+    if (name.length > maxLength) {
+      return '${name.substring(0, maxLength - 3)}...';
+    }
+    return name;
+  }
+
   @override
   Widget build(BuildContext context) {
     String guestUserName = generateGuestUserName(6);
+    guestUserName = shortenName(guestUserName, 30);
 
     return Scaffold(
+      backgroundColor: ProjectColor().dark,
       appBar: AppBar(
+        elevation: 0,
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
-              icon: Icon(Icons.menu,
-                  color: ProjectColor().white), // Drawer icon color is set here
+              icon: Icon(Icons.menu, color: ProjectColor().white),
               onPressed: () {
                 Scaffold.of(context).openDrawer();
               },
@@ -73,6 +83,7 @@ class _ControlPageState extends State<ControlPage> {
         title: const ValineupsText(),
       ),
       drawer: Drawer(
+        elevation: 0,
         backgroundColor: ProjectColor().dark,
         child: ListView(
           padding: EdgeInsets.zero,
@@ -102,17 +113,6 @@ class _ControlPageState extends State<ControlPage> {
               ),
             ),
             _createDrawerItem(
-              icon: FontAwesomeIcons.userAlt,
-              text: 'Agents Info',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AgentsList()));
-              },
-            ),
-            _createDrawerItem(
-              icon: FontAwesomeIcons.rankingStar,
               text: 'Rank Tiers',
               onTap: () {
                 Navigator.push(
@@ -122,37 +122,6 @@ class _ControlPageState extends State<ControlPage> {
               },
             ),
             _createDrawerItem(
-              icon: FontAwesomeIcons.borderStyle,
-              text: 'Level Borders',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LevelBorderListScreen()));
-              },
-            ),
-            _createDrawerItem(
-              icon: FontAwesomeIcons.idCard,
-              text: 'Player Cards',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const PlayerCardsScreen()));
-              },
-            ),
-            _createDrawerItem(
-              icon: FontAwesomeIcons.sprayCan,
-              text: 'Sprays',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SprayListScreen()));
-              },
-            ),
-            _createDrawerItem(
-              icon: FontAwesomeIcons.gun,
               text: 'Weapon',
               onTap: () {
                 Navigator.push(
@@ -162,100 +131,138 @@ class _ControlPageState extends State<ControlPage> {
               },
             ),
             _createDrawerItem(
-              icon: FontAwesomeIcons.gun,
               text: 'Weapon Skins',
               onTap: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => WeaponSkinsScreen()));
+                        builder: (context) => const WeaponSkinsScreen()));
               },
             ),
             _createDrawerItem(
-              icon: Icons.logout,
-              text: 'Logout',
+              text: 'Player Cards',
               onTap: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const LoginAndGuestScreen()));
+                        builder: (context) => const PlayerCardsScreen()));
               },
+            ),
+            _createDrawerItem(
+              text: 'Sprays',
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SprayListScreen()));
+              },
+            ),
+            const Divider(),
+            SizedBox(
+              height: MediaQuery.of(context).size.width / 1.5,
+              child: _createDrawerItem(
+                text: 'Logout',
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginAndGuestScreen()));
+                },
+              ),
             ),
           ],
         ),
       ),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (newIndex) {
-          setState(() {
-            _currentIndex = newIndex;
-          });
-        },
-        children: const [
-          Agents(),
-          Maps(),
-          Chat(),
-          Profile(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: ProjectColor().dark,
-        selectedItemColor: ProjectColor().white,
-        unselectedItemColor: ProjectColor().hintGrey,
-        unselectedLabelStyle:
-            const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-        selectedLabelStyle:
-            const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        currentIndex: _currentIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: "AGENTS",
+      body: Column(
+        children: [
+          Container(
+            height: 80,
+            color: ProjectColor().dark,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildTopNavigationItem(Icons.people, "AGENTS", 0),
+                _buildTopNavigationItem(Icons.map, "MAPS", 1),
+                _buildTopNavigationItem(Icons.chat, "CHAT", 2),
+                _buildTopNavigationItem(Icons.bookmark, "SAVED", 3),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: "MAPS",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: "CHAT",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: "SAVED",
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (newIndex) {
+                setState(() {
+                  _currentIndex = newIndex;
+                });
+              },
+              children: const [
+                Agents(),
+                Maps(),
+                Chat(),
+                Profile(),
+              ],
+            ),
           ),
         ],
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-            _pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.ease,
-            );
-          });
-        },
       ),
     );
   }
 
   Widget _createDrawerItem(
-      {required IconData icon,
-      required String text,
-      required GestureTapCallback onTap}) {
+      {required String text, required GestureTapCallback onTap}) {
+    text = shortenName(text, 30);
     return ListTile(
-      leading: FaIcon(
-        icon,
-        color: ProjectColor().white,
-      ),
-      title: Text(
-        text,
-        style: TextStyle(
-          color: ProjectColor().white,
+      title: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontFamily: Fonts().valFonts,
+            shadows: [
+              Shadow(
+                color: ProjectColor().dark,
+                blurRadius: 0,
+              ),
+            ],
+            color: ProjectColor().white,
+            fontSize: 18,
+          ),
         ),
       ),
       onTap: onTap,
+    );
+  }
+
+  Widget _buildTopNavigationItem(IconData icon, String label, int index) {
+    label = shortenName(label, 30);
+    return GestureDetector(
+      onTap: () {
+        _onItemTapped(index);
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 25),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: Fonts().valFonts,
+              color: _currentIndex == index
+                  ? ProjectColor().white
+                  : ProjectColor().hintGrey,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          if (_currentIndex == index)
+            Container(
+              margin: const EdgeInsets.only(top: 2),
+              height: 2,
+              width: 20,
+              color: ProjectColor().valoRed,
+            ),
+        ],
+      ),
     );
   }
 }

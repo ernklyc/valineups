@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:valineups/localization/strings.dart';
+import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
 
@@ -90,32 +91,56 @@ class _MapsState extends State<Maps> {
                           children: [
                             Container(
                               width: mediaQueryWidth,
-                              height: mediaQueryHeight / 10,
+                              height: mediaQueryHeight / 4.5,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
                                   image: AssetImage(MapList().map[index]),
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.fitWidth,
                                 ),
                               ),
                             ),
                             Container(
                               width: mediaQueryWidth,
-                              height: mediaQueryHeight / 10,
-                              color: ProjectColor().dark.withOpacity(0.5),
+                              height: mediaQueryHeight / 4.5,
+                              color: ProjectColor().dark.withOpacity(0.35),
                             ),
-                            Text(
-                              MapList().entries[index],
-                              style: TextStyle(
-                                shadows: [
-                                  Shadow(
-                                    color: ProjectColor().dark,
-                                    blurRadius: 50,
-                                  ),
-                                ],
-                                color: ProjectColor().white,
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 10,
+                            Positioned(
+                              bottom: 130,
+                              left: 20,
+                              child: Text(
+                                MapList().entries[index],
+                                style: TextStyle(
+                                  fontFamily: Fonts().valFonts,
+                                  shadows: [
+                                    Shadow(
+                                      color: ProjectColor().dark,
+                                      blurRadius: 0,
+                                    ),
+                                  ],
+                                  color: ProjectColor().white,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 3,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 110,
+                              left: 23,
+                              child: Text(
+                                MapList().location[index],
+                                style: TextStyle(
+                                  shadows: [
+                                    Shadow(
+                                      color: ProjectColor().dark,
+                                      blurRadius: 0,
+                                    ),
+                                  ],
+                                  color: ProjectColor().white,
+                                  fontSize: 16,
+                                  letterSpacing: 1,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -127,6 +152,11 @@ class _MapsState extends State<Maps> {
                 childCount: MapList().entries.length,
               ),
             ),
+            SliverToBoxAdapter(
+              child: Container(
+                height: 60,
+              ),
+            )
           ],
         ),
       ),

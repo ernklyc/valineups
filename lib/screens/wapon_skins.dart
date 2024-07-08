@@ -1,24 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: WeaponSkinsScreen(),
-    );
-  }
-}
+import 'package:valineups/styles/fonts.dart';
+import 'package:valineups/styles/project_color.dart';
 
 class WeaponSkinsScreen extends StatefulWidget {
+  const WeaponSkinsScreen({super.key});
+
   @override
   _WeaponSkinsScreenState createState() => _WeaponSkinsScreenState();
 }
@@ -26,7 +16,7 @@ class WeaponSkinsScreen extends StatefulWidget {
 class _WeaponSkinsScreenState extends State<WeaponSkinsScreen> {
   List<dynamic> _skins = [];
   List<dynamic> _filteredSkins = [];
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -42,7 +32,8 @@ class _WeaponSkinsScreenState extends State<WeaponSkinsScreen> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
-        _skins = data['data'];
+        _skins =
+            data['data'].where((skin) => skin['displayIcon'] != null).toList();
         _filteredSkins = _skins;
       });
     } else {
@@ -70,72 +61,88 @@ class _WeaponSkinsScreenState extends State<WeaponSkinsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Weapon Skins'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_outlined,
+              color: ProjectColor().white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ProjectColor().dark,
+        title: Text(
+          'WEAPONS SKINS',
+          style: TextStyle(
+            fontFamily: Fonts().valFonts,
+            color: ProjectColor().white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
       ),
+      backgroundColor: ProjectColor().dark,
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-              ),
-            ),
-          ),
           Expanded(
             child: _filteredSkins.isEmpty
-                ? Center(child: CircularProgressIndicator())
-                : ListView.builder(
+                ? const Center(child: CircularProgressIndicator())
+                : Swiper(
+                    loop: true,
+                    viewportFraction: 0.35,
+                    scale: 1,
+                    scrollDirection: Axis.vertical,
+                    physics: const BouncingScrollPhysics(),
                     itemCount: _filteredSkins.length,
                     itemBuilder: (context, index) {
                       final skin = _filteredSkins[index];
+                      String displayName = skin['displayName'] ?? '';
+                      if (displayName.length > 10) {
+                        displayName = '${displayName.substring(0, 10)}...';
+                      }
                       return Card(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                        elevation: 5,
-                        margin:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(15)),
-                              child: skin['displayIcon'] != null
-                                  ? Image.network(
-                                      skin['displayIcon'],
-                                      fit: BoxFit.fitWidth,
-                                      width: double.infinity,
-                                      height: 200,
-                                    )
-                                  : Container(
-                                      width: double.infinity,
-                                      height: 200,
-                                      color: Colors.grey[300],
-                                      child: Center(child: Text('No Image')),
-                                    ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                skin['displayName'],
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.start,
+                        color: ProjectColor().valoRed,
+                        margin: const EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(0.0),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Image.network(
+                                skin['displayIcon'],
+                                fit: BoxFit.fitWidth,
                               ),
-                            ),
-                          ],
+                              Positioned(
+                                bottom: 20,
+                                left: 15,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    displayName,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: Fonts().valFonts,
+                                      shadows: [
+                                        Shadow(
+                                          color: ProjectColor().dark,
+                                          blurRadius: 30,
+                                        ),
+                                      ],
+                                      color: ProjectColor().white,
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0,
+                                    ),
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

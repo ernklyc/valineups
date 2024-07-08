@@ -29,5 +29,6 @@ class ProjectEdgeInsets {
 class ProjectBorderRadius {
   final BorderRadius circular8 = BorderRadius.circular(8.0);
   final BorderRadius circular12 = BorderRadius.circular(12.0);
+  final BorderRadius circular21 = BorderRadius.circular(21.0);
   final BorderRadius circular30 = BorderRadius.circular(30.0);
 }

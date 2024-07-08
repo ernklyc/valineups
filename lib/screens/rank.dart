@@ -1,25 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shimmer/shimmer.dart';
+import 'package:valineups/styles/fonts.dart';
 import 'dart:convert';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Valorant Competitive Tiers',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const CompetitiveTiersScreen(),
-    );
-  }
-}
+import 'package:valineups/styles/project_color.dart';
 
 class CompetitiveTiersScreen extends StatefulWidget {
   const CompetitiveTiersScreen({super.key});
@@ -34,7 +19,6 @@ class _CompetitiveTiersScreenState extends State<CompetitiveTiersScreen> {
   @override
   void initState() {
     super.initState();
-    // UUID'yi burada belirtiyoruz
     _futureTiers = fetchTiers('03621f52-342b-cf4e-4f86-9350a49c6d04');
   }
 
@@ -61,14 +45,36 @@ class _CompetitiveTiersScreenState extends State<CompetitiveTiersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ProjectColor().dark,
       appBar: AppBar(
-        title: const Text('Valorant Competitive Tiers'),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_outlined,
+            color: ProjectColor().white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ProjectColor().dark,
+        title: Text(
+          'TIERS',
+          style: TextStyle(
+            fontFamily: Fonts().valFonts,
+            color: ProjectColor().white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
       ),
       body: FutureBuilder<List<Tier>>(
         future: _futureTiers,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return _buildShimmerEffect();
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -87,6 +93,7 @@ class _CompetitiveTiersScreenState extends State<CompetitiveTiersScreen> {
             itemBuilder: (context, index) {
               final tier = tiers[index];
               return Card(
+                color: ProjectColor().dark,
                 margin: const EdgeInsets.all(8.0),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -97,21 +104,13 @@ class _CompetitiveTiersScreenState extends State<CompetitiveTiersScreen> {
                             ? Image.network(tier.largeIcon!)
                             : const SizedBox.shrink(),
                       ),
-                      const SizedBox(height: 8.0),
-                      Text(
-                        tier.tierName,
-                        style: const TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
                       Text(
                         tier.divisionName,
                         style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.grey[600],
-                        ),
+                            fontFamily: Fonts().valFonts,
+                            fontSize: 14.0,
+                            color: ProjectColor().white,
+                            fontWeight: FontWeight.w800),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -122,6 +121,46 @@ class _CompetitiveTiersScreenState extends State<CompetitiveTiersScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildShimmerEffect() {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+        childAspectRatio: 0.7,
+      ),
+      itemCount: 9,
+      itemBuilder: (context, index) {
+        return Card(
+          color: ProjectColor().dark,
+          margin: const EdgeInsets.all(8.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              enabled: true,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Container(
+                    height: 20.0,
+                    color: Colors.grey,
+                    margin: const EdgeInsets.only(top: 8.0),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

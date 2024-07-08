@@ -1,25 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:valineups/styles/fonts.dart';
 import 'dart:convert';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Valorant Player Cards',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const PlayerCardsScreen(),
-    );
-  }
-}
+import 'package:valineups/styles/project_color.dart';
 
 class PlayerCardsScreen extends StatefulWidget {
   const PlayerCardsScreen({super.key});
@@ -54,8 +38,28 @@ class _PlayerCardsScreenState extends State<PlayerCardsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ProjectColor().dark,
       appBar: AppBar(
-        title: const Text('Valorant Player Cards'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_outlined,
+              color: ProjectColor().white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ProjectColor().dark,
+        title: Text(
+          'PLAYER CARDS',
+          style: TextStyle(
+            fontFamily: Fonts().valFonts,
+            color: ProjectColor().white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -67,29 +71,44 @@ class _PlayerCardsScreenState extends State<PlayerCardsScreen> {
               itemCount: playerCards.length,
               itemBuilder: (context, index) {
                 final card = playerCards[index];
-                return Card(
-                  clipBehavior: Clip.antiAlias, // Clip the overflowing content
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: Image.network(
-                          card['largeArt'],
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          card['displayName'],
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                String displayName = card['displayName'];
+                if (displayName.length > 10) {
+                  displayName = '${displayName.substring(0, 10)}...';
+                }
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 0,
+                    color: ProjectColor().valoRed,
+                    clipBehavior:
+                        Clip.antiAlias, // Clip the overflowing content
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Image.network(
+                              card['largeArt'],
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            displayName,
+                            style: TextStyle(
+                              fontFamily: Fonts().valFonts,
+                              color: ProjectColor().white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
