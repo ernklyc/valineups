@@ -71,7 +71,7 @@ class _SprayListScreenState extends State<SprayListScreen> {
               itemBuilder: (context, index) {
                 final spray = sprays[index];
                 return Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(2.0),
                   child: Card(
                     color: ProjectColor().valoRed,
                     child: Column(
@@ -131,7 +131,7 @@ class Spray {
 
   String get truncatedDisplayName {
     return displayName.length > 5
-        ? '${displayName.substring(0, 5)}...'
+        ? '${displayName.substring(0, 6)}...'
         : displayName;
   }
 }

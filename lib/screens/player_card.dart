@@ -66,49 +66,43 @@ class _PlayerCardsScreenState extends State<PlayerCardsScreen> {
           : GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 1080 / 1920,
+                childAspectRatio: 1600 / 2560,
               ),
               itemCount: playerCards.length,
               itemBuilder: (context, index) {
                 final card = playerCards[index];
                 String displayName = card['displayName'];
-                if (displayName.length > 10) {
+                if (displayName.length > 5) {
                   displayName = '${displayName.substring(0, 10)}...';
                 }
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Card(
-                    elevation: 0,
-                    color: ProjectColor().valoRed,
-                    clipBehavior:
-                        Clip.antiAlias, // Clip the overflowing content
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Image.network(
-                              card['largeArt'],
-                              fit: BoxFit.cover,
-                            ),
+                return Card(
+                  elevation: 0,
+                  color: ProjectColor().dark,
+                  clipBehavior: Clip.antiAlias, // Clip the overflowing content
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Image.network(
+                            card['largeArt'],
+                            fit: BoxFit
+                                .contain, // Resmin kartın içine sığmasını sağla
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Text(
-                            displayName,
-                            style: TextStyle(
-                              fontFamily: Fonts().valFonts,
-                              color: ProjectColor().white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                      ),
+                      Text(
+                        displayName,
+                        style: TextStyle(
+                          fontFamily: Fonts().valFonts,
+                          color: ProjectColor().white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                    ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 );
               },

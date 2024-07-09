@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -26,8 +25,8 @@ class _WeaponSkinsScreenState extends State<WeaponSkinsScreen> {
   }
 
   Future<void> _fetchSkins() async {
-    final response = await http
-        .get(Uri.parse('https://valorant-api.com/v1/weapons/skinchromas'));
+    final response =
+        await http.get(Uri.parse('https://valorant-api.com/v1/weapons/skins'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -85,15 +84,36 @@ class _WeaponSkinsScreenState extends State<WeaponSkinsScreen> {
       backgroundColor: ProjectColor().dark,
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              style: TextStyle(color: ProjectColor().white),
+              decoration: InputDecoration(
+                hintText: 'Search Skins...',
+                hintStyle: TextStyle(color: ProjectColor().hintGrey),
+                filled: true,
+                fillColor: ProjectColor().dark,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                prefixIcon: Icon(Icons.search, color: ProjectColor().hintGrey),
+              ),
+            ),
+          ),
           Expanded(
             child: _filteredSkins.isEmpty
                 ? const Center(child: CircularProgressIndicator())
-                : Swiper(
-                    loop: true,
-                    viewportFraction: 0.35,
-                    scale: 1,
-                    scrollDirection: Axis.vertical,
-                    physics: const BouncingScrollPhysics(),
+                : GridView.builder(
+                    padding: const EdgeInsets.all(8.0),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, // İki sütun
+                      mainAxisSpacing: 8.0,
+                      crossAxisSpacing: 8.0,
+                      childAspectRatio: 4 / 4,
+                    ),
                     itemCount: _filteredSkins.length,
                     itemBuilder: (context, index) {
                       final skin = _filteredSkins[index];
@@ -105,40 +125,37 @@ class _WeaponSkinsScreenState extends State<WeaponSkinsScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        color: ProjectColor().valoRed,
-                        margin: const EdgeInsets.all(8.0),
+                        color: ProjectColor().dark,
                         child: Padding(
-                          padding: const EdgeInsets.all(0.0),
-                          child: Stack(
-                            alignment: Alignment.center,
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Image.network(
-                                skin['displayIcon'],
-                                fit: BoxFit.fitWidth,
+                              Expanded(
+                                child: Image.network(
+                                  skin['displayIcon'],
+                                  fit: BoxFit.fitWidth,
+                                ),
                               ),
-                              Positioned(
-                                bottom: 20,
-                                left: 15,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    displayName,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontFamily: Fonts().valFonts,
-                                      shadows: [
-                                        Shadow(
-                                          color: ProjectColor().dark,
-                                          blurRadius: 30,
-                                        ),
-                                      ],
-                                      color: ProjectColor().white,
-                                      fontSize: 40,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0,
-                                    ),
-                                    maxLines: 1,
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  displayName,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: Fonts().valFonts,
+                                    shadows: [
+                                      Shadow(
+                                        color: ProjectColor().dark,
+                                        blurRadius: 30,
+                                      ),
+                                    ],
+                                    color: ProjectColor().white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0,
                                   ),
+                                  maxLines: 1,
                                 ),
                               ),
                             ],

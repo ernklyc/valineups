@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
+import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 
 class Profile extends StatefulWidget {
@@ -62,8 +63,9 @@ class _ProfileState extends State<Profile> {
                     child: Text(
                       "SAVED LINEUPS",
                       style: TextStyle(
+                        fontFamily: Fonts().valFonts,
                         color: ProjectColor().white,
-                        fontSize: 20,
+                        fontSize: 22,
                         letterSpacing: 5,
                         fontWeight: FontWeight.bold,
                       ),
@@ -118,6 +120,7 @@ class _ProfileState extends State<Profile> {
                                     Text(
                                       map['name'],
                                       style: TextStyle(
+                                        fontFamily: Fonts().valFonts,
                                         color: ProjectColor().white,
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -138,6 +141,7 @@ class _ProfileState extends State<Profile> {
                                 Text(
                                   "Side: ${map['side']}",
                                   style: TextStyle(
+                                    fontFamily: Fonts().valFonts,
                                     color:
                                         ProjectColor().white.withOpacity(0.7),
                                     fontSize: 14,

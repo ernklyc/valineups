@@ -1,8 +1,11 @@
 import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/screens/agents.dart';
+import 'package:valineups/screens/agents_info.dart';
 import 'package:valineups/screens/chat.dart';
 import 'package:valineups/screens/login_and_guest.dart';
 import 'package:valineups/screens/maps.dart';
@@ -88,86 +91,161 @@ class _ControlPageState extends State<ControlPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ClipOval(
-                    child: RandomAvatar(
-                      DateTime.now().toIso8601String(),
-                      height: 70,
-                      width: 70,
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.width * 0.15,
+                  horizontal: MediaQuery.of(context).size.width * 0.05,
+                ),
+                child: Row(
+                  children: [
+                    ClipOval(
+                      child: RandomAvatar(
+                        DateTime.now().toIso8601String(),
+                        height: 50,
+                        width: 50,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 15),
-                  Text(
-                    guestUserName,
-                    style: TextStyle(
-                      color: ProjectColor().white,
-                      fontSize: 16,
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(width: 15),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          guestUserName,
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            color: ProjectColor().white,
+                            fontSize: 13,
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        // Ekstra bilgiler eklemek için buraya Text widget'ları ekleyebilirsiniz
+                        Text(
+                          'valinups user', // Ekstra bilgi örneği
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            color: ProjectColor().hintGrey,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-            _createDrawerItem(
-              text: 'Rank Tiers',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const CompetitiveTiersScreen()));
-              },
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _createDrawerItem(
+                      text: 'A G E N T S',
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AgentsInfo()));
+                      },
+                      iconDrawerr: FaIcon(
+                        FontAwesomeIcons.userNinja,
+                        size: 16,
+                      ),
+                    ),
+                    _createDrawerItem(
+                      text: 'T I E R S',
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const CompetitiveTiersScreen()));
+                      },
+                      iconDrawerr: FaIcon(
+                        FontAwesomeIcons.trophy,
+                        size: 16,
+                      ),
+                    ),
+                    _createDrawerItem(
+                      text: 'W E A P O N S',
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const WeaponsPage()));
+                      },
+                      iconDrawerr: FaIcon(
+                        FontAwesomeIcons.gun,
+                        size: 16,
+                      ),
+                    ),
+                    _createDrawerItem(
+                      text: 'S K I N S',
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const WeaponSkinsScreen()));
+                      },
+                      iconDrawerr: FaIcon(
+                        FontAwesomeIcons.sackDollar,
+                        size: 16,
+                      ),
+                    ),
+                    _createDrawerItem(
+                      text: 'C A R D S',
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const PlayerCardsScreen()));
+                      },
+                      iconDrawerr: FaIcon(
+                        FontAwesomeIcons.clipboardUser,
+                        size: 16,
+                      ),
+                    ),
+                    _createDrawerItem(
+                      text: 'S P R A Y S',
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SprayListScreen()));
+                      },
+                      iconDrawerr: FaIcon(
+                        FontAwesomeIcons.sprayCanSparkles,
+                        size: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            _createDrawerItem(
-              text: 'Weapon',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const WeaponsPage()));
-              },
-            ),
-            _createDrawerItem(
-              text: 'Weapon Skins',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const WeaponSkinsScreen()));
-              },
-            ),
-            _createDrawerItem(
-              text: 'Player Cards',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const PlayerCardsScreen()));
-              },
-            ),
-            _createDrawerItem(
-              text: 'Sprays',
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SprayListScreen()));
-              },
-            ),
-            const Divider(),
-            SizedBox(
-              height: MediaQuery.of(context).size.width / 1.5,
-              child: _createDrawerItem(
-                text: 'Logout',
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginAndGuestScreen()));
-                },
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.2,
+                    left: 12,
+                    right: 12),
+                child: _createDrawerItem(
+                  text: 'L O G O U T',
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginAndGuestScreen()));
+                  },
+                  iconDrawerr: FaIcon(
+                    FontAwesomeIcons.outdent,
+                    size: 16,
+                  ),
+                ),
               ),
             ),
           ],
@@ -209,24 +287,27 @@ class _ControlPageState extends State<ControlPage> {
     );
   }
 
-  Widget _createDrawerItem(
-      {required String text, required GestureTapCallback onTap}) {
+  Widget _createDrawerItem({
+    required String text,
+    required FaIcon iconDrawerr,
+    required GestureTapCallback onTap,
+  }) {
     text = shortenName(text, 30);
     return ListTile(
-      title: Center(
-        child: Text(
-          text,
-          style: TextStyle(
-            fontFamily: Fonts().valFonts,
-            shadows: [
-              Shadow(
-                color: ProjectColor().dark,
-                blurRadius: 0,
-              ),
-            ],
-            color: ProjectColor().white,
-            fontSize: 18,
-          ),
+      leading: iconDrawerr,
+      iconColor: ProjectColor().white,
+      title: Text(
+        text,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          shadows: [
+            Shadow(
+              color: ProjectColor().dark,
+              blurRadius: 0,
+            ),
+          ],
+          color: ProjectColor().white,
+          fontSize: 17,
         ),
       ),
       onTap: onTap,
