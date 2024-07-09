@@ -26,12 +26,12 @@ class _AgentsState extends State<Agents> {
         backgroundColor: ProjectColor().dark,
         body: Center(
           child: SizedBox(
-            height: mediaQueryHeight * 0.65,
+            height: mediaQueryHeight * 0.8,
             child: Swiper(
               loop: true,
               viewportFraction: 0.8,
               scale: 0.9,
-              scrollDirection: Axis.horizontal,
+              scrollDirection: Axis.vertical,
               physics: const BouncingScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 final int agentIndex = index % agents.length;

@@ -92,173 +92,164 @@ class _ControlPageState extends State<ControlPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.width * 0.15,
-                  horizontal: MediaQuery.of(context).size.width * 0.05,
-                ),
-                child: Row(
-                  children: [
-                    ClipOval(
-                      child: RandomAvatar(
-                        DateTime.now().toIso8601String(),
-                        height: 50,
-                        width: 50,
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          guestUserName,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            color: ProjectColor().white,
-                            fontSize: 13,
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        // Ekstra bilgiler eklemek için buraya Text widget'ları ekleyebilirsiniz
-                        Text(
-                          'valinups user', // Ekstra bilgi örneği
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            color: ProjectColor().hintGrey,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.width * 0.15,
+                horizontal: MediaQuery.of(context).size.width * 0.05,
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _createDrawerItem(
-                      text: 'A G E N T S',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AgentsInfo()));
-                      },
-                      iconDrawerr: const FaIcon(
-                        FontAwesomeIcons.userNinja,
-                        size: 16,
-                      ),
+              child: Row(
+                children: [
+                  ClipOval(
+                    child: RandomAvatar(
+                      DateTime.now().toIso8601String(),
+                      height: 50,
+                      width: 50,
                     ),
-                    _createDrawerItem(
-                      text: 'T I E R S',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const CompetitiveTiersScreen()));
-                      },
-                      iconDrawerr: const FaIcon(
-                        FontAwesomeIcons.trophy,
-                        size: 16,
-                      ),
-                    ),
-                    _createDrawerItem(
-                      text: 'W E A P O N S',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const WeaponsPage()));
-                      },
-                      iconDrawerr: const FaIcon(
-                        FontAwesomeIcons.gun,
-                        size: 16,
-                      ),
-                    ),
-                    _createDrawerItem(
-                      text: 'S K I N S',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const WeaponSkinsScreen()));
-                      },
-                      iconDrawerr: const FaIcon(
-                        FontAwesomeIcons.sackDollar,
-                        size: 16,
-                      ),
-                    ),
-                    _createDrawerItem(
-                      text: 'B U N D L E S',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BundlesPage()));
-                      },
-                      iconDrawerr: const FaIcon(
-                        FontAwesomeIcons.boxArchive,
-                        size: 16,
-                      ),
-                    ),
-                    _createDrawerItem(
-                      text: 'C A R D S',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const PlayerCardsScreen()));
-                      },
-                      iconDrawerr: const FaIcon(
-                        FontAwesomeIcons.clipboardUser,
-                        size: 16,
-                      ),
-                    ),
-                    _createDrawerItem(
-                      text: 'S P R A Y S',
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SprayListScreen()));
-                      },
-                      iconDrawerr: const FaIcon(
-                        FontAwesomeIcons.sprayCanSparkles,
-                        size: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * 0.2,
-                    left: 12,
-                    right: 12),
-                child: _createDrawerItem(
-                  text: 'L O G O U T',
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginAndGuestScreen()));
-                  },
-                  iconDrawerr: const FaIcon(
-                    FontAwesomeIcons.outdent,
-                    size: 16,
                   ),
+                  const SizedBox(width: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        guestUserName,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: ProjectColor().white,
+                          fontSize: 13,
+                          letterSpacing: 2,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      // Ekstra bilgiler eklemek için buraya Text widget'ları ekleyebilirsiniz
+                      Text(
+                        'valinups user', // Ekstra bilgi örneği
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: ProjectColor().hintGrey,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  _createDrawerItem(
+                    text: 'A G E N T S',
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AgentsInfo()));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.userNinja,
+                      size: 16,
+                    ),
+                  ),
+                  _createDrawerItem(
+                    text: 'T I E R S',
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const CompetitiveTiersScreen()));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.trophy,
+                      size: 16,
+                    ),
+                  ),
+                  _createDrawerItem(
+                    text: 'W E A P O N S',
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const WeaponsPage()));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.gun,
+                      size: 16,
+                    ),
+                  ),
+                  _createDrawerItem(
+                    text: 'S K I N S',
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const WeaponSkinsScreen()));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.sackDollar,
+                      size: 16,
+                    ),
+                  ),
+                  _createDrawerItem(
+                    text: 'B U N D L E S',
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => BundlesPage()));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.boxArchive,
+                      size: 16,
+                    ),
+                  ),
+                  _createDrawerItem(
+                    text: 'C A R D S',
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PlayerCardsScreen()));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.clipboardUser,
+                      size: 16,
+                    ),
+                  ),
+                  _createDrawerItem(
+                    text: 'S P R A Y S',
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SprayListScreen()));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.sprayCanSparkles,
+                      size: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.1,
+                  left: 12,
+                  right: 12),
+              child: _createDrawerItem(
+                text: 'L O G O U T',
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginAndGuestScreen()));
+                },
+                iconDrawerr: const FaIcon(
+                  FontAwesomeIcons.outdent,
+                  size: 16,
                 ),
               ),
             ),
