@@ -6,6 +6,8 @@ import 'dart:convert';
 import 'package:valineups/styles/project_color.dart';
 
 class AgentsInfo extends StatefulWidget {
+  const AgentsInfo({super.key});
+
   @override
   _AgentsInfoState createState() => _AgentsInfoState();
 }
@@ -30,6 +32,31 @@ class _AgentsInfoState extends State<AgentsInfo> {
     return Scaffold(
       backgroundColor: ProjectColor().dark,
       appBar: AppBar(
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: DropdownButton<String>(
+              value: selectedLanguage,
+              dropdownColor: Colors.grey[900], // Dropdown'un arka plan rengi
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedLanguage = newValue!;
+                });
+              },
+              items: <String>['en-US', 'tr-TR']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value == 'en-US' ? 'English' : 'Turkish',
+                    style: const TextStyle(
+                        color: Colors.white), // Yazı rengi beyaz
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_outlined,
               color: ProjectColor().white),
@@ -53,38 +80,16 @@ class _AgentsInfoState extends State<AgentsInfo> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: DropdownButton<String>(
-              value: selectedLanguage,
-              dropdownColor: Colors.grey[900], // Dropdown'un arka plan rengi
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedLanguage = newValue!;
-                });
-              },
-              items: <String>['en-US', 'tr-TR']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value == 'en-US' ? 'English' : 'Turkish',
-                    style: TextStyle(color: Colors.white), // Yazı rengi beyaz
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
           Expanded(
             child: FutureBuilder<List<dynamic>>(
               future: fetchAgents(selectedLanguage),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No data available'));
+                  return const Center(child: Text('No data available'));
                 } else {
                   return ListView.builder(
                     itemCount: snapshot.data!.length,
@@ -98,8 +103,8 @@ class _AgentsInfoState extends State<AgentsInfo> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        margin:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 16),
                         child: Padding(
                           padding: const EdgeInsets.only(top: 16, bottom: 16),
                           child: ListTile(
@@ -109,16 +114,17 @@ class _AgentsInfoState extends State<AgentsInfo> {
                             title: Text(
                               agent['displayName'].toUpperCase(),
                               style: TextStyle(
+                                shadows: [
+                                  Shadow(
+                                    color: ProjectColor().dark,
+                                    blurRadius: 20,
+                                  ),
+                                ],
+                                fontSize: 24,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: Fonts().valFonts,
-                              ),
-                            ),
-                            subtitle: Text(
-                              agent['description'],
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontWeight: FontWeight.w500,
+                                letterSpacing: 5,
                               ),
                             ),
                             onTap: () {
@@ -148,7 +154,7 @@ class _AgentsInfoState extends State<AgentsInfo> {
 class AgentDetailPage extends StatelessWidget {
   final Map<String, dynamic> agent;
 
-  AgentDetailPage({required this.agent});
+  const AgentDetailPage({super.key, required this.agent});
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +189,7 @@ class AgentDetailPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(child: Image.network(agent['fullPortrait'])),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 agent['description'],
                 style: TextStyle(
@@ -193,7 +199,7 @@ class AgentDetailPage extends StatelessWidget {
                       ),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 'Role: ${agent['role']['displayName']}',
                 style: TextStyle(
@@ -201,7 +207,7 @@ class AgentDetailPage extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: ProjectColor().white),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 agent['role']['description'],
                 style: TextStyle(
@@ -210,7 +216,7 @@ class AgentDetailPage extends StatelessWidget {
                       ),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 'Abilities:',
                 style: TextStyle(
@@ -238,7 +244,7 @@ class AgentDetailPage extends StatelessWidget {
                   ),
                 );
               }).toList(),
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
             ],
           ),
         ),

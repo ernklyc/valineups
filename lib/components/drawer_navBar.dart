@@ -6,6 +6,7 @@ import 'package:random_avatar/random_avatar.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/screens/agents.dart';
 import 'package:valineups/screens/agents_info.dart';
+import 'package:valineups/screens/bundles.dart';
 import 'package:valineups/screens/chat.dart';
 import 'package:valineups/screens/login_and_guest.dart';
 import 'package:valineups/screens/maps.dart';
@@ -150,7 +151,7 @@ class _ControlPageState extends State<ControlPage> {
                             MaterialPageRoute(
                                 builder: (context) => AgentsInfo()));
                       },
-                      iconDrawerr: FaIcon(
+                      iconDrawerr: const FaIcon(
                         FontAwesomeIcons.userNinja,
                         size: 16,
                       ),
@@ -164,7 +165,7 @@ class _ControlPageState extends State<ControlPage> {
                                 builder: (context) =>
                                     const CompetitiveTiersScreen()));
                       },
-                      iconDrawerr: FaIcon(
+                      iconDrawerr: const FaIcon(
                         FontAwesomeIcons.trophy,
                         size: 16,
                       ),
@@ -177,7 +178,7 @@ class _ControlPageState extends State<ControlPage> {
                             MaterialPageRoute(
                                 builder: (context) => const WeaponsPage()));
                       },
-                      iconDrawerr: FaIcon(
+                      iconDrawerr: const FaIcon(
                         FontAwesomeIcons.gun,
                         size: 16,
                       ),
@@ -191,8 +192,21 @@ class _ControlPageState extends State<ControlPage> {
                                 builder: (context) =>
                                     const WeaponSkinsScreen()));
                       },
-                      iconDrawerr: FaIcon(
+                      iconDrawerr: const FaIcon(
                         FontAwesomeIcons.sackDollar,
+                        size: 16,
+                      ),
+                    ),
+                    _createDrawerItem(
+                      text: 'B U N D L E S',
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BundlesPage()));
+                      },
+                      iconDrawerr: const FaIcon(
+                        FontAwesomeIcons.boxArchive,
                         size: 16,
                       ),
                     ),
@@ -205,7 +219,7 @@ class _ControlPageState extends State<ControlPage> {
                                 builder: (context) =>
                                     const PlayerCardsScreen()));
                       },
-                      iconDrawerr: FaIcon(
+                      iconDrawerr: const FaIcon(
                         FontAwesomeIcons.clipboardUser,
                         size: 16,
                       ),
@@ -218,7 +232,7 @@ class _ControlPageState extends State<ControlPage> {
                             MaterialPageRoute(
                                 builder: (context) => const SprayListScreen()));
                       },
-                      iconDrawerr: FaIcon(
+                      iconDrawerr: const FaIcon(
                         FontAwesomeIcons.sprayCanSparkles,
                         size: 16,
                       ),
@@ -241,7 +255,7 @@ class _ControlPageState extends State<ControlPage> {
                         MaterialPageRoute(
                             builder: (context) => const LoginAndGuestScreen()));
                   },
-                  iconDrawerr: FaIcon(
+                  iconDrawerr: const FaIcon(
                     FontAwesomeIcons.outdent,
                     size: 16,
                   ),
