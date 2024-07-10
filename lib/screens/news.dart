@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 class News extends StatefulWidget {
   const News({super.key});
@@ -67,6 +68,7 @@ class _NewsState extends State<News> {
                   'description': descriptionController.text,
                   'fullContent': fullContentController.text,
                   'imageUrl': imageUrlController.text,
+                  'publicationDate': DateTime.now(), // Add publication date
                 });
                 Navigator.of(context).pop();
               },
@@ -76,6 +78,10 @@ class _NewsState extends State<News> {
         );
       },
     );
+  }
+
+  void _deleteNews(String docId) {
+    FirebaseFirestore.instance.collection('news').doc(docId).delete();
   }
 
   @override
@@ -109,10 +115,15 @@ class _NewsState extends State<News> {
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
                   final news = newsList[index];
+                  final publicationDate = (news['publicationDate'] as Timestamp).toDate();
+                  final formattedDate = DateFormat('dd MMM yyyy').format(publicationDate);
+                  final isCurrentUser = _user?.email == 'ernklyc@gmail.com';
+
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
                       child: ListTile(
+                        contentPadding: EdgeInsets.all(10),
                         leading: news['imageUrl'] != null
                             ? Image.network(
                                 news['imageUrl'],
@@ -120,8 +131,21 @@ class _NewsState extends State<News> {
                                 width: 100,
                               )
                             : null,
-                        title: Text(news['title']),
-                        subtitle: Text(news['description']),
+                        title: Text(news['title'], style: TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(news['description']),
+                            SizedBox(height: 5),
+                            Text('Published on: $formattedDate', style: TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                        trailing: isCurrentUser
+                            ? IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () => _deleteNews(news.id),
+                              )
+                            : null,
                         onTap: () {
                           showDialog(
                             context: context,
@@ -130,8 +154,7 @@ class _NewsState extends State<News> {
                                 title: Text(news['title']),
                                 content: SingleChildScrollView(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       news['imageUrl'] != null
                                           ? Image.network(news['imageUrl'])
