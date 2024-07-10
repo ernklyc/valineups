@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class News extends StatefulWidget {
   const News({super.key});
@@ -9,8 +11,77 @@ class News extends StatefulWidget {
 }
 
 class _NewsState extends State<News> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _user = _auth.currentUser;
+  }
+
+  void _addNews() {
+    final TextEditingController titleController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+    final TextEditingController fullContentController = TextEditingController();
+    final TextEditingController imageUrlController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Add News'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(labelText: 'Title'),
+                ),
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(labelText: 'Description'),
+                ),
+                TextField(
+                  controller: fullContentController,
+                  decoration: InputDecoration(labelText: 'Full Content'),
+                ),
+                TextField(
+                  controller: imageUrlController,
+                  decoration: InputDecoration(labelText: 'Image URL'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                FirebaseFirestore.instance.collection('news').add({
+                  'title': titleController.text,
+                  'description': descriptionController.text,
+                  'fullContent': fullContentController.text,
+                  'imageUrl': imageUrlController.text,
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final double mediaQueryHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('News'),
@@ -27,56 +98,77 @@ class _NewsState extends State<News> {
 
           final newsList = snapshot.data?.docs ?? [];
 
-          return ListView.builder(
-            itemCount: newsList.length,
-            itemBuilder: (context, index) {
-              final news = newsList[index];
-              return Card(
-                child: ListTile(
-                  leading: news['imageUrl'] != null
-                      ? Image.network(
-                          news['imageUrl'],
-                          width: 100,
-                        )
-                      : null,
-                  title: Text(news['title']),
-                  subtitle: Text(news['description']),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text(news['title']),
-                          content: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                news['imageUrl'] != null
-                                    ? Image.network(news['imageUrl'])
-                                    : Container(),
-                                SizedBox(height: 10),
-                                Text(news['fullContent']),
-                              ],
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('Close'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                ),
-              );
-            },
+          return Center(
+            child: SizedBox(
+              height: mediaQueryHeight * 0.8,
+              child: Swiper(
+                loop: true,
+                viewportFraction: 0.8,
+                scale: 0.9,
+                scrollDirection: Axis.vertical,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  final news = newsList[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: ListTile(
+                        leading: news['imageUrl'] != null
+                            ? Image.network(
+                                news['imageUrl'],
+                                fit: BoxFit.fill,
+                                width: 100,
+                              )
+                            : null,
+                        title: Text(news['title']),
+                        subtitle: Text(news['description']),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text(news['title']),
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      news['imageUrl'] != null
+                                          ? Image.network(news['imageUrl'])
+                                          : Container(),
+                                      SizedBox(height: 10),
+                                      Text(news['fullContent']),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Close'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+                itemCount: newsList.length,
+              ),
+            ),
           );
         },
       ),
+      floatingActionButton: _user?.email == 'ernklyc@gmail.com'
+          ? FloatingActionButton(
+              onPressed: _addNews,
+              child: Icon(Icons.add),
+            )
+          : null,
     );
   }
 }
