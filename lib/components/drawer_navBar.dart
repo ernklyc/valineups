@@ -9,6 +9,7 @@ import 'package:valineups/screens/bundles.dart';
 import 'package:valineups/screens/chat.dart';
 import 'package:valineups/screens/login_and_guest.dart';
 import 'package:valineups/screens/maps.dart';
+import 'package:valineups/screens/news.dart';
 import 'package:valineups/screens/player_card.dart';
 import 'package:valineups/screens/profile.dart';
 import 'package:valineups/screens/rank.dart';
@@ -17,6 +18,9 @@ import 'package:valineups/screens/wapon.dart';
 import 'package:valineups/screens/wapon_skins.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
+import 'package:valineups/services/firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class ControlPage extends StatefulWidget {
   const ControlPage({super.key});
@@ -28,6 +32,24 @@ class ControlPage extends StatefulWidget {
 class _ControlPageState extends State<ControlPage> {
   int _currentIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
+  final AuthService authService = AuthService();
+  String guestUserName = "";
+  String displayName = "";
+  String email = "";
+  String photoUrl = "";
+
+  @override
+  void initState() {
+    super.initState();
+    authService.signInWithGoogle().then((_) {
+      setState(() {
+        displayName = authService.displayName ?? generateGuestUserName(6);
+        email = authService.email ?? 'valineups user';
+        photoUrl = authService.photoUrl ?? "";
+      });
+    });
+    guestUserName = shortenName(generateGuestUserName(6), 30);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -56,10 +78,6 @@ class _ControlPageState extends State<ControlPage> {
 
   @override
   Widget build(BuildContext context) {
-    //final User? user = ModalRoute.of(context)?.settings.arguments as User?;
-    String guestUserName = generateGuestUserName(6);
-    guestUserName = shortenName(guestUserName, 30);
-
     return Scaffold(
       backgroundColor: ProjectColor().dark,
       appBar: AppBar(
@@ -100,11 +118,13 @@ class _ControlPageState extends State<ControlPage> {
               child: Row(
                 children: [
                   ClipOval(
-                    child: RandomAvatar(
-                      DateTime.now().toIso8601String(),
-                      height: 50,
-                      width: 50,
-                    ),
+                    child: photoUrl.isNotEmpty
+                        ? Image.network(photoUrl, height: 50, width: 50)
+                        : RandomAvatar(
+                            DateTime.now().toIso8601String(),
+                            height: 50,
+                            width: 50,
+                          ),
                   ),
                   const SizedBox(width: 15),
                   Column(
@@ -112,7 +132,7 @@ class _ControlPageState extends State<ControlPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        guestUserName,
+                        displayName,
                         textAlign: TextAlign.start,
                         style: TextStyle(
                           color: ProjectColor().white,
@@ -121,9 +141,8 @@ class _ControlPageState extends State<ControlPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      // Ekstra bilgiler eklemek için buraya Text widget'ları ekleyebilirsiniz
                       Text(
-                        'valinups user', // Ekstra bilgi örneği
+                        email,
                         textAlign: TextAlign.start,
                         style: TextStyle(
                           color: ProjectColor().hintGrey,
@@ -241,11 +260,14 @@ class _ControlPageState extends State<ControlPage> {
                   right: 12),
               child: _createDrawerItem(
                 text: 'L O G O U T',
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginAndGuestScreen()));
+                onTap: () async {
+                  await authService.signOut();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginAndGuestScreen(),
+                    ),
+                  );
                 },
                 iconDrawerr: const FaIcon(
                   FontAwesomeIcons.outdent,
@@ -266,8 +288,9 @@ class _ControlPageState extends State<ControlPage> {
               children: [
                 _buildTopNavigationItem(Icons.people, "AGENTS", 0),
                 _buildTopNavigationItem(Icons.map, "MAPS", 1),
-                _buildTopNavigationItem(Icons.chat, "CHAT", 2),
-                _buildTopNavigationItem(Icons.bookmark, "SAVED", 3),
+                _buildTopNavigationItem(Icons.bookmark, "SAVED", 2),
+                _buildTopNavigationItem(Icons.chat, "CHAT", 3),
+                _buildTopNavigationItem(Icons.chat, "NEWS", 4),
               ],
             ),
           ),
@@ -282,8 +305,9 @@ class _ControlPageState extends State<ControlPage> {
               children: const [
                 Agents(),
                 Maps(),
-                Chat(),
                 Profile(),
+                Chat(),
+                News(),
               ],
             ),
           ),
@@ -337,7 +361,7 @@ class _ControlPageState extends State<ControlPage> {
                   ? ProjectColor().white
                   : ProjectColor().hintGrey,
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 16,
             ),
           ),
           if (_currentIndex == index)
