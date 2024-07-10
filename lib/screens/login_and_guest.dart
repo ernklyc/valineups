@@ -2,14 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/drawer_navBar.dart';
 import 'package:valineups/components/valineups_text.dart';
+import 'package:valineups/services/firestore.dart';
 import 'package:valineups/utils/constants.dart';
 import 'onboarding_screen.dart';
 import 'package:valineups/components/custom_button.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/styles/project_color.dart';
 
-class LoginAndGuestScreen extends StatelessWidget {
+class LoginAndGuestScreen extends StatefulWidget {
   const LoginAndGuestScreen({super.key});
+
+  @override
+  _LoginAndGuestScreenState createState() => _LoginAndGuestScreenState();
+}
+
+class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
+  late ThemeData themeData;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    themeData = Theme.of(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,30 +62,28 @@ class LoginAndGuestScreen extends StatelessWidget {
                               image: AuthPageText().googleAuth,
                               buttonTxt: AuthPageText().google,
                               onPressed: () async {
+                                await AuthService().signInWithGoogle();
+                                if (!mounted) return;
                                 Navigator.pushReplacement(
-                                  // ignore: use_build_context_synchronously
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => const ControlPage(),
                                   ),
                                 );
                               }),
-                          // CustomButton(
-                          //   image: AuthPageText().mailAuth,
-                          //   buttonTxt: AuthPageText().mail,
-                          // ),
                           CustomButton(
                               image: AuthPageText().anonimAuth,
                               buttonTxt: AuthPageText().anonim,
                               onPressed: () async {
+                                if (!mounted) return;
                                 Navigator.pushReplacement(
-                                  // ignore: use_build_context_synchronously
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => const ControlPage(),
                                   ),
                                 );
                               }),
+                          SizedBox(height: mediaQueryWidth / 30),
                         ],
                       ),
                       SizedBox(height: mediaQueryWidth / 30),
@@ -97,8 +109,8 @@ class LoginAndGuestScreen extends StatelessWidget {
           onPressed: () async {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setBool('seenOnboarding', true);
+            if (!mounted) return;
             Navigator.pushReplacement(
-              // ignore: use_build_context_synchronously
               context,
               MaterialPageRoute(
                 builder: (context) => const OnboardingScreen(),
@@ -114,6 +126,23 @@ class LoginAndGuestScreen extends StatelessWidget {
       ),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.endTop, // Düğmenin konumu
+    );
+  }
+
+  Widget _buildTextField(String hintText, bool obscureText) {
+    return TextField(
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        hintText: hintText,
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.8),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+      ),
     );
   }
 }

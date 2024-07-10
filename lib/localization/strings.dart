@@ -11,6 +11,11 @@ class AuthPageText {
 
   final String google = "Google";
   final String anonim = "Anonim";
+
+  final String usernameHint = "Anonim";
+  final String emailHint = "Anonim";
+  final String passwordHint = "Anonim";
+  final String confirmPasswordHint = "Anonim";
 }
 
 class OnBoardingScreen {

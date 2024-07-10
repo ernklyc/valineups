@@ -12,7 +12,20 @@
           "package_name": "com.example.valineups"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "460791088203-cba13hjtm21tribg6jd9k35pn3loiolj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.valineups",
+            "certificate_hash": "f8a3788bc2a4b5d2b64d25a8fc1979231d886db7"
+          }
+        },
+        {
+          "client_id": "460791088203-jkc3mqbi8vn92i7speq4nvbntjvqcp4r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBV101K1bu6YNYp4Uz6J71jDlL00A75p_M"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "460791088203-jkc3mqbi8vn92i7speq4nvbntjvqcp4r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

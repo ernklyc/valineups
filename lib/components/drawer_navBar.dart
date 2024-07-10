@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
@@ -57,6 +56,7 @@ class _ControlPageState extends State<ControlPage> {
 
   @override
   Widget build(BuildContext context) {
+    //final User? user = ModalRoute.of(context)?.settings.arguments as User?;
     String guestUserName = generateGuestUserName(6);
     guestUserName = shortenName(guestUserName, 30);
 
@@ -145,7 +145,7 @@ class _ControlPageState extends State<ControlPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => AgentsInfo()));
+                              builder: (context) => const AgentsInfo()));
                     },
                     iconDrawerr: const FaIcon(
                       FontAwesomeIcons.userNinja,
@@ -198,7 +198,7 @@ class _ControlPageState extends State<ControlPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => BundlesPage()));
+                              builder: (context) => const BundlesPage()));
                     },
                     iconDrawerr: const FaIcon(
                       FontAwesomeIcons.boxArchive,
