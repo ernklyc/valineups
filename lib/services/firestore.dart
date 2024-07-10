@@ -35,6 +35,21 @@ class AuthService {
     }
   }
 
+  Future<void> signInAnonymously() async {
+    try {
+      UserCredential userCredential = await firebaseAuth.signInAnonymously();
+      User? user = userCredential.user;
+
+      if (user != null) {
+        displayName = 'Guest';
+        email = 'guest@example.com';
+        photoUrl = '';
+      }
+    } on FirebaseAuthException catch (e) {
+      print(e.toString());
+    }
+  }
+
   Future<void> signOut() async {
     try {
       await googleSignIn.signOut();

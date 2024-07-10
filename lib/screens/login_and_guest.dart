@@ -8,6 +8,9 @@ import 'onboarding_screen.dart';
 import 'package:valineups/components/custom_button.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/styles/project_color.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 
 class LoginAndGuestScreen extends StatefulWidget {
   const LoginAndGuestScreen({super.key});
@@ -75,6 +78,7 @@ class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
                               image: AuthPageText().anonimAuth,
                               buttonTxt: AuthPageText().anonim,
                               onPressed: () async {
+                                await AuthService().signInAnonymously();
                                 if (!mounted) return;
                                 Navigator.pushReplacement(
                                   context,
@@ -128,21 +132,17 @@ class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
           FloatingActionButtonLocation.endTop, // Düğmenin konumu
     );
   }
+}
 
-  Widget _buildTextField(String hintText, bool obscureText) {
-    return TextField(
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        hintText: hintText,
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.8),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
-      ),
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: ControlPage(),
     );
   }
 }
