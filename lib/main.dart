@@ -4,13 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/screens/login_and_guest.dart';
 import 'package:valineups/screens/onboarding_screen.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
+
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
@@ -20,8 +18,9 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final bool seenOnboarding;
-  // ignore: use_key_in_widget_constructors
+
   const MyApp({required this.seenOnboarding});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

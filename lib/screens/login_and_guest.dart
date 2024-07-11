@@ -67,7 +67,7 @@ class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
                                   highlightColor: Colors.yellow,
                                   child: SizedBox(
                                     width: mediaQueryWidth * 0.6,
-                                    child: Text(
+                                    child: const Text(
                                       'Loading...',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
@@ -101,7 +101,7 @@ class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        SnackBar(
+                                        const SnackBar(
                                           content:
                                               Text('Google sign-in failed'),
                                         ),
@@ -114,7 +114,7 @@ class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
                                   highlightColor: Colors.yellow,
                                   child: SizedBox(
                                     width: mediaQueryWidth * 0.6,
-                                    child: Text(
+                                    child: const Text(
                                       'Loading...',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
@@ -148,7 +148,7 @@ class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        SnackBar(
+                                        const SnackBar(
                                           content:
                                               Text('Anonymous sign-in failed'),
                                         ),

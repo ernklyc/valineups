@@ -30,6 +30,7 @@ class _NewsState extends State<News> {
     final TextEditingController descriptionController = TextEditingController();
     final TextEditingController fullContentController = TextEditingController();
     final TextEditingController imageUrlController = TextEditingController();
+    final TextEditingController tagController = TextEditingController();
 
     showDialog(
       context: context,
@@ -62,6 +63,10 @@ class _NewsState extends State<News> {
                   controller: imageUrlController,
                   labelText: 'Resim URL',
                 ),
+                CustomTextField(
+                  controller: imageUrlController,
+                  labelText: 'TAG',
+                ),
               ],
             ),
           ),
@@ -84,6 +89,7 @@ class _NewsState extends State<News> {
                   'description': descriptionController.text,
                   'fullContent': fullContentController.text,
                   'imageUrl': imageUrlController.text,
+                  'tag': tagController.text,
                   'timestamp': FieldValue.serverTimestamp(),
                 });
                 Navigator.of(context).pop();
@@ -357,7 +363,7 @@ class _NewsState extends State<News> {
                                 top: 10,
                                 right: 10,
                                 child: Container(
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     color: Colors.white,
                                     shape: BoxShape.circle,
                                     boxShadow: [

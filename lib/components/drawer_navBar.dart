@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
@@ -58,7 +59,6 @@ class _ControlPageState extends State<ControlPage> {
 
   @override
   Widget build(BuildContext context) {
-    //final User? user = ModalRoute.of(context)?.settings.arguments as User?;
     String guestUserName = generateGuestUserName(6);
     guestUserName = shortenName(guestUserName, 30);
 
@@ -77,12 +77,62 @@ class _ControlPageState extends State<ControlPage> {
           },
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.notifications,
-              color: ProjectColor().white,
-            ),
-            onPressed: () {},
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('news').snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return IconButton(
+                  icon: Icon(
+                    Icons.notifications,
+                    color: ProjectColor().white,
+                  ),
+                  onPressed: () {},
+                );
+              }
+
+              int newPostsCount = snapshot.data?.docs.length ?? 0;
+
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.notifications,
+                      color: ProjectColor().white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        newPostsCount = 0;
+                      });
+                      _onItemTapped(4); // Navigate to the News page
+                    },
+                  ),
+                  if (newPostsCount > 0)
+                    Positioned(
+                      right: 11,
+                      top: 11,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 14,
+                          minHeight: 14,
+                        ),
+                        child: Text(
+                          '$newPostsCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ],
         backgroundColor: ProjectColor().dark,
@@ -123,9 +173,8 @@ class _ControlPageState extends State<ControlPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      // Ekstra bilgiler eklemek için buraya Text widget'ları ekleyebilirsiniz
                       Text(
-                        'valinups user', // Ekstra bilgi örneği
+                        'valinups user',
                         textAlign: TextAlign.start,
                         style: TextStyle(
                           color: ProjectColor().hintGrey,
@@ -273,7 +322,7 @@ class _ControlPageState extends State<ControlPage> {
                 _buildTopNavigationItem(Icons.map, "MAPS", 1),
                 _buildTopNavigationItem(Icons.bookmark, "SAVED", 2),
                 _buildTopNavigationItem(Icons.chat, "CHAT", 3),
-                _buildTopNavigationItem(Icons.chat, "MEWS", 4),
+                _buildTopNavigationItem(Icons.chat, "NEWS", 4),
               ],
             ),
           ),

@@ -123,7 +123,9 @@ class _AgentsState extends State<Agents> {
                       height: mediaQueryHeight * 0.6,
                       width: 100.0,
                       decoration: BoxDecoration(
-                        color: ProjectColor().white, // Dark background color
+                        color: ProjectColor()
+                            .white
+                            .withOpacity(0.8), // Dark background color
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: ListView.builder(
@@ -164,11 +166,11 @@ class _AgentsState extends State<Agents> {
               _isDropdownOpen = !_isDropdownOpen;
             });
           },
+          backgroundColor: ProjectColor().white,
           child: FaIcon(
             FontAwesomeIcons.userNinja,
             color: ProjectColor().valoRed,
           ),
-          backgroundColor: ProjectColor().white,
         ),
       ),
     );
