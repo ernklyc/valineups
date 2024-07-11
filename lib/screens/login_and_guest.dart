@@ -8,8 +8,6 @@ import 'onboarding_screen.dart';
 import 'package:valineups/components/custom_button.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/styles/project_color.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 
 class LoginAndGuestScreen extends StatefulWidget {

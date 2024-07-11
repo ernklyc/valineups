@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -33,7 +32,7 @@ class _NewsState extends State<News> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: ProjectColor().dark,
-          title: Text(
+          title: const Text(
             'HABER EKLE',
             style: TextStyle(
               color: Colors.white,
@@ -67,7 +66,7 @@ class _NewsState extends State<News> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(
+              child: const Text(
                 'ÇIK',
                 style: TextStyle(
                   color: Colors.white,
@@ -81,10 +80,11 @@ class _NewsState extends State<News> {
                   'description': descriptionController.text,
                   'fullContent': fullContentController.text,
                   'imageUrl': imageUrlController.text,
+                  'timestamp': FieldValue.serverTimestamp(),
                 });
                 Navigator.of(context).pop();
               },
-              child: Text(
+              child: const Text(
                 'EKLE',
                 style: TextStyle(
                   color: Colors.white,
@@ -95,6 +95,10 @@ class _NewsState extends State<News> {
         );
       },
     );
+  }
+
+  void _deleteNews(String docId) {
+    FirebaseFirestore.instance.collection('news').doc(docId).delete();
   }
 
   void _showNewsDetail(Map<String, dynamic> news) {
@@ -109,7 +113,7 @@ class _NewsState extends State<News> {
           title: Text(
             textAlign: TextAlign.center,
             news['title'],
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
@@ -124,13 +128,13 @@ class _NewsState extends State<News> {
                         child: Image.network(news['imageUrl']),
                       )
                     : Container(),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Text(
                     textAlign: TextAlign.center,
                     news['fullContent'],
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                     ),
@@ -144,7 +148,7 @@ class _NewsState extends State<News> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(
+              child: const Text(
                 'KAPAT',
                 style: TextStyle(
                   color: Colors.white,
@@ -164,13 +168,16 @@ class _NewsState extends State<News> {
     return Scaffold(
       backgroundColor: ProjectColor().dark,
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('news').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('news')
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Something went wrong'));
+            return const Center(child: Text('Something went wrong'));
           }
 
           final newsList = snapshot.data?.docs ?? [];
@@ -221,20 +228,20 @@ class _NewsState extends State<News> {
                                 children: [
                                   Text(
                                     news['title'],
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 2,
                                     ),
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                   Text(
                                     news['description'].length > 30
                                         ? news['description'].substring(0, 35) +
                                             '...'
                                         : news['description'],
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
                                     ),
@@ -242,6 +249,32 @@ class _NewsState extends State<News> {
                                 ],
                               ),
                             ),
+                            if (_user?.email == 'ernklyc@gmail.com')
+                              Positioned(
+                                top: 10,
+                                right: 10,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black,
+                                        blurRadius: 10,
+                                      ),
+                                    ],
+                                  ),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: ProjectColor().dark,
+                                    ),
+                                    onPressed: () {
+                                      _deleteNews(news.id);
+                                    },
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -258,7 +291,7 @@ class _NewsState extends State<News> {
           ? FloatingActionButton(
               backgroundColor: ProjectColor().valoRed,
               onPressed: _addNews,
-              child: FaIcon(FontAwesomeIcons.plus, color: Colors.white),
+              child: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
             )
           : null,
     );
@@ -270,10 +303,10 @@ class CustomTextField extends StatelessWidget {
   final String labelText;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.labelText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
