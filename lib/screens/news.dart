@@ -106,13 +106,18 @@ class _NewsState extends State<News> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: const Text(
-                'Silmek istediğine emin miisn?',
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                textAlign: TextAlign.center,
+                'SİLMEK İSTİYOR MUSUN?',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -123,16 +128,44 @@ class _NewsState extends State<News> {
               children: [
                 TextButton(
                   style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    backgroundColor: ProjectColor().dark,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     textStyle: const TextStyle(
                       fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('HAYIR'),
+                  child: const Text(
+                    'HAYIR',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
                 TextButton(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                   onPressed: () {
                     FirebaseFirestore.instance
                         .collection('news')
@@ -140,7 +173,12 @@ class _NewsState extends State<News> {
                         .delete();
                     Navigator.of(context).pop();
                   },
-                  child: const Text('SİL'),
+                  child: const Text(
+                    'SİL',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),
