@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:valineups/styles/project_color.dart';
+import 'package:intl/intl.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class News extends StatefulWidget {
   const News({super.key});
@@ -19,6 +22,7 @@ class _NewsState extends State<News> {
   void initState() {
     super.initState();
     _user = _auth.currentUser;
+    tz.initializeTimeZones();
   }
 
   void _addNews() {
@@ -98,7 +102,52 @@ class _NewsState extends State<News> {
   }
 
   void _deleteNews(String docId) {
-    FirebaseFirestore.instance.collection('news').doc(docId).delete();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: const Text(
+                'Silmek istediğine emin miisn?',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('HAYIR'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    FirebaseFirestore.instance
+                        .collection('news')
+                        .doc(docId)
+                        .delete();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('SİL'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showNewsDetail(Map<String, dynamic> news) {
@@ -190,6 +239,14 @@ class _NewsState extends State<News> {
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
                   final news = newsList[index];
+                  final timestamp = news['timestamp']?.toDate();
+                  final localTime = timestamp != null
+                      ? tz.TZDateTime.from(timestamp, tz.local)
+                      : null;
+                  final formattedTimestamp = localTime != null
+                      ? DateFormat('dd/MM/yyyy HH:mm').format(localTime)
+                      : 'Bilinmiyor';
+
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
@@ -244,6 +301,14 @@ class _NewsState extends State<News> {
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    formattedTimestamp,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 ],
