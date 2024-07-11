@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/drawer_navBar.dart';
 import 'package:valineups/components/valineups_text.dart';
@@ -9,7 +10,6 @@ import 'package:valineups/components/custom_button.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/styles/project_color.dart';
 
-
 class LoginAndGuestScreen extends StatefulWidget {
   const LoginAndGuestScreen({super.key});
 
@@ -19,6 +19,8 @@ class LoginAndGuestScreen extends StatefulWidget {
 
 class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
   late ThemeData themeData;
+  bool _isLoadingGoogle = false;
+  bool _isLoadingAnonymous = false;
 
   @override
   void didChangeDependencies() {
@@ -59,32 +61,100 @@ class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          CustomButton(
-                              image: AuthPageText().googleAuth,
-                              buttonTxt: AuthPageText().google,
-                              onPressed: () async {
-                                await AuthService().signInWithGoogle();
-                                if (!mounted) return;
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ControlPage(),
+                          _isLoadingGoogle
+                              ? Shimmer.fromColors(
+                                  baseColor: Colors.red,
+                                  highlightColor: Colors.yellow,
+                                  child: SizedBox(
+                                    width: mediaQueryWidth * 0.6,
+                                    child: Text(
+                                      'Loading...',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                );
-                              }),
-                          CustomButton(
-                              image: AuthPageText().anonimAuth,
-                              buttonTxt: AuthPageText().anonim,
-                              onPressed: () async {
-                                await AuthService().signInAnonymously();
-                                if (!mounted) return;
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ControlPage(),
+                                )
+                              : CustomButton(
+                                  image: AuthPageText().googleAuth,
+                                  buttonTxt: AuthPageText().google,
+                                  onPressed: () async {
+                                    setState(() {
+                                      _isLoadingGoogle = true;
+                                    });
+                                    bool result =
+                                        await AuthService().signInWithGoogle();
+                                    setState(() {
+                                      _isLoadingGoogle = false;
+                                    });
+                                    if (result) {
+                                      if (!mounted) return;
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ControlPage(),
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content:
+                                              Text('Google sign-in failed'),
+                                        ),
+                                      );
+                                    }
+                                  }),
+                          _isLoadingAnonymous
+                              ? Shimmer.fromColors(
+                                  baseColor: Colors.red,
+                                  highlightColor: Colors.yellow,
+                                  child: SizedBox(
+                                    width: mediaQueryWidth * 0.6,
+                                    child: Text(
+                                      'Loading...',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                );
-                              }),
+                                )
+                              : CustomButton(
+                                  image: AuthPageText().anonimAuth,
+                                  buttonTxt: AuthPageText().anonim,
+                                  onPressed: () async {
+                                    setState(() {
+                                      _isLoadingAnonymous = true;
+                                    });
+                                    bool result =
+                                        await AuthService().signInAnonymously();
+                                    setState(() {
+                                      _isLoadingAnonymous = false;
+                                    });
+                                    if (result) {
+                                      if (!mounted) return;
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ControlPage(),
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content:
+                                              Text('Anonymous sign-in failed'),
+                                        ),
+                                      );
+                                    }
+                                  }),
                           SizedBox(height: mediaQueryWidth / 30),
                         ],
                       ),
@@ -128,21 +198,6 @@ class _LoginAndGuestScreenState extends State<LoginAndGuestScreen> {
       ),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.endTop, // Düğmenin konumu
-    );
-  }
-}
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: ControlPage(),
     );
   }
 }

@@ -282,7 +282,7 @@ class _NewsState extends State<News> {
                       ? tz.TZDateTime.from(timestamp, tz.local)
                       : null;
                   final formattedTimestamp = localTime != null
-                      ? DateFormat('dd/MM/yyyy HH:mm').format(localTime)
+                      ? DateFormat('dd/MM/yyyy').format(localTime)
                       : 'Bilinmiyor';
 
                   return Padding(

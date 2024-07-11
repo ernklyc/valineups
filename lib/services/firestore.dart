@@ -9,7 +9,7 @@ class AuthService {
   String? email;
   String? photoUrl;
 
-  Future<void> signInWithGoogle() async {
+  Future<bool> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleSignInAccount =
           await googleSignIn.signIn();
@@ -28,14 +28,16 @@ class AuthService {
           displayName = user.displayName;
           email = user.email;
           photoUrl = user.photoURL;
+          return true;
         }
       }
     } on FirebaseAuthException catch (e) {
       print(e.toString());
     }
+    return false;
   }
 
-  Future<void> signInAnonymously() async {
+  Future<bool> signInAnonymously() async {
     try {
       UserCredential userCredential = await firebaseAuth.signInAnonymously();
       User? user = userCredential.user;
@@ -44,10 +46,12 @@ class AuthService {
         displayName = 'Guest';
         email = 'guest@example.com';
         photoUrl = '';
+        return true;
       }
     } on FirebaseAuthException catch (e) {
       print(e.toString());
     }
+    return false;
   }
 
   Future<void> signOut() async {
