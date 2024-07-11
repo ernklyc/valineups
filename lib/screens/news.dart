@@ -223,9 +223,9 @@ class _NewsState extends State<News> {
                     : Container(),
                 const SizedBox(height: 10),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                     news['fullContent'],
                     style: const TextStyle(
                       color: Colors.white,
