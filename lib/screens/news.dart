@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:valineups/styles/project_color.dart';
 
 class News extends StatefulWidget {
   const News({super.key});
@@ -31,25 +32,32 @@ class _NewsState extends State<News> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add News'),
+          backgroundColor: ProjectColor().dark,
+          title: Text(
+            'HABER EKLE',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           content: SingleChildScrollView(
             child: Column(
               children: [
-                TextField(
+                CustomTextField(
                   controller: titleController,
-                  decoration: InputDecoration(labelText: 'Title'),
+                  labelText: 'Başlık',
                 ),
-                TextField(
+                CustomTextField(
                   controller: descriptionController,
-                  decoration: InputDecoration(labelText: 'Description'),
+                  labelText: 'Kısa İçerik',
                 ),
-                TextField(
+                CustomTextField(
                   controller: fullContentController,
-                  decoration: InputDecoration(labelText: 'Full Content'),
+                  labelText: 'Tam İçerik',
                 ),
-                TextField(
+                CustomTextField(
                   controller: imageUrlController,
-                  decoration: InputDecoration(labelText: 'Image URL'),
+                  labelText: 'Resim URL',
                 ),
               ],
             ),
@@ -59,7 +67,12 @@ class _NewsState extends State<News> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: Text(
+                'ÇIK',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -68,11 +81,15 @@ class _NewsState extends State<News> {
                   'description': descriptionController.text,
                   'fullContent': fullContentController.text,
                   'imageUrl': imageUrlController.text,
-                  'publicationDate': DateTime.now(), // Add publication date
                 });
                 Navigator.of(context).pop();
               },
-              child: Text('Add'),
+              child: Text(
+                'EKLE',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
             ),
           ],
         );
@@ -80,8 +97,64 @@ class _NewsState extends State<News> {
     );
   }
 
-  void _deleteNews(String docId) {
-    FirebaseFirestore.instance.collection('news').doc(docId).delete();
+  void _showNewsDetail(Map<String, dynamic> news) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          backgroundColor: ProjectColor().dark,
+          title: Text(
+            textAlign: TextAlign.center,
+            news['title'],
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                news['imageUrl'] != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Image.network(news['imageUrl']),
+                      )
+                    : Container(),
+                SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    textAlign: TextAlign.center,
+                    news['fullContent'],
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'KAPAT',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -89,9 +162,7 @@ class _NewsState extends State<News> {
     final double mediaQueryHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('News'),
-      ),
+      backgroundColor: ProjectColor().dark,
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('news').snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -106,76 +177,73 @@ class _NewsState extends State<News> {
 
           return Center(
             child: SizedBox(
-              height: mediaQueryHeight * 0.8,
-              child: Swiper(
-                loop: true,
-                viewportFraction: 0.8,
-                scale: 0.9,
+              height: mediaQueryHeight,
+              child: ListView.builder(
                 scrollDirection: Axis.vertical,
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
                   final news = newsList[index];
-                  final publicationDate = (news['publicationDate'] as Timestamp).toDate();
-                  final formattedDate = DateFormat('dd MMM yyyy').format(publicationDate);
-                  final isCurrentUser = _user?.email == 'ernklyc@gmail.com';
-
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(10),
-                        leading: news['imageUrl'] != null
-                            ? Image.network(
-                                news['imageUrl'],
-                                fit: BoxFit.fill,
-                                width: 100,
-                              )
-                            : null,
-                        title: Text(news['title'], style: TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(news['description']),
-                            SizedBox(height: 5),
-                            Text('Published on: $formattedDate', style: TextStyle(color: Colors.grey)),
-                          ],
+                    child: GestureDetector(
+                      onTap: () {
+                        _showNewsDetail(news.data() as Map<String, dynamic>);
+                      },
+                      child: Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          image: DecorationImage(
+                            image: NetworkImage(news['imageUrl']),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        trailing: isCurrentUser
-                            ? IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () => _deleteNews(news.id),
-                              )
-                            : null,
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text(news['title']),
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      news['imageUrl'] != null
-                                          ? Image.network(news['imageUrl'])
-                                          : Container(),
-                                      SizedBox(height: 10),
-                                      Text(news['fullContent']),
-                                    ],
-                                  ),
+                        child: Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    ProjectColor().dark.withOpacity(0.9),
+                                    Colors.black.withOpacity(0.0),
+                                  ],
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
                                 ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text('Close'),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 20,
+                              left: 20,
+                              right: 0,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    news['title'],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    news['description'].length > 30
+                                        ? news['description'].substring(0, 35) +
+                                            '...'
+                                        : news['description'],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                 ],
-                              );
-                            },
-                          );
-                        },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -188,10 +256,41 @@ class _NewsState extends State<News> {
       ),
       floatingActionButton: _user?.email == 'ernklyc@gmail.com'
           ? FloatingActionButton(
+              backgroundColor: ProjectColor().valoRed,
               onPressed: _addNews,
-              child: Icon(Icons.add),
+              child: FaIcon(FontAwesomeIcons.plus, color: Colors.white),
             )
           : null,
+    );
+  }
+}
+
+class CustomTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelText;
+
+  const CustomTextField({
+    Key? key,
+    required this.controller,
+    required this.labelText,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      cursorColor: Colors.white,
+      controller: controller,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: const TextStyle(
+          color: Colors.grey,
+          fontSize: 13,
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+      ),
     );
   }
 }
