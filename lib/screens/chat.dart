@@ -36,15 +36,15 @@ class _ChatState extends State<Chat> {
   Widget build(BuildContext context) {
     User? user = _auth.currentUser;
 
-    if (user == null) {
-      // If the user is not logged in, show a message to prompt login
+    if (user == null || user.isAnonymous) {
+      // If the user is not logged in or is anonymous, show a message to prompt registration or login
       return Scaffold(
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const Text(
-                'Lütfen oturum açınız',
+                'Konuşmak için ilk önce kayıt olmalısınız',
                 style: TextStyle(fontSize: 20),
               ),
               const SizedBox(height: 20),
@@ -63,24 +63,8 @@ class _ChatState extends State<Chat> {
         ),
       );
     } else {
-      // If the user is logged in, show the chat screen
+      // If the user is logged in and not anonymous, show the chat screen
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Chat'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () async {
-                await _auth.signOut();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => LoginAndGuestScreen()),
-                );
-              },
-            ),
-          ],
-        ),
         body: Column(
           children: [
             Expanded(
@@ -112,7 +96,7 @@ class _ChatState extends State<Chat> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 100),
+              padding: const EdgeInsets.only(bottom: 150),
               child: Row(
                 children: [
                   Expanded(
