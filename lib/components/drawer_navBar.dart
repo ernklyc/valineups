@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/screens/agents.dart';
 import 'package:valineups/screens/agents_info.dart';
@@ -17,9 +18,9 @@ import 'package:valineups/screens/rank.dart';
 import 'package:valineups/screens/sprey.dart';
 import 'package:valineups/screens/wapon.dart';
 import 'package:valineups/screens/wapon_skins.dart';
+import 'package:valineups/services/firestore.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
-import 'package:valineups/services/firestore.dart';
 
 class ControlPage extends StatefulWidget {
   const ControlPage({super.key});
@@ -29,8 +30,15 @@ class ControlPage extends StatefulWidget {
 }
 
 class _ControlPageState extends State<ControlPage> {
-  int _currentIndex = 0;
   final PageController _pageController = PageController(initialPage: 0);
+  final AuthService authService = AuthService();
+
+  String guestUserName = "";
+  String displayName = "";
+  String email = "";
+  String photoUrl = "";
+
+  int _currentIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -58,10 +66,30 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    String guestUserName = generateGuestUserName(6);
-    guestUserName = shortenName(guestUserName, 30);
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
 
+  void _fetchUserData() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        displayName = user.displayName ?? "Anonymous";
+        email = user.email ?? "";
+        photoUrl = user.photoURL ?? "";
+      });
+    } else {
+      setState(() {
+        guestUserName = generateGuestUserName(6);
+        displayName = shortenName(guestUserName, 30);
+        email = "Guest User";
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ProjectColor().dark,
       appBar: AppBar(
@@ -152,11 +180,13 @@ class _ControlPageState extends State<ControlPage> {
               child: Row(
                 children: [
                   ClipOval(
-                    child: RandomAvatar(
-                      DateTime.now().toIso8601String(),
-                      height: 50,
-                      width: 50,
-                    ),
+                    child: photoUrl.isNotEmpty
+                        ? Image.network(photoUrl, height: 50, width: 50)
+                        : RandomAvatar(
+                            DateTime.now().toIso8601String(),
+                            height: 50,
+                            width: 50,
+                          ),
                   ),
                   const SizedBox(width: 15),
                   Column(
@@ -164,7 +194,7 @@ class _ControlPageState extends State<ControlPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        guestUserName,
+                        displayName,
                         textAlign: TextAlign.start,
                         style: TextStyle(
                           color: ProjectColor().white,
@@ -174,7 +204,7 @@ class _ControlPageState extends State<ControlPage> {
                         ),
                       ),
                       Text(
-                        'valinups user',
+                        email,
                         textAlign: TextAlign.start,
                         style: TextStyle(
                           color: ProjectColor().hintGrey,
