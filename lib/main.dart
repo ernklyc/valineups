@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Debug yazısını kaldırır
+      debugShowCheckedModeBanner: false,
       home: seenOnboarding
           ? const LoginAndGuestScreen()
           : const OnboardingScreen(),
