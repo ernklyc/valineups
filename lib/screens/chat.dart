@@ -32,7 +32,6 @@ class _ChatState extends State<Chat> {
     List<Color> colors = [
       Colors.yellow,
       const Color.fromARGB(255, 127, 255, 131),
-      Colors.amber,
       Colors.teal,
     ];
 
@@ -63,7 +62,30 @@ class _ChatState extends State<Chat> {
   }
 
   void _deleteMessage(String messageId) async {
-    await _firestore.collection('messages').doc(messageId).delete();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Message'),
+          content: Text('Are you sure you want to delete this message?'),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Kapat dialog
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () async {
+                Navigator.of(context).pop(); // Kapat dialog
+                await _firestore.collection('messages').doc(messageId).delete();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _replyTo(String message, String sender) {
@@ -116,7 +138,7 @@ class _ChatState extends State<Chat> {
     } else {
       // Kullanıcı giriş yapmış ve anonim değilse, sohbet ekranını göster
       return Scaffold(
-        backgroundColor: ProjectColor().darkGrey,
+        backgroundColor: ProjectColor().dark,
         body: Column(
           children: [
             Expanded(
@@ -141,57 +163,58 @@ class _ChatState extends State<Chat> {
                       final isMe = message['uid'] == user.uid;
 
                       return Row(
-                          mainAxisAlignment: isMe
-                              ? MainAxisAlignment.end
-                              : MainAxisAlignment.start,
-                          children: [
+                        mainAxisAlignment: isMe
+                            ? MainAxisAlignment.end
+                            : MainAxisAlignment.start,
+                        children: [
+                          if (!isMe) // Kullanıcının kendi mesajı değilse avatar göster
                             CircleAvatar(
                               backgroundImage:
                                   NetworkImage(message['photoURL'] ?? ''),
                               radius: 15,
                             ),
-                            GestureDetector(
-                              onLongPress: isMe
-                                  ? () => _deleteMessage(message.id)
-                                  : null,
-                              onTap: () =>
-                                  _replyTo(message['text'], message['sender']),
-                              child: Align(
-                                alignment: isMe
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 8),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: isMe
-                                        ? ProjectColor().valoRed
-                                        : Colors.grey[900],
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      if (message['replyTo'] != null)
-                                        Container(
-                                          padding: const EdgeInsets.all(8.0),
-                                          margin: const EdgeInsets.only(
-                                              bottom: 8.0),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[200],
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            'Yanıtlanan: ${message['replyToSender']}\n"${message['replyTo']}"',
-                                            style: TextStyle(
-                                                color: Colors.grey[600],
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w500),
+                          GestureDetector(
+                            onLongPress:
+                                isMe ? () => _deleteMessage(message.id) : null,
+                            onTap: () =>
+                                _replyTo(message['text'], message['sender']),
+                            child: Align(
+                              alignment: isMe
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 8),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: isMe
+                                      ? ProjectColor().valoRed
+                                      : Colors.green[800],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (message['replyTo'] != null)
+                                      Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        margin:
+                                            const EdgeInsets.only(bottom: 8.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          'Yanıtlanan: ${message['replyToSender']}\n"${message['replyTo']}"',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         ),
+                                      ),
+                                    if (!isMe) // Kullanıcının kendi mesajı değilse isim göster
                                       Text(
                                         message['sender'],
                                         style: TextStyle(
@@ -200,22 +223,25 @@ class _ChatState extends State<Chat> {
                                           fontWeight: FontWeight.w900,
                                         ),
                                       ),
-                                      const SizedBox(height: 5),
-                                      Text(
-                                        message['text'],
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: isMe
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      message['text'],
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color:
+                                            isMe ? Colors.white : Colors.black,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ]);
+                          ),
+                          if (isMe) // Kullanıcının kendi mesajıysa boş bir widget döndür
+                            SizedBox(width: 16), // Boş bir widget
+                        ],
+                      );
                     },
                   );
                 },
