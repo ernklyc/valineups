@@ -25,20 +25,6 @@ class _ChatState extends State<Chat> {
   String? _replyToMessage;
   String? _replyToSender;
 
-  Color getRandomColor() {
-    Random random = Random();
-
-    // Renk seçimine göre döndür
-    List<Color> colors = [
-      Colors.yellow,
-      const Color.fromARGB(255, 127, 255, 131),
-      Colors.teal,
-    ];
-
-    return colors[random.nextInt(colors.length)]
-        .withAlpha(255); // Rastgele bir renk döndür
-  }
-
   void _sendMessage() async {
     if (_controller.text.isNotEmpty) {
       await _firestore.collection('messages').add({
@@ -189,8 +175,12 @@ class _ChatState extends State<Chat> {
                                 decoration: BoxDecoration(
                                   color: isMe
                                       ? ProjectColor().valoRed
-                                      : Colors.green[800],
+                                      : ProjectColor().white,
                                   borderRadius: BorderRadius.circular(8),
+                                ),
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.7,
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +208,7 @@ class _ChatState extends State<Chat> {
                                       Text(
                                         message['sender'],
                                         style: TextStyle(
-                                          color: getRandomColor(),
+                                          color: ProjectColor().valoRed,
                                           fontSize: 15,
                                           fontWeight: FontWeight.w900,
                                         ),
