@@ -1,7 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:valineups/components/custom_button.dart';
+import 'package:valineups/localization/strings.dart';
 import 'package:valineups/screens/login_and_guest.dart';
+import 'package:valineups/styles/fonts.dart';
+import 'package:valineups/styles/project_color.dart';
 
 class Chat extends StatefulWidget {
   const Chat({Key? key});
@@ -18,6 +24,21 @@ class _ChatState extends State<Chat> {
 
   String? _replyToMessage;
   String? _replyToSender;
+
+  Color getRandomColor() {
+    Random random = Random();
+
+    // Renk seçimine göre döndür
+    List<Color> colors = [
+      Colors.yellow,
+      const Color.fromARGB(255, 127, 255, 131),
+      Colors.amber,
+      Colors.teal,
+    ];
+
+    return colors[random.nextInt(colors.length)]
+        .withAlpha(255); // Rastgele bir renk döndür
+  }
 
   void _sendMessage() async {
     if (_controller.text.isNotEmpty) {
@@ -59,16 +80,26 @@ class _ChatState extends State<Chat> {
     if (user == null || user.isAnonymous) {
       // Kullanıcı giriş yapmamış veya anonimse, giriş ekranını göster
       return Scaffold(
+        backgroundColor: ProjectColor().dark,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text(
-                'Konuşmak için ilk önce kayıt olmalısınız',
-                style: TextStyle(fontSize: 20),
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  'JOIN CHAT',
+                  style: TextStyle(
+                    fontSize: 34,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontFamily: Fonts().valFonts,
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
+              CustomButton(
+                image: AuthPageText().googleAuth,
+                buttonTxt: AuthPageText().google,
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
@@ -76,8 +107,8 @@ class _ChatState extends State<Chat> {
                         builder: (context) => LoginAndGuestScreen()),
                   );
                 },
-                child: const Text('Oturum Aç'),
               ),
+              const SizedBox(height: 100),
             ],
           ),
         ),
@@ -85,6 +116,7 @@ class _ChatState extends State<Chat> {
     } else {
       // Kullanıcı giriş yapmış ve anonim değilse, sohbet ekranını göster
       return Scaffold(
+        backgroundColor: ProjectColor().darkGrey,
         body: Column(
           children: [
             Expanded(
@@ -108,74 +140,82 @@ class _ChatState extends State<Chat> {
                       final message = messages[index];
                       final isMe = message['uid'] == user.uid;
 
-                      return GestureDetector(
-                        onLongPress:
-                            isMe ? () => _deleteMessage(message.id) : null,
-                        onTap: () =>
-                            _replyTo(message['text'], message['sender']),
-                        child: Align(
-                          alignment: isMe
-                              ? Alignment.centerRight
-                              : Alignment.centerLeft,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 8),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color:
-                                  isMe ? Colors.blueAccent : Colors.grey[300],
-                              borderRadius: BorderRadius.circular(8),
+                      return Row(
+                          mainAxisAlignment: isMe
+                              ? MainAxisAlignment.end
+                              : MainAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(message['photoURL'] ?? ''),
+                              radius: 15,
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (message['replyTo'] != null)
-                                  Container(
-                                    padding: const EdgeInsets.all(8.0),
-                                    margin: const EdgeInsets.only(bottom: 8.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      'Yanıtlanan: ${message['replyToSender']}\n"${message['replyTo']}"',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                      ),
-                                    ),
+                            GestureDetector(
+                              onLongPress: isMe
+                                  ? () => _deleteMessage(message.id)
+                                  : null,
+                              onTap: () =>
+                                  _replyTo(message['text'], message['sender']),
+                              child: Align(
+                                alignment: isMe
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 8),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: isMe
+                                        ? ProjectColor().valoRed
+                                        : Colors.grey[900],
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          message['photoURL'] ?? ''),
-                                      radius: 15,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      message['sender'],
-                                      style: TextStyle(
-                                        color: isMe
-                                            ? Colors.white70
-                                            : Colors.black54,
-                                        fontSize: 12,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (message['replyTo'] != null)
+                                        Container(
+                                          padding: const EdgeInsets.all(8.0),
+                                          margin: const EdgeInsets.only(
+                                              bottom: 8.0),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            'Yanıtlanan: ${message['replyToSender']}\n"${message['replyTo']}"',
+                                            style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      Text(
+                                        message['sender'],
+                                        style: TextStyle(
+                                          color: getRandomColor(),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w900,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  message['text'],
-                                  style: TextStyle(
-                                    color: isMe ? Colors.white : Colors.black,
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        message['text'],
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: isMe
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      );
+                          ]);
                     },
                   );
                 },
@@ -189,7 +229,7 @@ class _ChatState extends State<Chat> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Yanıtlanan: $_replyToSender\n"$_replyToMessage"',
+                        '$_replyToSender\n"$_replyToMessage"',
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 12,
@@ -208,26 +248,46 @@ class _ChatState extends State<Chat> {
                   ],
                 ),
               ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 100),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        hintText: 'Mesajınızı yazın...',
-                        border: OutlineInputBorder(),
+            //---------------
+            SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: TextField(
+                          controller: _controller,
+                          decoration: InputDecoration(
+                            hintText: 'Message',
+                            border: InputBorder.none, // No border inside
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: _sendMessage,
-                  ),
-                ],
+                    Container(
+                      margin: const EdgeInsets.only(left: 5),
+                      decoration: BoxDecoration(
+                        color: ProjectColor().valoRed,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.send, color: Colors.white),
+                        onPressed: _sendMessage,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
+            //---------------
           ],
         ),
       );
