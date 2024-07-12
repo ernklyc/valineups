@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Ekledik
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:valineups/components/custom_button.dart';
@@ -148,88 +149,105 @@ class _ChatState extends State<Chat> {
                       final message = messages[index];
                       final isMe = message['uid'] == user.uid;
 
-                      return Row(
-                        mainAxisAlignment: isMe
-                            ? MainAxisAlignment.end
-                            : MainAxisAlignment.start,
+                      // Tarih formatı için
+                      DateTime? timestamp;
+                      if (message['timestamp'] != null) {
+                        timestamp =
+                            (message['timestamp'] as Timestamp).toDate();
+                      } else {
+                        // Varsayılan olarak şu anki zamanı kullanabiliriz
+                        timestamp = DateTime.now();
+                      }
+                      final timeFormatter = DateFormat.Hm().format(timestamp);
+
+                      return Column(
+                        crossAxisAlignment: isMe
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
                         children: [
-                          if (!isMe) // Kullanıcının kendi mesajı değilse avatar göster
-                            CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage(message['photoURL'] ?? ''),
-                              radius: 15,
-                            ),
-                          GestureDetector(
-                            onLongPress:
-                                isMe ? () => _deleteMessage(message.id) : null,
-                            onTap: () =>
-                                _replyTo(message['text'], message['sender']),
-                            child: Align(
-                              alignment: isMe
-                                  ? Alignment.centerRight
-                                  : Alignment.centerLeft,
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 8),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: isMe
-                                      ? ProjectColor().valoRed
-                                      : ProjectColor().white,
-                                  borderRadius: BorderRadius.circular(8),
+                          Row(
+                            mainAxisAlignment: isMe
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
+                            children: [
+                              if (!isMe) // Kullanıcının kendi mesajı değilse avatar göster
+                                CircleAvatar(
+                                  backgroundImage:
+                                      NetworkImage(message['photoURL'] ?? ''),
+                                  radius: 15,
                                 ),
-                                constraints: BoxConstraints(
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.7,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (message['replyTo'] != null)
-                                      Container(
-                                        padding: const EdgeInsets.all(8.0),
-                                        margin:
-                                            const EdgeInsets.only(bottom: 8.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[200],
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          'Yanıtlanan: ${message['replyToSender']}\n"${message['replyTo']}"',
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
+                              GestureDetector(
+                                onLongPress: isMe
+                                    ? () => _deleteMessage(message.id)
+                                    : null,
+                                onTap: () => _replyTo(
+                                    message['text'], message['sender']),
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 8),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: isMe
+                                        ? ProjectColor().valoRed
+                                        : ProjectColor().white,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (message['replyTo'] != null)
+                                        Container(
+                                          padding: const EdgeInsets.all(8.0),
+                                          margin: const EdgeInsets.only(
+                                              bottom: 8.0),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            'Yanıtlanan: ${message['replyToSender']}\n"${message['replyTo']}"',
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    if (!isMe) // Kullanıcının kendi mesajı değilse isim göster
                                       Text(
-                                        message['sender'],
+                                        message['text'],
                                         style: TextStyle(
-                                          color: ProjectColor().valoRed,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w900,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: isMe
+                                              ? Colors.white
+                                              : Colors.black,
                                         ),
                                       ),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      message['text'],
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color:
-                                            isMe ? Colors.white : Colors.black,
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
+                              ),
+                              if (isMe) // Kullanıcının kendi mesajıysa boş bir widget döndür
+                                SizedBox(width: 16), // Boş bir widget
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 4),
+                            child: Text(
+                              timeFormatter,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
                               ),
                             ),
                           ),
-                          if (isMe) // Kullanıcının kendi mesajıysa boş bir widget döndür
-                            SizedBox(width: 16), // Boş bir widget
                         ],
                       );
                     },
