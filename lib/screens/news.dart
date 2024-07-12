@@ -259,6 +259,22 @@ class _NewsState extends State<News> {
     final double mediaQueryHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      appBar: _user?.email == 'ernklyc@gmail.com'
+          ? AppBar(
+              centerTitle: true,
+              elevation: 0,
+              backgroundColor: ProjectColor().dark,
+              title: const Text(
+                'ADMİN PANELİ',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+            )
+          : null,
       backgroundColor: ProjectColor().dark,
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
