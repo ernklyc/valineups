@@ -1,7 +1,6 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Ekledik
+import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:valineups/components/custom_button.dart';
@@ -17,7 +16,7 @@ class Chat extends StatefulWidget {
   State<Chat> createState() => _ChatState();
 }
 
-class _ChatState extends State<Chat> {
+class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -25,10 +24,22 @@ class _ChatState extends State<Chat> {
 
   String? _replyToMessage;
   String? _replyToSender;
+  late TabController _tabController;
 
-  void _sendMessage() async {
+  final List<String> _adminEmails = [
+    'ernklyc@gmail.com',
+    'sevindikemre21@gmail.com'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  void _sendMessage(String collection) async {
     if (_controller.text.isNotEmpty) {
-      await _firestore.collection('messages').add({
+      await _firestore.collection(collection).add({
         'text': _controller.text,
         'sender': _auth.currentUser?.displayName ?? 'Anonim',
         'photoURL': _auth.currentUser?.photoURL ?? '',
@@ -45,28 +56,47 @@ class _ChatState extends State<Chat> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
+      FocusScope.of(context).requestFocus(FocusNode()); // Close keyboard
     }
   }
 
-  void _deleteMessage(String messageId) async {
+  void _deleteMessage(String collection, String messageId) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Delete Message'),
-          content: Text('Are you sure you want to delete this message?'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          title: Text(
+            'Delete Message',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: ProjectColor().valoRed,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to delete this message?',
+            style: TextStyle(color: ProjectColor().dark),
+          ),
           actions: [
             TextButton(
-              child: Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: ProjectColor().valoRed),
+              ),
               onPressed: () {
-                Navigator.of(context).pop(); // Kapat dialog
+                Navigator.of(context).pop(); // Close dialog
               },
             ),
             TextButton(
-              child: Text('Delete'),
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
               onPressed: () async {
-                Navigator.of(context).pop(); // Kapat dialog
-                await _firestore.collection('messages').doc(messageId).delete();
+                Navigator.of(context).pop(); // Close dialog
+                await _firestore.collection(collection).doc(messageId).delete();
               },
             ),
           ],
@@ -87,7 +117,7 @@ class _ChatState extends State<Chat> {
     User? user = _auth.currentUser;
 
     if (user == null || user.isAnonymous) {
-      // Kullanıcı giriş yapmamış veya anonimse, giriş ekranını göster
+      // Show login screen if user is not signed in or is anonymous
       return Scaffold(
         backgroundColor: ProjectColor().dark,
         body: Center(
@@ -123,208 +153,252 @@ class _ChatState extends State<Chat> {
         ),
       );
     } else {
-      // Kullanıcı giriş yapmış ve anonim değilse, sohbet ekranını göster
+      bool isAdmin = _adminEmails.contains(user.email);
       return Scaffold(
         backgroundColor: ProjectColor().dark,
-        body: Column(
-          children: [
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore
-                    .collection('messages')
-                    .orderBy('timestamp', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
+        appBar: isAdmin
+            ? AppBar(
+                backgroundColor: ProjectColor().valoRed,
+                title: const Text('Chat'),
+                bottom: isAdmin
+                    ? TabBar(
+                        controller: _tabController,
+                        tabs: const [
+                          Tab(text: 'Global Chat'),
+                          Tab(text: 'Admin Chat'),
+                        ],
+                      )
+                    : null,
+              )
+            : null,
+        body: isAdmin
+            ? TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildChatScreen(user, 'messages'),
+                  _buildChatScreen(user, 'adminMessages'),
+                ],
+              )
+            : _buildChatScreen(user, 'messages'),
+      );
+    }
+  }
+
+  Widget _buildChatScreen(User user, String collection) {
+    return Column(
+      children: [
+        Expanded(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: _firestore
+                .collection(collection)
+                .orderBy('timestamp', descending: true)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final messages = snapshot.data!.docs;
+
+              return ListView.builder(
+                controller: _scrollController,
+                reverse: true,
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final message = messages[index];
+                  final isMe = message['uid'] == user.uid;
+
+                  // Date formatting
+                  DateTime? timestamp;
+                  if (message['timestamp'] != null) {
+                    timestamp = (message['timestamp'] as Timestamp).toDate();
+                  } else {
+                    // Use current time as default
+                    timestamp = DateTime.now();
                   }
+                  final timeFormatter = DateFormat.Hm().format(timestamp);
 
-                  final messages = snapshot.data!.docs;
-
-                  return ListView.builder(
-                    controller: _scrollController,
-                    reverse: true,
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      final isMe = message['uid'] == user.uid;
-
-                      // Tarih formatı için
-                      DateTime? timestamp;
-                      if (message['timestamp'] != null) {
-                        timestamp =
-                            (message['timestamp'] as Timestamp).toDate();
-                      } else {
-                        // Varsayılan olarak şu anki zamanı kullanabiliriz
-                        timestamp = DateTime.now();
-                      }
-                      final timeFormatter = DateFormat.Hm().format(timestamp);
-
-                      return Column(
-                        crossAxisAlignment: isMe
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
+                  return Column(
+                    crossAxisAlignment: isMe
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: isMe
+                            ? MainAxisAlignment.end
+                            : MainAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: isMe
-                                ? MainAxisAlignment.end
-                                : MainAxisAlignment.start,
-                            children: [
-                              if (!isMe) // Kullanıcının kendi mesajı değilse avatar göster
-                                CircleAvatar(
-                                  backgroundImage:
-                                      NetworkImage(message['photoURL'] ?? ''),
-                                  radius: 15,
+                          if (!isMe) // Show avatar if not user's own message
+                            CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(message['photoURL'] ?? ''),
+                              radius: 15,
+                            ),
+                          GestureDetector(
+                            onLongPress: isMe
+                                ? () => _deleteMessage(collection, message.id)
+                                : null,
+                            child: Dismissible(
+                              key: Key(message.id),
+                              direction: DismissDirection.startToEnd,
+                              confirmDismiss: (direction) async {
+                                if (direction == DismissDirection.startToEnd) {
+                                  _replyTo(message['text'], message['sender']);
+                                  return false;
+                                }
+                                return false;
+                              },
+                              background: Container(
+                                color: Colors.blue,
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Icon(Icons.reply, color: Colors.white),
+                              ),
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 8),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: isMe
+                                      ? ProjectColor().valoRed
+                                      : ProjectColor().white,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              GestureDetector(
-                                onLongPress: isMe
-                                    ? () => _deleteMessage(message.id)
-                                    : null,
-                                onTap: () => _replyTo(
-                                    message['text'], message['sender']),
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 8),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: isMe
-                                        ? ProjectColor().valoRed
-                                        : ProjectColor().white,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width * 0.7,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      if (message['replyTo'] != null)
-                                        Container(
-                                          padding: const EdgeInsets.all(8.0),
-                                          margin: const EdgeInsets.only(
-                                              bottom: 8.0),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[200],
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            'Yanıtlanan: ${message['replyToSender']}\n"${message['replyTo']}"',
-                                            style: TextStyle(
-                                              color: Colors.grey[600],
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (message['replyTo'] != null)
+                                      Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        margin:
+                                            const EdgeInsets.only(bottom: 8.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
-                                      Text(
-                                        message['text'],
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: isMe
-                                              ? Colors.white
-                                              : Colors.black,
+                                        child: Text(
+                                          'Yanıtlanan: ${message['replyToSender']}\n"${message['replyTo']}"',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    if (!isMe)
+                                      Text(
+                                        message['sender'],
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: ProjectColor().valoRed,
+                                        ),
+                                      ),
+                                    Text(
+                                      message['text'],
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color:
+                                            isMe ? Colors.white : Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              if (isMe) // Kullanıcının kendi mesajıysa boş bir widget döndür
-                                SizedBox(width: 16), // Boş bir widget
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 4),
-                            child: Text(
-                              timeFormatter,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
                               ),
                             ),
                           ),
+                          if (isMe) // Empty widget if user's own message
+                            SizedBox(width: 16), // Empty widget
                         ],
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            if (_replyToMessage != null)
-              Container(
-                color: Colors.grey[200],
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '$_replyToSender\n"$_replyToMessage"',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        setState(() {
-                          _replyToMessage = null;
-                          _replyToSender = null;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            //---------------
-            SafeArea(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: TextField(
-                          controller: _controller,
-                          decoration: InputDecoration(
-                            hintText: 'Message',
-                            border: InputBorder.none, // No border inside
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        child: Text(
+                          timeFormatter,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
                           ),
                         ),
                       ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 5),
-                      decoration: BoxDecoration(
-                        color: ProjectColor().valoRed,
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.send, color: Colors.white),
-                        onPressed: _sendMessage,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            //---------------
-          ],
+                    ],
+                  );
+                },
+              );
+            },
+          ),
         ),
-      );
-    }
+        if (_replyToMessage != null)
+          Container(
+            color: Colors.grey[200],
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '$_replyToSender\n"$_replyToMessage"',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    setState(() {
+                      _replyToMessage = null;
+                      _replyToSender = null;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: TextField(
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        hintText: 'Message',
+                        border: InputBorder.none, // No border inside
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 5),
+                  decoration: BoxDecoration(
+                    color: ProjectColor().valoRed,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.send, color: Colors.white),
+                    onPressed: () => _sendMessage(collection),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
