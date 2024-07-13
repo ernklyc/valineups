@@ -28,7 +28,8 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
 
   final List<String> _adminEmails = [
     'ernklyc@gmail.com',
-    'sevindikemre21@gmail.com'
+    'sevindikemre21@gmail.com',
+    'baturaybk@gmail.com'
   ];
 
   @override
@@ -48,9 +49,11 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
         'replyTo': _replyToMessage,
         'replyToSender': _replyToSender,
       });
-      _controller.clear();
-      _replyToMessage = null;
-      _replyToSender = null;
+      setState(() {
+        _controller.clear();
+        _replyToMessage = null;
+        _replyToSender = null;
+      });
       _scrollController.animateTo(
         _scrollController.position.minScrollExtent,
         duration: const Duration(milliseconds: 300),
@@ -158,15 +161,20 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
         backgroundColor: ProjectColor().dark,
         appBar: isAdmin
             ? AppBar(
-                backgroundColor: ProjectColor().valoRed,
-                title: const Text('Chat'),
+                backgroundColor: ProjectColor().dark,
+                toolbarHeight: 40, // App bar heightini düşürdük
                 bottom: isAdmin
-                    ? TabBar(
-                        controller: _tabController,
-                        tabs: const [
-                          Tab(text: 'Global Chat'),
-                          Tab(text: 'Admin Chat'),
-                        ],
+                    ? PreferredSize(
+                        preferredSize: Size.fromHeight(30.0),
+                        child: TabBar(
+                          labelColor: Colors.white,
+                          indicatorColor: Colors.white,
+                          controller: _tabController,
+                          tabs: const [
+                            Tab(text: 'GLOBAL'),
+                            Tab(text: 'ADMIN'),
+                          ],
+                        ),
                       )
                     : null,
               )
