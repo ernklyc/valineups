@@ -24,6 +24,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
 
   String? _replyToMessage;
   String? _replyToSender;
+  String? _replyToMessageId;
   late TabController _tabController;
 
   final List<String> _adminEmails = [
@@ -32,6 +33,8 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
     'baturaybk@gmail.com'
   ];
 
+  Map<String, GlobalKey> messageKeys = {};
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +42,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
   }
 
   void _sendMessage(String collection) async {
-    if (_controller.text.isNotEmpty) {
+    if (_controller.text.isNotEmpty && _controller.text.length <= 6000) {
       await _firestore.collection(collection).add({
         'text': _controller.text,
         'sender': _auth.currentUser?.displayName ?? 'Anonim',
@@ -108,8 +111,9 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
     );
   }
 
-  void _replyTo(String message, String sender) {
+  void _replyTo(String messageId, String message, String sender) {
     setState(() {
+      _replyToMessageId = messageId;
       _replyToMessage = message;
       _replyToSender = sender;
     });
@@ -215,6 +219,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                 itemBuilder: (context, index) {
                   final message = messages[index];
                   final isMe = message['uid'] == user.uid;
+                  final messageId = message.id;
 
                   // Date formatting
                   DateTime? timestamp;
@@ -225,6 +230,10 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                     timestamp = DateTime.now();
                   }
                   final timeFormatter = DateFormat.Hm().format(timestamp);
+
+                  if (!messageKeys.containsKey(messageId)) {
+                    messageKeys[messageId] = GlobalKey();
+                  }
 
                   return Column(
                     crossAxisAlignment: isMe
@@ -247,11 +256,13 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                                 ? () => _deleteMessage(collection, message.id)
                                 : null,
                             child: Dismissible(
-                              key: Key(message.id),
-                              direction: DismissDirection.startToEnd,
+                              key: messageKeys[messageId]!,
+                              direction: DismissDirection.horizontal,
                               confirmDismiss: (direction) async {
-                                if (direction == DismissDirection.startToEnd) {
-                                  _replyTo(message['text'], message['sender']);
+                                if (direction == DismissDirection.startToEnd ||
+                                    direction == DismissDirection.endToStart) {
+                                  _replyTo(message.id, message['text'],
+                                      message['sender']);
                                   return false;
                                 }
                                 return false;
@@ -259,6 +270,12 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                               background: Container(
                                 color: Colors.blue,
                                 alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Icon(Icons.reply, color: Colors.white),
+                              ),
+                              secondaryBackground: Container(
+                                color: Colors.blue,
+                                alignment: Alignment.centerRight,
                                 padding: EdgeInsets.symmetric(horizontal: 20),
                                 child: Icon(Icons.reply, color: Colors.white),
                               ),
@@ -383,10 +400,14 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                     ),
                     child: TextField(
                       controller: _controller,
+                      maxLength: 6000, // 6000 karakter sınırı
                       decoration: InputDecoration(
                         hintText: 'Message',
                         border: InputBorder.none, // No border inside
                         contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                        hintStyle: TextStyle(
+                          height: 1.5, // Texti dikey olarak ortalamak için
+                        ),
                       ),
                     ),
                   ),
