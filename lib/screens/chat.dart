@@ -398,15 +398,18 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    child: TextField(
-                      controller: _controller,
-                      maxLength: 6000, // 6000 karakter sınırı
-                      decoration: InputDecoration(
-                        hintText: 'Message',
-                        border: InputBorder.none, // No border inside
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                        hintStyle: TextStyle(
-                          height: 1.5, // Texti dikey olarak ortalamak için
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: _controller,
+                        maxLength: 6000, // 6000 karakter sınırı
+                        decoration: InputDecoration(
+                          hintText: 'Message',
+                          border: InputBorder.none, // No border inside
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                          hintStyle: TextStyle(
+                            height: 1.5, // Texti dikey olarak ortalamak için
+                          ),
                         ),
                       ),
                     ),
