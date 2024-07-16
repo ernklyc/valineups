@@ -226,35 +226,37 @@ class _NewsState extends State<News> {
       builder: (context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(8),
           ),
           backgroundColor: ProjectColor().dark,
-          title: Text(
-            textAlign: TextAlign.center,
-            news['title'],
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
           content: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 news['imageUrl'] != null
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(8),
                         child: Image.network(news['imageUrl']),
                       )
                     : Container(),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
+                Text(
+                  textAlign: TextAlign.start,
+                  news['title'],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
                     textAlign: TextAlign.left,
                     news['fullContent'],
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.white70,
                       fontSize: 16,
                     ),
                   ),
@@ -439,7 +441,8 @@ class _NewsState extends State<News> {
                                     enabled: true,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: ProjectColor().valoRed.withOpacity(0.5),
+                                        color:
+                                            ProjectColor().dark.withOpacity(1),
                                         borderRadius: BorderRadius.circular(30),
                                       ),
                                     ),
@@ -462,7 +465,9 @@ class _NewsState extends State<News> {
                                           enabled: true,
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              color: ProjectColor().valoRed.withOpacity(0.5),
+                                              color: ProjectColor()
+                                                  .valoRed
+                                                  .withOpacity(0.5),
                                               borderRadius:
                                                   BorderRadius.circular(30),
                                             ),
@@ -476,7 +481,7 @@ class _NewsState extends State<News> {
                                       gradient: LinearGradient(
                                         colors: [
                                           ProjectColor().dark.withOpacity(0.9),
-                                          Colors.black.withOpacity(0.0),
+                                          Colors.black.withOpacity(0.5),
                                         ],
                                         begin: Alignment.bottomCenter,
                                         end: Alignment.topCenter,
