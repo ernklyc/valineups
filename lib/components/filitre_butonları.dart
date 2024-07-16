@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class FliterButton extends StatelessWidget {
+  const FliterButton({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,7 +30,7 @@ class CategoryButton extends StatelessWidget {
   final String title;
   final VoidCallback onPressed;
 
-  const CategoryButton({required this.title, required this.onPressed});
+  const CategoryButton({super.key, required this.title, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +38,14 @@ class CategoryButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: Colors.grey),
+          side: const BorderSide(color: Colors.grey),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
       onPressed: onPressed,
       child: Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }

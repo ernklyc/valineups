@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,7 +9,7 @@ import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 
 class Chat extends StatefulWidget {
-  const Chat({Key? key});
+  const Chat({superKey, Key? key});
 
   @override
   State<Chat> createState() => _ChatState();
@@ -24,7 +23,6 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
 
   String? _replyToMessage;
   String? _replyToSender;
-  String? _replyToMessageId;
   late TabController _tabController;
 
   final List<String> _adminEmails = [
@@ -96,7 +94,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
               },
             ),
             TextButton(
-              child: Text(
+              child: const Text(
                 'Delete',
                 style: TextStyle(color: Colors.red),
               ),
@@ -113,7 +111,6 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
 
   void _replyTo(String messageId, String message, String sender) {
     setState(() {
-      _replyToMessageId = messageId;
       _replyToMessage = message;
       _replyToSender = sender;
     });
@@ -132,7 +129,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Text(
                   'JOIN CHAT',
                   style: TextStyle(
@@ -150,7 +147,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => LoginAndGuestScreen()),
+                        builder: (context) => const LoginAndGuestScreen()),
                   );
                 },
               ),
@@ -169,7 +166,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                 toolbarHeight: 40, // App bar heightini düşürdük
                 bottom: isAdmin
                     ? PreferredSize(
-                        preferredSize: Size.fromHeight(30.0),
+                        preferredSize: const Size.fromHeight(30.0),
                         child: TabBar(
                           labelColor: Colors.white,
                           indicatorColor: Colors.white,
@@ -270,14 +267,14 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                               background: Container(
                                 color: Colors.blue,
                                 alignment: Alignment.centerLeft,
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                child: Icon(Icons.reply, color: Colors.white),
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: const Icon(Icons.reply, color: Colors.white),
                               ),
                               secondaryBackground: Container(
                                 color: Colors.blue,
                                 alignment: Alignment.centerRight,
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                child: Icon(Icons.reply, color: Colors.white),
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: const Icon(Icons.reply, color: Colors.white),
                               ),
                               child: Container(
                                 margin: const EdgeInsets.symmetric(
@@ -339,7 +336,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                             ),
                           ),
                           if (isMe) // Empty widget if user's own message
-                            SizedBox(width: 16), // Empty widget
+                            const SizedBox(width: 16), // Empty widget
                         ],
                       ),
                       Padding(
@@ -403,7 +400,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                       child: TextField(
                         controller: _controller,
                         maxLength: 6000, // 6000 karakter sınırı
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Message',
                           border: InputBorder.none, // No border inside
                           contentPadding: EdgeInsets.symmetric(horizontal: 16),
@@ -422,7 +419,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
-                    icon: Icon(Icons.send, color: Colors.white),
+                    icon: const Icon(Icons.send, color: Colors.white),
                     onPressed: () => _sendMessage(collection),
                   ),
                 ),

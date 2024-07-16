@@ -20,7 +20,6 @@ class _NewsState extends State<News> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? _user;
   String? _selectedTag;
-  List<String> _tags = [];
 
   @override
   void initState() {
@@ -38,9 +37,7 @@ class _NewsState extends State<News> {
       final newsTags = List<String>.from(doc['tags'] ?? []);
       tags.addAll(newsTags);
     }
-    setState(() {
-      _tags = tags.toList();
-    });
+    setState(() {});
   }
 
   void _addNews() {
@@ -329,10 +326,11 @@ class _NewsState extends State<News> {
                         backgroundColor: ProjectColor().dark,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
-                          side: BorderSide(color: Colors.white),
+                          side: const BorderSide(color: Colors.white),
                         ),
                       ),
-                      child: Text('ALL', style: TextStyle(color: Colors.white)),
+                      child: const Text('ALL',
+                          style: TextStyle(color: Colors.white)),
                     ),
                   ),
                   Padding(
@@ -345,11 +343,11 @@ class _NewsState extends State<News> {
                         backgroundColor: ProjectColor().dark,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
-                          side: BorderSide(color: Colors.white),
+                          side: const BorderSide(color: Colors.white),
                         ),
                       ),
-                      child:
-                          Text('UPDATE', style: TextStyle(color: Colors.white)),
+                      child: const Text('UPDATE',
+                          style: TextStyle(color: Colors.white)),
                     ),
                   ),
                   Padding(
@@ -362,10 +360,10 @@ class _NewsState extends State<News> {
                         backgroundColor: ProjectColor().dark,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
-                          side: BorderSide(color: Colors.white),
+                          side: const BorderSide(color: Colors.white),
                         ),
                       ),
-                      child: Text('ESPORTS',
+                      child: const Text('ESPORTS',
                           style: TextStyle(color: Colors.white)),
                     ),
                   ),
@@ -379,10 +377,10 @@ class _NewsState extends State<News> {
                         backgroundColor: ProjectColor().dark,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
-                          side: BorderSide(color: Colors.white),
+                          side: const BorderSide(color: Colors.white),
                         ),
                       ),
-                      child: Text('VALINEUPS',
+                      child: const Text('VALINEUPS',
                           style: TextStyle(color: Colors.white)),
                     ),
                   ),
@@ -431,7 +429,7 @@ class _NewsState extends State<News> {
                               _showNewsDetail(
                                   news.data() as Map<String, dynamic>);
                             },
-                            child: Container(
+                            child: SizedBox(
                               height: 200,
                               child: Stack(
                                 children: [
@@ -507,7 +505,7 @@ class _NewsState extends State<News> {
                                           ),
                                         ),
                                         const SizedBox(height: 5),
-                                        Container(
+                                        SizedBox(
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width -
