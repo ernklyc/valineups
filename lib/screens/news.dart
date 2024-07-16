@@ -7,6 +7,7 @@ import 'package:valineups/styles/project_color.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:shimmer/shimmer.dart';
 
 class News extends StatefulWidget {
   const News({super.key});
@@ -430,15 +431,46 @@ class _NewsState extends State<News> {
                             },
                             child: Container(
                               height: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                image: DecorationImage(
-                                  image: NetworkImage(news['imageUrl']),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
                               child: Stack(
                                 children: [
+                                  Shimmer.fromColors(
+                                    baseColor: ProjectColor().valoRed,
+                                    highlightColor: ProjectColor().dark,
+                                    enabled: true,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: ProjectColor().valoRed.withOpacity(0.5),
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                    ),
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(30),
+                                    child: Image.network(
+                                      news['imageUrl'],
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Shimmer.fromColors(
+                                          baseColor: ProjectColor().valoRed,
+                                          highlightColor: ProjectColor().dark,
+                                          enabled: true,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: ProjectColor().valoRed.withOpacity(0.5),
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                   Container(
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
@@ -449,6 +481,7 @@ class _NewsState extends State<News> {
                                         begin: Alignment.bottomCenter,
                                         end: Alignment.topCenter,
                                       ),
+                                      borderRadius: BorderRadius.circular(30),
                                     ),
                                   ),
                                   Positioned(
