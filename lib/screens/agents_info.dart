@@ -36,6 +36,10 @@ class _AgentsInfoState extends State<AgentsInfo> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: DropdownButton<String>(
+              underline: Container(
+                height: 2,
+                color: ProjectColor().transparent,
+              ),
               value: selectedLanguage,
               dropdownColor: Colors.grey[900], // Dropdown'un arka plan rengi
               onChanged: (String? newValue) {

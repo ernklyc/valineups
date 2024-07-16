@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:valineups/components/news_custom_text_field.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -63,23 +64,23 @@ class _NewsState extends State<News> {
           content: SingleChildScrollView(
             child: Column(
               children: [
-                CustomTextField(
+                NewsCustomTextField(
                   controller: titleController,
                   labelText: 'Başlık',
                 ),
-                CustomTextField(
+                NewsCustomTextField(
                   controller: descriptionController,
                   labelText: 'Kısa İçerik',
                 ),
-                CustomTextField(
+                NewsCustomTextField(
                   controller: fullContentController,
                   labelText: 'Tam İçerik',
                 ),
-                CustomTextField(
+                NewsCustomTextField(
                   controller: imageUrlController,
                   labelText: 'Resim URL',
                 ),
-                CustomTextField(
+                NewsCustomTextField(
                   controller: tagsController,
                   labelText: 'Etiketler (Virgülle ayrılmış)',
                 ),
@@ -310,48 +311,99 @@ class _NewsState extends State<News> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: DropdownButton<String>(
-              hint: const Text("Etikete göre filtrele"),
-              value: _selectedTag,
-              items: _tags.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: _filterByTag,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _filterByTag(null);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ProjectColor().dark,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      child: Text('ALL', style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _filterByTag('UPDATE');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ProjectColor().dark,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      child:
+                          Text('UPDATE', style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _filterByTag('ESPORTS');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ProjectColor().dark,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      child: Text('ESPORTS',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _filterByTag('VALINEUPS');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ProjectColor().dark,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      child: Text('VALINEUPS',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Expanded(
-            child: StreamBuilder(
-              stream: _selectedTag == null
-                  ? FirebaseFirestore.instance
-                      .collection('news')
-                      .orderBy('timestamp', descending: true)
-                      .snapshots()
-                  : FirebaseFirestore.instance
-                      .collection('news')
-                      .where('tags', arrayContains: _selectedTag)
-                      .orderBy('timestamp', descending: true)
-                      .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return const Center(child: Text('Something went wrong'));
-                }
-
-                final newsList = snapshot.data?.docs ?? [];
-
-                if (newsList.isEmpty) {
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('news')
+                  .orderBy('timestamp', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
                   return const Center(
-                    child: Text(
-                      'No news found for this tag.',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: CircularProgressIndicator(),
                   );
                 }
+
+                final docs = snapshot.data!.docs.where((doc) {
+                  final tags = List<String>.from(doc['tags'] ?? []);
+                  return _selectedTag == null || tags.contains(_selectedTag);
+                }).toList();
 
                 return Center(
                   child: SizedBox(
@@ -360,7 +412,7 @@ class _NewsState extends State<News> {
                       scrollDirection: Axis.vertical,
                       physics: const BouncingScrollPhysics(),
                       itemBuilder: (BuildContext context, int index) {
-                        final news = newsList[index];
+                        final news = docs[index];
                         final timestamp = news['timestamp']?.toDate();
                         final localTime = timestamp != null
                             ? tz.TZDateTime.from(timestamp, tz.local)
@@ -417,15 +469,19 @@ class _NewsState extends State<News> {
                                           ),
                                         ),
                                         const SizedBox(height: 5),
-                                        Text(
-                                          news['description'].length > 30
-                                              ? news['description']
-                                                      .substring(0, 35) +
-                                                  '...'
-                                              : news['description'],
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              40,
+                                          child: Text(
+                                            news['description'],
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                         const SizedBox(height: 5),
@@ -471,7 +527,7 @@ class _NewsState extends State<News> {
                           ),
                         );
                       },
-                      itemCount: newsList.length,
+                      itemCount: docs.length,
                     ),
                   ),
                 );
@@ -487,36 +543,6 @@ class _NewsState extends State<News> {
               child: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
             )
           : null,
-    );
-  }
-}
-
-class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String labelText;
-
-  const CustomTextField({
-    super.key,
-    required this.controller,
-    required this.labelText,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      cursorColor: Colors.white,
-      controller: controller,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: const TextStyle(
-          color: Colors.grey,
-          fontSize: 13,
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-      ),
     );
   }
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:valineups/styles/project_color.dart';
 
-class CustomTextField extends StatelessWidget {
+class NewsCustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
 
-  const CustomTextField({
+  const NewsCustomTextField({
     super.key,
     required this.controller,
     required this.labelText,
