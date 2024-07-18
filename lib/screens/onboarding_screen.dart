@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:valineups/generated/locale_keys.g.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/screens/login_and_guest.dart';
 import 'package:valineups/styles/project_color.dart';
@@ -33,6 +35,67 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ],
         ),
       ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ProjectColor().white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: ProjectBorderRadius().circular30,
+                ),
+                padding: EdgeInsets.symmetric(
+                    vertical: 8, horizontal: 12), // Buton içi boşluklar
+                minimumSize: Size(30, 30), // Butonun minimum boyutları
+                tapTargetSize: MaterialTapTargetSize
+                    .shrinkWrap, // Dokunma hedefi boyutunu küçült
+              ),
+              onPressed: () {
+                context.setLocale(const Locale('tr', 'TR'));
+              },
+              child: Text(
+                'TR',
+                style: TextStyle(
+                  color: ProjectColor().dark,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            SizedBox(width: 10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ProjectColor().white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: ProjectBorderRadius().circular30,
+                ),
+                padding: EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 12,
+                ), // Buton içi boşluklar
+                minimumSize: Size(30, 30), // Butonun minimum boyutları
+                tapTargetSize: MaterialTapTargetSize
+                    .shrinkWrap, // Dokunma hedefi boyutunu küçült
+              ),
+              onPressed: () {
+                context.setLocale(const Locale('en', 'US'));
+              },
+              child: Text(
+                'EN',
+                style: TextStyle(
+                  color: ProjectColor().dark,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterFloat,
     );
   }
 
@@ -50,21 +113,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         switch (index) {
           case 0:
             return buildPage(
-              title: OnBoardingScreen().agentTitle,
-              description: OnBoardingScreen().agentDesc,
+              title: LocaleKeys.screen1Title.tr(),
+              description: LocaleKeys.screen1Text.tr(),
               imagePath: OnBoardingScreen().agents,
             );
           case 1:
             return buildPage(
-              title: OnBoardingScreen().lineupTitle,
-              description: OnBoardingScreen().lineupDesc,
+              title: LocaleKeys.screen2Text.tr(),
+              description: LocaleKeys.screen2Text.tr(),
               imagePath: OnBoardingScreen().lineups,
             );
           case 2:
           default:
             return buildPage(
-              title: OnBoardingScreen().discussionTitle,
-              description: OnBoardingScreen().discussionDesc,
+              title: LocaleKeys.screen3Title.tr(),
+              description: LocaleKeys.screen3Text.tr(),
               imagePath: OnBoardingScreen().discussions,
             );
         }
@@ -88,7 +151,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           TextButton(
             onPressed: _completeOnboardingAndNavigate,
             child: Text(
-              OnBoardingScreen().skip,
+              LocaleKeys.skipButton.tr(),
               style: TextStyle(fontSize: 16, color: ProjectColor().customWhite),
             ),
           ),
@@ -114,7 +177,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         backgroundColor: ProjectColor().valoRed,
       ),
       child: Text(
-        OnBoardingScreen().next,
+        LocaleKeys.nextButton.tr(),
         style: TextStyle(
           fontSize: 18,
           color: ProjectColor().customWhite,
@@ -127,13 +190,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return ElevatedButton(
       onPressed: _completeOnboardingAndNavigate,
       style: ElevatedButton.styleFrom(
-          padding: ProjectEdgeInsets().horizontal50Vertical15,
+          padding: EdgeInsets.symmetric(vertical: 15),
           shape: RoundedRectangleBorder(
-            borderRadius: ProjectBorderRadius().circular30,
+            borderRadius: BorderRadius.circular(30),
           ),
+          minimumSize: Size(100, 0),
           backgroundColor: ProjectColor().valoRed),
       child: Text(
-        OnBoardingScreen().start,
+        LocaleKeys.startButton.tr(),
         style: TextStyle(fontSize: 18, color: ProjectColor().customWhite),
       ),
     );
@@ -144,39 +208,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required String description,
     required String imagePath,
   }) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset(
-          imagePath,
-          height: 300,
-        ),
-        const SizedBox(height: 20),
-        Padding(
-          padding: ProjectEdgeInsets().top64,
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: ProjectColor().customWhite,
+    return SafeArea(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Image.asset(
+              imagePath,
+              height: 50,
             ),
           ),
-        ),
-        const SizedBox(height: 20),
-        Padding(
-          padding: ProjectEdgeInsets().onBoardingText,
-          child: Text(
-            description,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 18,
-              color: Colors.grey,
+          const SizedBox(height: 20),
+          Padding(
+            padding: ProjectEdgeInsets().top64,
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: ProjectColor().customWhite,
+              ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 20),
+          Padding(
+            padding: ProjectEdgeInsets().onBoardingText,
+            child: Text(
+              description,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

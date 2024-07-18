@@ -13,7 +13,7 @@ class ProjectEdgeInsets {
 
   final EdgeInsets all16 = const EdgeInsets.all(16.0);
 
-  final EdgeInsets vertical20 = const EdgeInsets.only(top: 20, bottom: 20);
+  final EdgeInsets vertical20 = const EdgeInsets.only(top: 20, bottom: 50);
 
   final EdgeInsets horizontal30Vertical15 =
       const EdgeInsets.symmetric(horizontal: 30, vertical: 15);

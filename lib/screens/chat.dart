@@ -267,14 +267,18 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                               background: Container(
                                 color: Colors.blue,
                                 alignment: Alignment.centerLeft,
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: const Icon(Icons.reply, color: Colors.white),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: const Icon(Icons.reply,
+                                    color: Colors.white),
                               ),
                               secondaryBackground: Container(
                                 color: Colors.blue,
                                 alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: const Icon(Icons.reply, color: Colors.white),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: const Icon(Icons.reply,
+                                    color: Colors.white),
                               ),
                               child: Container(
                                 margin: const EdgeInsets.symmetric(
