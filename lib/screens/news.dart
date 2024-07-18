@@ -434,8 +434,8 @@ class _NewsState extends State<News> {
                               child: Stack(
                                 children: [
                                   Shimmer.fromColors(
-                                    baseColor: ProjectColor().valoRed,
-                                    highlightColor: ProjectColor().dark,
+                                    baseColor: Colors.grey.shade300,
+                                    highlightColor: Colors.grey.shade100,
                                     enabled: true,
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -458,8 +458,8 @@ class _NewsState extends State<News> {
                                           return child;
                                         }
                                         return Shimmer.fromColors(
-                                          baseColor: ProjectColor().valoRed,
-                                          highlightColor: ProjectColor().dark,
+                                          baseColor: Colors.grey.shade300,
+                                          highlightColor: Colors.grey.shade100,
                                           enabled: true,
                                           child: Container(
                                             decoration: BoxDecoration(

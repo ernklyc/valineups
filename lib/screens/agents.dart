@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/screens/AgentPage.dart';
 import 'package:valineups/styles/fonts.dart';
@@ -16,12 +17,67 @@ class Agents extends StatefulWidget {
 
 class _AgentsState extends State<Agents> {
   bool _isDropdownOpen = false;
+  String? _favoriteAgent;
+  SharedPreferences? _prefs;
+  List<String>? _agents;
+  List<String>? _agentImages;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFavoriteAgent();
+  }
+
+  Future<void> _loadFavoriteAgent() async {
+    _prefs = await SharedPreferences.getInstance();
+    final List<String> agents = AgentList().entries;
+    final List<String> agentImages = AgentList().agents;
+
+    setState(() {
+      _favoriteAgent = _prefs?.getString('favoriteAgent');
+      _agents = agents;
+      _agentImages = agentImages;
+    });
+  }
+
+  Future<void> _setFavoriteAgent(String agent) async {
+    setState(() {
+      _favoriteAgent = agent;
+    });
+    await _prefs?.setString('favoriteAgent', agent);
+  }
+
+  List<String> getDisplayAgents() {
+    if (_favoriteAgent == null) {
+      return _agents!;
+    }
+    final List<String> displayAgents = List.from(_agents!);
+    displayAgents.remove(_favoriteAgent);
+    displayAgents.insert(0, _favoriteAgent!);
+    return displayAgents;
+  }
+
+  List<String> getDisplayAgentImages() {
+    if (_favoriteAgent == null) {
+      return _agentImages!;
+    }
+    final int favIndex = _agents!.indexOf(_favoriteAgent!);
+    final List<String> displayAgentImages = List.from(_agentImages!);
+    final String favImage = displayAgentImages.removeAt(favIndex);
+    displayAgentImages.insert(0, favImage);
+    return displayAgentImages;
+  }
 
   @override
   Widget build(BuildContext context) {
     final double mediaQueryHeight = MediaQuery.of(context).size.height;
-    final List<String> agents = AgentList().entries;
-    final List<String> agentImages = AgentList().agents;
+
+    if (_agents == null || _agentImages == null) {
+      return CircularProgressIndicator();
+    }
+
+    final List<String> displayAgents = getDisplayAgents();
+    final List<String> displayAgentImages = getDisplayAgentImages();
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -39,7 +95,7 @@ class _AgentsState extends State<Agents> {
                   scrollDirection: Axis.vertical,
                   physics: const BouncingScrollPhysics(),
                   itemBuilder: (BuildContext context, int index) {
-                    final int agentIndex = index % agents.length;
+                    final int agentIndex = index % displayAgents.length;
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
@@ -53,10 +109,10 @@ class _AgentsState extends State<Agents> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => AgentPage(
-                                  agentName: agents[agentIndex],
-                                  agentImage: agentImages[agentIndex],
+                                  agentName: displayAgents[agentIndex],
+                                  agentImage: displayAgentImages[agentIndex],
                                   maps: AgentList()
-                                      .agentMaps[agents[agentIndex]]!,
+                                      .agentMaps[displayAgents[agentIndex]]!,
                                 ),
                               ),
                             );
@@ -74,7 +130,7 @@ class _AgentsState extends State<Agents> {
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
                                           image: AssetImage(
-                                              agentImages[agentIndex]),
+                                              displayAgentImages[agentIndex]),
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -85,7 +141,7 @@ class _AgentsState extends State<Agents> {
                                       child: RotatedBox(
                                         quarterTurns: 3,
                                         child: Text(
-                                          agents[agentIndex],
+                                          displayAgents[agentIndex],
                                           style: TextStyle(
                                             fontFamily: Fonts().valFonts,
                                             shadows: [
@@ -104,6 +160,31 @@ class _AgentsState extends State<Agents> {
                                     ),
                                   ],
                                 ),
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      await _setFavoriteAgent(
+                                          displayAgents[agentIndex]);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              '${displayAgents[agentIndex]} favori olarak kaydedildi!'),
+                                        ),
+                                      );
+                                    },
+                                    child: Icon(
+                                      _favoriteAgent ==
+                                              displayAgents[agentIndex]
+                                          ? Icons.star
+                                          : Icons.star_border,
+                                      color: Colors.yellow,
+                                      size: 30.0,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -111,7 +192,7 @@ class _AgentsState extends State<Agents> {
                       ),
                     );
                   },
-                  itemCount: 24,
+                  itemCount: displayAgents.length,
                 ),
               ),
             ),
@@ -129,7 +210,7 @@ class _AgentsState extends State<Agents> {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: ListView.builder(
-                        itemCount: agents.length,
+                        itemCount: displayAgents.length,
                         itemBuilder: (BuildContext context, int index) {
                           return GestureDetector(
                             onTap: () {
@@ -140,16 +221,17 @@ class _AgentsState extends State<Agents> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => AgentPage(
-                                    agentName: agents[index],
-                                    agentImage: agentImages[index],
-                                    maps: AgentList().agentMaps[agents[index]]!,
+                                    agentName: displayAgents[index],
+                                    agentImage: displayAgentImages[index],
+                                    maps: AgentList()
+                                        .agentMaps[displayAgents[index]]!,
                                   ),
                                 ),
                               );
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Image.asset(agentImages[index],
+                              child: Image.asset(displayAgentImages[index],
                                   height: 90.0, width: 90.0),
                             ),
                           );
