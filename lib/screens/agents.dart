@@ -37,6 +37,15 @@ class _AgentsState extends State<Agents> {
       _favoriteAgent = _prefs?.getString('favoriteAgent');
       _agents = agents;
       _agentImages = agentImages;
+      if (_favoriteAgent != null) {
+        final int favIndex = _agents!.indexOf(_favoriteAgent!);
+        if (favIndex != -1) {
+          _agents!.removeAt(favIndex);
+          _agents!.insert(0, _favoriteAgent!);
+          final String favImage = _agentImages!.removeAt(favIndex);
+          _agentImages!.insert(0, favImage);
+        }
+      }
     });
   }
 
@@ -45,27 +54,15 @@ class _AgentsState extends State<Agents> {
       _favoriteAgent = agent;
     });
     await _prefs?.setString('favoriteAgent', agent);
+    await _loadFavoriteAgent();
   }
 
   List<String> getDisplayAgents() {
-    if (_favoriteAgent == null) {
-      return _agents!;
-    }
-    final List<String> displayAgents = List.from(_agents!);
-    displayAgents.remove(_favoriteAgent);
-    displayAgents.insert(0, _favoriteAgent!);
-    return displayAgents;
+    return _agents!;
   }
 
   List<String> getDisplayAgentImages() {
-    if (_favoriteAgent == null) {
-      return _agentImages!;
-    }
-    final int favIndex = _agents!.indexOf(_favoriteAgent!);
-    final List<String> displayAgentImages = List.from(_agentImages!);
-    final String favImage = displayAgentImages.removeAt(favIndex);
-    displayAgentImages.insert(0, favImage);
-    return displayAgentImages;
+    return _agentImages!;
   }
 
   @override
@@ -73,7 +70,7 @@ class _AgentsState extends State<Agents> {
     final double mediaQueryHeight = MediaQuery.of(context).size.height;
 
     if (_agents == null || _agentImages == null) {
-      return CircularProgressIndicator();
+      return const CircularProgressIndicator();
     }
 
     final List<String> displayAgents = getDisplayAgents();
