@@ -10,5 +10,18 @@ abstract class  LocaleKeys {
   static const skipButton = 'skipButton';
   static const nextButton = 'nextButton';
   static const startButton = 'startButton';
+  static const agents = 'agents';
+  static const tiers = 'tiers';
+  static const weapons = 'weapons';
+  static const skins = 'skins';
+  static const bundles = 'bundles';
+  static const cards = 'cards';
+  static const sprays = 'sprays';
+  static const logout = 'logout';
+  static const agentsNav = 'agentsNav';
+  static const maps = 'maps';
+  static const saved = 'saved';
+  static const chat = 'chat';
+  static const news = 'news';
 
 }

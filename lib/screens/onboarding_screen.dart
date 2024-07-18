@@ -25,14 +25,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: ProjectColor().dark,
       body: Padding(
         padding: ProjectEdgeInsets().all16,
-        child: Column(
-          children: [
-            Expanded(
-              child: _buildPageView(),
-            ),
-            _buildDotsIndicator(),
-            _buildNavigationButtons(),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                Expanded(
+                  child: _buildPageView(),
+                ),
+                _buildDotsIndicator(),
+                _buildNavigationButtons(),
+              ],
+            );
+          },
         ),
       ),
       floatingActionButton: Padding(
@@ -46,11 +50,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: ProjectBorderRadius().circular30,
                 ),
-                padding: EdgeInsets.symmetric(
-                    vertical: 8, horizontal: 12), // Buton içi boşluklar
-                minimumSize: Size(30, 30), // Butonun minimum boyutları
-                tapTargetSize: MaterialTapTargetSize
-                    .shrinkWrap, // Dokunma hedefi boyutunu küçült
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                minimumSize: Size(30, 30),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               onPressed: () {
                 context.setLocale(const Locale('tr', 'TR'));
@@ -74,10 +76,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding: EdgeInsets.symmetric(
                   vertical: 8,
                   horizontal: 12,
-                ), // Buton içi boşluklar
-                minimumSize: Size(30, 30), // Butonun minimum boyutları
-                tapTargetSize: MaterialTapTargetSize
-                    .shrinkWrap, // Dokunma hedefi boyutunu küçült
+                ),
+                minimumSize: Size(30, 30),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               onPressed: () {
                 context.setLocale(const Locale('en', 'US'));
@@ -109,7 +110,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         });
       },
       itemBuilder: (context, index) {
-        // Her sayfa için farklı bir resim ve açıklama
         switch (index) {
           case 0:
             return buildPage(
@@ -119,7 +119,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             );
           case 1:
             return buildPage(
-              title: LocaleKeys.screen2Text.tr(),
+              title: LocaleKeys.screen2Title.tr(),
               description: LocaleKeys.screen2Text.tr(),
               imagePath: OnBoardingScreen().lineups,
             );
@@ -190,12 +190,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return ElevatedButton(
       onPressed: _completeOnboardingAndNavigate,
       style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          minimumSize: Size(100, 0),
-          backgroundColor: ProjectColor().valoRed),
+        padding: EdgeInsets.symmetric(vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        minimumSize: Size(100, 0),
+        backgroundColor: ProjectColor().valoRed,
+      ),
       child: Text(
         LocaleKeys.startButton.tr(),
         style: TextStyle(fontSize: 18, color: ProjectColor().customWhite),
@@ -209,41 +210,46 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required String imagePath,
   }) {
     return SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Image.asset(
-              imagePath,
-              height: 50,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: ProjectEdgeInsets().top64,
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().customWhite,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Image.asset(
+                  imagePath,
+                  height: constraints.maxHeight * 0.4,
+                  fit: BoxFit.contain,
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: ProjectEdgeInsets().onBoardingText,
-            child: Text(
-              description,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
+              const SizedBox(height: 20),
+              Padding(
+                padding: EdgeInsets.only(top: constraints.maxHeight * 0.1),
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: constraints.maxWidth * 0.08,
+                    fontWeight: FontWeight.bold,
+                    color: ProjectColor().customWhite,
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
+              const SizedBox(height: 20),
+              Padding(
+                padding: ProjectEdgeInsets().onBoardingText,
+                child: Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: constraints.maxWidth * 0.05,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

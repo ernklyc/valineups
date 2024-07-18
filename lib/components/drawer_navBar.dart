@@ -1,10 +1,12 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/valineups_text.dart';
+import 'package:valineups/generated/locale_keys.g.dart';
 import 'package:valineups/screens/agents.dart';
 import 'package:valineups/screens/agents_info.dart';
 import 'package:valineups/screens/bundles.dart';
@@ -221,7 +223,7 @@ class _ControlPageState extends State<ControlPage> {
               child: Column(
                 children: [
                   _createDrawerItem(
-                    text: 'A G E N T S',
+                    text: LocaleKeys.agents.tr(),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -234,7 +236,7 @@ class _ControlPageState extends State<ControlPage> {
                     ),
                   ),
                   _createDrawerItem(
-                    text: 'T I E R S',
+                    text: LocaleKeys.tiers.tr(),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -248,7 +250,7 @@ class _ControlPageState extends State<ControlPage> {
                     ),
                   ),
                   _createDrawerItem(
-                    text: 'W E A P O N S',
+                    text: LocaleKeys.weapons.tr(),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -261,7 +263,7 @@ class _ControlPageState extends State<ControlPage> {
                     ),
                   ),
                   _createDrawerItem(
-                    text: 'S K I N S',
+                    text: LocaleKeys.skins.tr(),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -274,7 +276,7 @@ class _ControlPageState extends State<ControlPage> {
                     ),
                   ),
                   _createDrawerItem(
-                    text: 'B U N D L E S',
+                    text: LocaleKeys.bundles.tr(),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -287,7 +289,7 @@ class _ControlPageState extends State<ControlPage> {
                     ),
                   ),
                   _createDrawerItem(
-                    text: 'C A R D S',
+                    text: LocaleKeys.cards.tr(),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -300,7 +302,7 @@ class _ControlPageState extends State<ControlPage> {
                     ),
                   ),
                   _createDrawerItem(
-                    text: 'S P R A Y S',
+                    text: LocaleKeys.sprays.tr(),
                     onTap: () {
                       Navigator.push(
                           context,
@@ -321,7 +323,7 @@ class _ControlPageState extends State<ControlPage> {
                   left: 12,
                   right: 12),
               child: _createDrawerItem(
-                text: 'L O G O U T',
+                text: LocaleKeys.logout.tr(),
                 onTap: () async {
                   await AuthService().signOut();
                   Navigator.pushReplacement(
