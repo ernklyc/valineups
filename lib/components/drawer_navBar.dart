@@ -7,12 +7,12 @@ import 'package:random_avatar/random_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/generated/locale_keys.g.dart';
+import 'package:valineups/maps/maps_screen.dart';
 import 'package:valineups/screens/agents.dart';
 import 'package:valineups/screens/agents_info.dart';
 import 'package:valineups/screens/bundles.dart';
 import 'package:valineups/screens/chat.dart';
 import 'package:valineups/screens/login_and_guest.dart';
-import 'package:valineups/screens/maps.dart';
 import 'package:valineups/screens/news.dart';
 import 'package:valineups/screens/player_card.dart';
 import 'package:valineups/screens/profile.dart';
@@ -314,6 +314,19 @@ class _ControlPageState extends State<ControlPage> {
                       size: 16,
                     ),
                   ),
+                  _createDrawerItem(
+                    text: "MAPS APİ DEMO",
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MapListScreen()));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.sprayCanSparkles,
+                      size: 16,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -368,7 +381,7 @@ class _ControlPageState extends State<ControlPage> {
               },
               children: const [
                 Agents(),
-                Maps(),
+                MapListScreen(),
                 Profile(),
                 Chat(),
                 News(),
