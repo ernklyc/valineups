@@ -3,8 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:valineups/screens/login_and_guest.dart';
-import 'package:valineups/screens/onboarding_screen.dart';
+import 'package:valineups/screens/first/login_and_guest.dart';
+import 'package:valineups/screens/first/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

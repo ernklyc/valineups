@@ -1,8 +1,8 @@
 // main.dart
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:valineups/maps/maps_api.dart';
-import 'package:valineups/maps/maps_model.dart';
+import 'package:valineups/screens/maps/maps_api.dart';
+import 'package:valineups/screens/maps/maps_model.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 

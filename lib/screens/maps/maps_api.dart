@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:valineups/maps/maps_model.dart';
+import 'package:valineups/screens/maps/maps_model.dart';
 
 class ApiService {
   final String apiUrl = 'https://valorant-api.com/v1/maps';

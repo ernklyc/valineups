@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:valineups/components/drawer_navBar.dart';
+import 'package:valineups/screens/home/drawer_navBar.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/services/firestore.dart';
 import 'package:valineups/utils/constants.dart';

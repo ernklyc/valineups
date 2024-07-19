@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/localization/strings.dart';
-import 'package:valineups/screens/AgentPage.dart';
+import 'package:valineups/screens/agents/AgentPage.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
@@ -26,27 +28,45 @@ class _AgentsState extends State<Agents> {
   void initState() {
     super.initState();
     _loadFavoriteAgent();
+    _fetchAgentsFromApi();
   }
 
   Future<void> _loadFavoriteAgent() async {
     _prefs = await SharedPreferences.getInstance();
-    final List<String> agents = AgentList().entries;
-    final List<String> agentImages = AgentList().agents;
-
     setState(() {
       _favoriteAgent = _prefs?.getString('favoriteAgent');
-      _agents = agents;
-      _agentImages = agentImages;
-      if (_favoriteAgent != null) {
-        final int favIndex = _agents!.indexOf(_favoriteAgent!);
-        if (favIndex != -1) {
-          _agents!.removeAt(favIndex);
-          _agents!.insert(0, _favoriteAgent!);
-          final String favImage = _agentImages!.removeAt(favIndex);
-          _agentImages!.insert(0, favImage);
-        }
-      }
     });
+  }
+
+  Future<void> _fetchAgentsFromApi() async {
+    final response = await http.get(Uri.parse(
+        'https://valorant-api.com/v1/agents?isPlayableCharacter=true'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body)['data'];
+      final List<String> agents = [];
+      final List<String> agentImages = [];
+
+      for (var agent in data) {
+        agents.add(agent['displayName']);
+        agentImages.add(agent['bustPortrait']);
+      }
+
+      setState(() {
+        _agents = agents;
+        _agentImages = agentImages;
+        if (_favoriteAgent != null) {
+          final int favIndex = _agents!.indexOf(_favoriteAgent!);
+          if (favIndex != -1) {
+            _agents!.removeAt(favIndex);
+            _agents!.insert(0, _favoriteAgent!);
+            final String favImage = _agentImages!.removeAt(favIndex);
+            _agentImages!.insert(0, favImage);
+          }
+        }
+      });
+    } else {
+      throw Exception('Failed to load agents');
+    }
   }
 
   Future<void> _setFavoriteAgent(String agent) async {
@@ -58,11 +78,11 @@ class _AgentsState extends State<Agents> {
   }
 
   List<String> getDisplayAgents() {
-    return _agents!;
+    return _agents ?? [];
   }
 
   List<String> getDisplayAgentImages() {
-    return _agentImages!;
+    return _agentImages ?? [];
   }
 
   @override
@@ -70,7 +90,7 @@ class _AgentsState extends State<Agents> {
     final double mediaQueryHeight = MediaQuery.of(context).size.height;
 
     if (_agents == null || _agentImages == null) {
-      return const CircularProgressIndicator();
+      return const Center(child: CircularProgressIndicator());
     }
 
     final List<String> displayAgents = getDisplayAgents();
@@ -108,8 +128,9 @@ class _AgentsState extends State<Agents> {
                                 builder: (context) => AgentPage(
                                   agentName: displayAgents[agentIndex],
                                   agentImage: displayAgentImages[agentIndex],
-                                  maps: AgentList()
-                                      .agentMaps[displayAgents[agentIndex]]!,
+                                  maps: AgentList().agentMaps[
+                                          displayAgents[agentIndex]] ??
+                                      [],
                                 ),
                               ),
                             );
@@ -126,7 +147,7 @@ class _AgentsState extends State<Agents> {
                                       height: mediaQueryHeight * 0.6,
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
-                                          image: AssetImage(
+                                          image: NetworkImage(
                                               displayAgentImages[agentIndex]),
                                           fit: BoxFit.cover,
                                         ),
@@ -221,14 +242,15 @@ class _AgentsState extends State<Agents> {
                                     agentName: displayAgents[index],
                                     agentImage: displayAgentImages[index],
                                     maps: AgentList()
-                                        .agentMaps[displayAgents[index]]!,
+                                            .agentMaps[displayAgents[index]] ??
+                                        [],
                                   ),
                                 ),
                               );
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Image.asset(displayAgentImages[index],
+                              child: Image.network(displayAgentImages[index],
                                   height: 90.0, width: 90.0),
                             ),
                           );

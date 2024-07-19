@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:valineups/components/custom_button.dart';
 import 'package:valineups/localization/strings.dart';
-import 'package:valineups/screens/login_and_guest.dart';
+import 'package:valineups/screens/first/login_and_guest.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 

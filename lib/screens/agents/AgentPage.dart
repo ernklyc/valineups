@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
 import 'package:valineups/components/lineups_maps.dart';
 import 'package:valineups/components/sides.dart';
-import 'package:valineups/screens/agents.dart';
+import 'package:valineups/screens/home/agents.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
@@ -81,6 +81,17 @@ class _AgentPageState extends State<AgentPage> {
     }).toList();
 
     return Scaffold(
+        appBar: AppBar(
+          backgroundColor: ProjectColor().dark,
+          title: Text(
+            "${widget.agentName} Lineups",
+            style: TextStyle(
+              color: ProjectColor().white,
+              fontFamily: Fonts().valFonts,
+            ),
+          ),
+          centerTitle: true,
+        ),
         backgroundColor: ProjectColor().dark,
         body: Column(
           children: [
@@ -102,6 +113,7 @@ class _AgentPageState extends State<AgentPage> {
                         selectedMap = newValue!;
                       });
                     },
+                    //map dropdown
                     items: maps.map<DropdownMenuItem<String>>((map) {
                       return DropdownMenuItem<String>(
                         value: map['name']!,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/generated/locale_keys.g.dart';
 import 'package:valineups/localization/strings.dart';
-import 'package:valineups/screens/login_and_guest.dart';
+import 'package:valineups/screens/first/login_and_guest.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
 
