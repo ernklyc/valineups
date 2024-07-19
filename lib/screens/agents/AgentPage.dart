@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +28,9 @@ class AgentPage extends StatefulWidget {
 }
 
 class _AgentPageState extends State<AgentPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _user;
+
   String selectedMap = 'Maps';
   String selectedSide = 'Side';
   List<Map<String, dynamic>> savedMaps = [];
@@ -34,6 +38,8 @@ class _AgentPageState extends State<AgentPage> {
   @override
   void initState() {
     super.initState();
+    _user = _auth.currentUser;
+
     _loadSavedMaps();
   }
 
@@ -81,292 +87,317 @@ class _AgentPageState extends State<AgentPage> {
     }).toList();
 
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: ProjectColor().dark,
-          title: Text(
-            "${widget.agentName} Lineups",
-            style: TextStyle(
-              color: ProjectColor().white,
-              fontFamily: Fonts().valFonts,
-            ),
-          ),
-          centerTitle: true,
-        ),
+      appBar: AppBar(
         backgroundColor: ProjectColor().dark,
-        body: Column(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: DropdownButton<String>(
-                    underline: Container(
-                      height: 0,
-                    ),
-                    value: selectedMap,
-                    alignment: Alignment.center,
-                    elevation: 10,
-                    icon: const Icon(Icons.arrow_drop_down_rounded),
-                    dropdownColor: ProjectColor().dark,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedMap = newValue!;
-                      });
-                    },
-                    //map dropdown
-                    items: maps.map<DropdownMenuItem<String>>((map) {
-                      return DropdownMenuItem<String>(
-                        value: map['name']!,
-                        child: map['name'] == 'Maps'
-                            ? Center(
-                                child: Text(
+        title: Text(
+          "${widget.agentName} Lineups",
+          style: TextStyle(
+            color: ProjectColor().white,
+            fontFamily: Fonts().valFonts,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      backgroundColor: ProjectColor().dark,
+      body: Column(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: DropdownButton<String>(
+                  underline: Container(
+                    height: 0,
+                  ),
+                  value: selectedMap,
+                  alignment: Alignment.center,
+                  elevation: 10,
+                  icon: const Icon(Icons.arrow_drop_down_rounded),
+                  dropdownColor: ProjectColor().dark,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedMap = newValue!;
+                    });
+                  },
+                  //map dropdown
+                  items: maps.map<DropdownMenuItem<String>>((map) {
+                    return DropdownMenuItem<String>(
+                      value: map['name']!,
+                      child: map['name'] == 'Maps'
+                          ? Center(
+                              child: Text(
+                                map['name']!,
+                                style: TextStyle(
+                                  color: ProjectColor().white,
+                                  fontFamily: Fonts().valFonts,
+                                ),
+                              ),
+                            )
+                          : Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        ProjectBorderRadius().circular12,
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width /
+                                          1.1,
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                            map['image']!,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.1,
+                                  height: 150,
+                                  color: ProjectColor().dark.withOpacity(0.5),
+                                ),
+                                Text(
                                   map['name']!,
                                   style: TextStyle(
-                                    color: ProjectColor().white,
                                     fontFamily: Fonts().valFonts,
-                                  ),
-                                ),
-                              )
-                            : Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: ClipRRect(
-                                      borderRadius:
-                                          ProjectBorderRadius().circular12,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                1.1,
-                                        height: 150,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: AssetImage(
-                                              map['image']!,
-                                            ),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
+                                    shadows: [
+                                      Shadow(
+                                        color: ProjectColor().white,
+                                        blurRadius: 50,
                                       ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 1.1,
-                                    height: 150,
-                                    color: ProjectColor().dark.withOpacity(0.5),
-                                  ),
-                                  Text(
-                                    map['name']!,
-                                    style: TextStyle(
-                                      fontFamily: Fonts().valFonts,
-                                      shadows: [
-                                        Shadow(
-                                          color: ProjectColor().white,
-                                          blurRadius: 50,
-                                        ),
-                                      ],
-                                      color: ProjectColor().white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 10,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Center(
-                  child: DropdownButton<String>(
-                    underline: Container(
-                      height: 0,
-                    ),
-                    value: selectedSide,
-                    alignment: Alignment.center,
-                    elevation: 10,
-                    icon: const Icon(Icons.arrow_drop_down_rounded),
-                    dropdownColor: ProjectColor().dark,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedSide = newValue!;
-                      });
-                    },
-                    items: sides.map<DropdownMenuItem<String>>((side) {
-                      return DropdownMenuItem<String>(
-                        value: side['name']!,
-                        child: side['name'] == 'Side'
-                            ? Center(
-                                child: Text(
-                                  side['name']!,
-                                  style: TextStyle(
+                                    ],
                                     color: ProjectColor().white,
-                                    fontFamily: Fonts().valFonts,
-                                  ),
-                                ),
-                              )
-                            : Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: ClipRRect(
-                                      borderRadius:
-                                          ProjectBorderRadius().circular12,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                1.1,
-                                        height: 150,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: AssetImage(
-                                              side['image']!,
-                                            ),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 1.1,
-                                    height: 150,
-                                    color: ProjectColor().dark.withOpacity(0.5),
-                                  ),
-                                  Text(
-                                    side['name']!,
-                                    style: TextStyle(
-                                      fontFamily: Fonts().valFonts,
-                                      shadows: [
-                                        Shadow(
-                                          color: ProjectColor().white,
-                                          blurRadius: 50,
-                                        ),
-                                      ],
-                                      color: ProjectColor().white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 10,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredMaps.length,
-                itemBuilder: (context, index) {
-                  var map = filteredMaps[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FullScreenImageViewer(
-                            images: List<String>.from(map['images']),
-                          ),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      margin: const EdgeInsets.all(8.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      color: ProjectColor().dark.withOpacity(0.8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12.0)),
-                            child: Image.asset(
-                              map['images'][0],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: 200,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      map['name'],
-                                      style: TextStyle(
-                                        color: ProjectColor().white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: Icon(
-                                        _isSaved(map)
-                                            ? Icons.bookmark
-                                            : Icons.bookmark_border,
-                                        color: ProjectColor().white,
-                                      ),
-                                      onPressed: () {
-                                        if (_isSaved(map)) {
-                                          _removeMap(map);
-                                        } else {
-                                          _saveMap(map);
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  "Side: ${map['side']}",
-                                  style: TextStyle(
-                                    color:
-                                        ProjectColor().white.withOpacity(0.7),
-                                    fontSize: 14,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 10,
                                   ),
                                 ),
                               ],
                             ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Center(
+                child: DropdownButton<String>(
+                  underline: Container(
+                    height: 0,
+                  ),
+                  value: selectedSide,
+                  alignment: Alignment.center,
+                  elevation: 10,
+                  icon: const Icon(Icons.arrow_drop_down_rounded),
+                  dropdownColor: ProjectColor().dark,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedSide = newValue!;
+                    });
+                  },
+                  items: sides.map<DropdownMenuItem<String>>((side) {
+                    return DropdownMenuItem<String>(
+                      value: side['name']!,
+                      child: side['name'] == 'Side'
+                          ? Center(
+                              child: Text(
+                                side['name']!,
+                                style: TextStyle(
+                                  color: ProjectColor().white,
+                                  fontFamily: Fonts().valFonts,
+                                ),
+                              ),
+                            )
+                          : Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        ProjectBorderRadius().circular12,
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width /
+                                          1.1,
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                            side['image']!,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.1,
+                                  height: 150,
+                                  color: ProjectColor().dark.withOpacity(0.5),
+                                ),
+                                Text(
+                                  side['name']!,
+                                  style: TextStyle(
+                                    fontFamily: Fonts().valFonts,
+                                    shadows: [
+                                      Shadow(
+                                        color: ProjectColor().white,
+                                        blurRadius: 50,
+                                      ),
+                                    ],
+                                    color: ProjectColor().white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+          //KARTLAR
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredMaps.length,
+              itemBuilder: (context, index) {
+                var map = filteredMaps[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FullScreenImageViewer(
+                          images: List<String>.from(map['images']),
+                        ),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.all(8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    color: ProjectColor().dark.withOpacity(0.8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12.0)),
+                          child: Image.asset(
+                            map['images'][0],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: 200,
                           ),
-                        ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    map['name'],
+                                    style: TextStyle(
+                                      color: ProjectColor().white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      _isSaved(map)
+                                          ? Icons.bookmark
+                                          : Icons.bookmark_border,
+                                      color: ProjectColor().white,
+                                    ),
+                                    onPressed: () {
+                                      if (_isSaved(map)) {
+                                        _removeMap(map);
+                                      } else {
+                                        _saveMap(map);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Side: ${map['side']}",
+                                style: TextStyle(
+                                  color: ProjectColor().white.withOpacity(0.7),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      persistentFooterButtons: _user?.email == 'ernklyc@gmail.com'
+          ? [
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.all(ProjectColor().valoRed),
+                    fixedSize: MaterialStateProperty.all(
+                      Size(
+                        MediaQuery.of(context).size.width / 1.1,
+                        50,
                       ),
                     ),
-                  );
-                },
+                  ),
+                  child: FaIcon(
+                    FontAwesomeIcons.add,
+                    color: ProjectColor().white,
+                  ),
+                ),
               ),
+            ]
+          : null,
+      floatingActionButton: FloatingActionButton(
+        elevation: 0,
+        backgroundColor: ProjectColor().valoRed,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Agents(),
             ),
-          ],
+          );
+        },
+        child: FaIcon(
+          // ignore: deprecated_member_use
+          FontAwesomeIcons.signOutAlt,
+          color: ProjectColor().white,
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: ProjectColor().valoRed,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const Agents(),
-              ),
-            );
-          },
-          child: FaIcon(
-            // ignore: deprecated_member_use
-            FontAwesomeIcons.signOutAlt,
-            color: ProjectColor().white,
-          ),
-        ));
+      ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterFloat,
+    );
   }
 }

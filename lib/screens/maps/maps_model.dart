@@ -1,4 +1,3 @@
-// map_model.dart
 class MapModel {
   final String uuid;
   final String displayName;
