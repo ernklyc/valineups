@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
-import 'package:valineups/components/lineups_maps.dart';
 import 'package:valineups/components/sides.dart';
 import 'package:valineups/screens/home/agents.dart';
 import 'package:valineups/screens/maps/maps_api.dart';
@@ -12,6 +11,9 @@ import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
 import 'dart:convert';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class AgentPage extends StatefulWidget {
   final String agentName;
@@ -76,6 +78,48 @@ class _AgentPageState extends State<AgentPage> {
 
   bool _isSaved(Map<String, dynamic> map) {
     return savedMaps.any((savedMap) => savedMap['name'] == map['name']);
+  }
+
+  Future<void> _uploadImages() async {
+    final picker = ImagePicker();
+    final List<XFile>? pickedFiles = await picker.pickMultiImage();
+
+    if (pickedFiles != null) {
+      if (pickedFiles.length > 3) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please select a maximum of 3 images')),
+        );
+        return;
+      }
+
+      List<String> uploadedUrls = [];
+      for (var i = 0; i < pickedFiles.length; i++) {
+        var file = pickedFiles[i];
+        String fileName =
+            'images/${widget.agentName}/${selectedMap}/${selectedSide}/a_${i + 1}_${DateTime.now().millisecondsSinceEpoch}.png';
+        Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
+
+        await storageRef.putFile(File(file.path));
+        String downloadUrl = await storageRef.getDownloadURL();
+        uploadedUrls.add(downloadUrl);
+      }
+
+      // Save the image URLs to a map
+      Map<String, dynamic> map = {
+        'name':
+            '${selectedMap}_${selectedSide}_${DateTime.now().millisecondsSinceEpoch}',
+        'side': selectedSide,
+        'images': uploadedUrls,
+      };
+
+      // Save to local storage
+      _saveMap(map);
+    } else {
+      // Show an error if no images are selected
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select exactly 1 to 3 images')),
+      );
+    }
   }
 
   @override
@@ -306,7 +350,7 @@ class _AgentPageState extends State<AgentPage> {
                         ClipRRect(
                           borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(12.0)),
-                          child: Image.asset(
+                          child: Image.network(
                             map['images'][0],
                             fit: BoxFit.cover,
                             width: double.infinity,
@@ -371,10 +415,10 @@ class _AgentPageState extends State<AgentPage> {
           ? [
               Center(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _uploadImages,
                   style: ButtonStyle(
                     backgroundColor:
-                        WidgetStateProperty.all(ProjectColor().valoRed),
+                        MaterialStateProperty.all(ProjectColor().valoRed),
                     fixedSize: MaterialStateProperty.all(
                       Size(
                         MediaQuery.of(context).size.width / 1.1,
@@ -402,7 +446,6 @@ class _AgentPageState extends State<AgentPage> {
           );
         },
         child: FaIcon(
-          // ignore: deprecated_member_use
           FontAwesomeIcons.signOutAlt,
           color: ProjectColor().white,
         ),
