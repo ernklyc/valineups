@@ -1,11 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
 import 'package:valineups/components/lineups_maps.dart';
 import 'package:valineups/components/sides.dart';
 import 'package:valineups/screens/home/agents.dart';
+import 'package:valineups/screens/maps/maps_api.dart';
+import 'package:valineups/screens/maps/maps_model.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
@@ -34,12 +36,14 @@ class _AgentPageState extends State<AgentPage> {
   String selectedMap = 'Maps';
   String selectedSide = 'Side';
   List<Map<String, dynamic>> savedMaps = [];
+  late Future<List<MapModel>> futureMaps;
+  List<MapModel> maps = [];
 
   @override
   void initState() {
     super.initState();
     _user = _auth.currentUser;
-
+    futureMaps = ApiService().fetchMaps();
     _loadSavedMaps();
   }
 
@@ -101,39 +105,41 @@ class _AgentPageState extends State<AgentPage> {
       backgroundColor: ProjectColor().dark,
       body: Column(
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                child: DropdownButton<String>(
-                  underline: Container(
-                    height: 0,
-                  ),
-                  value: selectedMap,
-                  alignment: Alignment.center,
-                  elevation: 10,
-                  icon: const Icon(Icons.arrow_drop_down_rounded),
-                  dropdownColor: ProjectColor().dark,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedMap = newValue!;
-                    });
-                  },
-                  //map dropdown
-                  items: maps.map<DropdownMenuItem<String>>((map) {
-                    return DropdownMenuItem<String>(
-                      value: map['name']!,
-                      child: map['name'] == 'Maps'
-                          ? Center(
-                              child: Text(
-                                map['name']!,
-                                style: TextStyle(
-                                  color: ProjectColor().white,
-                                  fontFamily: Fonts().valFonts,
-                                ),
-                              ),
-                            )
-                          : Stack(
+          FutureBuilder<List<MapModel>>(
+            future: futureMaps,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Text('No maps found');
+              } else {
+                maps = snapshot.data!;
+                if (!maps.any((map) => map.displayName == selectedMap)) {
+                  selectedMap = maps[0].displayName;
+                }
+                return Column(
+                  children: [
+                    Center(
+                      child: DropdownButton<String>(
+                        underline: Container(
+                          height: 0,
+                        ),
+                        value: selectedMap,
+                        alignment: Alignment.center,
+                        elevation: 10,
+                        icon: const Icon(Icons.arrow_drop_down_rounded),
+                        dropdownColor: ProjectColor().dark,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedMap = newValue!;
+                          });
+                        },
+                        items: maps.map<DropdownMenuItem<String>>((map) {
+                          return DropdownMenuItem<String>(
+                            value: map.displayName,
+                            child: Stack(
                               alignment: Alignment.center,
                               children: [
                                 Padding(
@@ -147,9 +153,7 @@ class _AgentPageState extends State<AgentPage> {
                                       height: 150,
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
-                                          image: AssetImage(
-                                            map['image']!,
-                                          ),
+                                          image: NetworkImage(map.splash),
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -163,7 +167,7 @@ class _AgentPageState extends State<AgentPage> {
                                   color: ProjectColor().dark.withOpacity(0.5),
                                 ),
                                 Text(
-                                  map['name']!,
+                                  map.displayName,
                                   style: TextStyle(
                                     fontFamily: Fonts().valFonts,
                                     shadows: [
@@ -180,93 +184,100 @@ class _AgentPageState extends State<AgentPage> {
                                 ),
                               ],
                             ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Center(
-                child: DropdownButton<String>(
-                  underline: Container(
-                    height: 0,
-                  ),
-                  value: selectedSide,
-                  alignment: Alignment.center,
-                  elevation: 10,
-                  icon: const Icon(Icons.arrow_drop_down_rounded),
-                  dropdownColor: ProjectColor().dark,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedSide = newValue!;
-                    });
-                  },
-                  items: sides.map<DropdownMenuItem<String>>((side) {
-                    return DropdownMenuItem<String>(
-                      value: side['name']!,
-                      child: side['name'] == 'Side'
-                          ? Center(
-                              child: Text(
-                                side['name']!,
-                                style: TextStyle(
-                                  color: ProjectColor().white,
-                                  fontFamily: Fonts().valFonts,
-                                ),
-                              ),
-                            )
-                          : Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: ClipRRect(
-                                    borderRadius:
-                                        ProjectBorderRadius().circular12,
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          1.1,
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: AssetImage(
-                                            side['image']!,
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Center(
+                      child: DropdownButton<String>(
+                        underline: Container(
+                          height: 0,
+                        ),
+                        value: selectedSide,
+                        alignment: Alignment.center,
+                        elevation: 10,
+                        icon: const Icon(Icons.arrow_drop_down_rounded),
+                        dropdownColor: ProjectColor().dark,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedSide = newValue!;
+                          });
+                        },
+                        items: sides.map<DropdownMenuItem<String>>((side) {
+                          return DropdownMenuItem<String>(
+                            value: side['name']!,
+                            child: side['name'] == 'Side'
+                                ? Center(
+                                    child: Text(
+                                      side['name']!,
+                                      style: TextStyle(
+                                        color: ProjectColor().white,
+                                        fontFamily: Fonts().valFonts,
                                       ),
                                     ),
-                                  ),
-                                ),
-                                Container(
-                                  width:
-                                      MediaQuery.of(context).size.width / 1.1,
-                                  height: 150,
-                                  color: ProjectColor().dark.withOpacity(0.5),
-                                ),
-                                Text(
-                                  side['name']!,
-                                  style: TextStyle(
-                                    fontFamily: Fonts().valFonts,
-                                    shadows: [
-                                      Shadow(
-                                        color: ProjectColor().white,
-                                        blurRadius: 50,
+                                  )
+                                : Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(2.0),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              ProjectBorderRadius().circular12,
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                1.1,
+                                            height: 150,
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: AssetImage(
+                                                  side['image']!,
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                1.1,
+                                        height: 150,
+                                        color: ProjectColor()
+                                            .dark
+                                            .withOpacity(0.5),
+                                      ),
+                                      Text(
+                                        side['name']!,
+                                        style: TextStyle(
+                                          fontFamily: Fonts().valFonts,
+                                          shadows: [
+                                            Shadow(
+                                              color: ProjectColor().white,
+                                              blurRadius: 50,
+                                            ),
+                                          ],
+                                          color: ProjectColor().white,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 10,
+                                        ),
                                       ),
                                     ],
-                                    color: ProjectColor().white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 10,
                                   ),
-                                ),
-                              ],
-                            ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
-          //KARTLAR
           Expanded(
             child: ListView.builder(
               itemCount: filteredMaps.length,

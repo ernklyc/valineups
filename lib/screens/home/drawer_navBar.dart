@@ -314,19 +314,6 @@ class _ControlPageState extends State<ControlPage> {
                       size: 16,
                     ),
                   ),
-                  _createDrawerItem(
-                    text: "MAPS APİ DEMO",
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MapListScreen()));
-                    },
-                    iconDrawerr: const FaIcon(
-                      FontAwesomeIcons.sprayCanSparkles,
-                      size: 16,
-                    ),
-                  ),
                 ],
               ),
             ),

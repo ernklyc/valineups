@@ -572,7 +572,9 @@ class _NewsState extends State<News> {
           ),
         ],
       ),
-      floatingActionButton: _user?.email == 'ernklyc@gmail.com'
+      floatingActionButton: (_user?.email == 'ernklyc@gmail.com' ||
+              _user?.email == 'baturaybk@gmail.com' ||
+              _user?.email == 'sevindikemre21@gmail.com')
           ? FloatingActionButton(
               backgroundColor: ProjectColor().valoRed,
               onPressed: _addNews,
