@@ -42,7 +42,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
             },
             itemBuilder: (context, index) {
               return Center(
-                child: Image.asset(
+                child: Image.network(
                   widget.images[index],
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {

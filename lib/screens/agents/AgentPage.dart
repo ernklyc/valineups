@@ -40,22 +40,38 @@ class _AgentPageState extends State<AgentPage> {
   List<Map<String, dynamic>> savedMaps = [];
   late Future<List<MapModel>> futureMaps;
   List<MapModel> maps = [];
+  late Future<void> futureLoadedImages;
 
   @override
   void initState() {
     super.initState();
     _user = _auth.currentUser;
     futureMaps = ApiService().fetchMaps();
-    _loadSavedMaps();
+    futureLoadedImages = _loadSavedMaps();
   }
 
   Future<void> _loadSavedMaps() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? savedMapsString = prefs.getString('savedMaps');
     if (savedMapsString != null) {
+      List<Map<String, dynamic>> mapsList =
+          List<Map<String, dynamic>>.from(json.decode(savedMapsString));
+      List<Map<String, dynamic>> validMapsList = [];
+      for (var map in mapsList) {
+        bool allImagesExist = true;
+        for (String url in map['images']) {
+          bool exists = await _checkImageExistence(url);
+          if (!exists) {
+            allImagesExist = false;
+            break;
+          }
+        }
+        if (allImagesExist) {
+          validMapsList.add(map);
+        }
+      }
       setState(() {
-        savedMaps =
-            List<Map<String, dynamic>>.from(json.decode(savedMapsString));
+        savedMaps = validMapsList;
       });
     }
   }
@@ -92,11 +108,15 @@ class _AgentPageState extends State<AgentPage> {
         return;
       }
 
+      int groupNumber =
+          (savedMaps.where((map) => map['side'] == selectedSide).length / 3)
+                  .ceil() +
+              1;
       List<String> uploadedUrls = [];
       for (var i = 0; i < pickedFiles.length; i++) {
         var file = pickedFiles[i];
         String fileName =
-            'images/${widget.agentName}/${selectedMap}/${selectedSide}/a_${i + 1}_${DateTime.now().millisecondsSinceEpoch}.png';
+            'images/${widget.agentName}/${selectedMap}/${selectedSide}/group_${groupNumber}/image_${i + 1}.png';
         Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
 
         await storageRef.putFile(File(file.path));
@@ -106,8 +126,7 @@ class _AgentPageState extends State<AgentPage> {
 
       // Save the image URLs to a map
       Map<String, dynamic> map = {
-        'name':
-            '${selectedMap}_${selectedSide}_${DateTime.now().millisecondsSinceEpoch}',
+        'name': '${selectedMap}_${selectedSide}_group_${groupNumber}',
         'side': selectedSide,
         'images': uploadedUrls,
       };
@@ -122,10 +141,19 @@ class _AgentPageState extends State<AgentPage> {
     }
   }
 
+  Future<bool> _checkImageExistence(String url) async {
+    try {
+      await FirebaseStorage.instance.refFromURL(url).getDownloadURL();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> filteredMaps = widget.maps.where((map) {
-      if (selectedMap != 'Maps' && map['name'] != selectedMap) {
+    List<Map<String, dynamic>> filteredMaps = savedMaps.where((map) {
+      if (selectedMap != 'Maps' && map['name'].split('_')[0] != selectedMap) {
         return false;
       }
       if (selectedSide != 'Side' && map['side'] != selectedSide) {
@@ -323,89 +351,115 @@ class _AgentPageState extends State<AgentPage> {
             },
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: filteredMaps.length,
-              itemBuilder: (context, index) {
-                var map = filteredMaps[index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FullScreenImageViewer(
-                          images: List<String>.from(map['images']),
-                        ),
+            child: FutureBuilder<void>(
+              future: futureLoadedImages,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error loading images'));
+                } else if (filteredMaps.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No images available.',
+                      style: TextStyle(
+                        color: ProjectColor().white,
+                        fontSize: 18,
                       ),
-                    );
-                  },
-                  child: Card(
-                    margin: const EdgeInsets.all(8.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
                     ),
-                    color: ProjectColor().dark.withOpacity(0.8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(12.0)),
-                          child: Image.network(
-                            map['images'][0],
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: 200,
+                  );
+                } else {
+                  return ListView.builder(
+                    itemCount: filteredMaps.length,
+                    itemBuilder: (context, index) {
+                      var map = filteredMaps[index];
+
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FullScreenImageViewer(
+                                images: List<String>.from(map['images']),
+                              ),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          margin: const EdgeInsets.all(8.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          color: ProjectColor().dark.withOpacity(0.8),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    map['name'],
-                                    style: TextStyle(
-                                      color: ProjectColor().white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(
-                                      _isSaved(map)
-                                          ? Icons.bookmark
-                                          : Icons.bookmark_border,
-                                      color: ProjectColor().white,
-                                    ),
-                                    onPressed: () {
-                                      if (_isSaved(map)) {
-                                        _removeMap(map);
-                                      } else {
-                                        _saveMap(map);
-                                      }
-                                    },
-                                  ),
-                                ],
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(12.0)),
+                                child: Image.network(
+                                  map['images'][0],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: 200,
+                                ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "Side: ${map['side']}",
-                                style: TextStyle(
-                                  color: ProjectColor().white.withOpacity(0.7),
-                                  fontSize: 14,
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          map['name'],
+                                          style: TextStyle(
+                                            color: ProjectColor().white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(
+                                            _isSaved(map)
+                                                ? Icons.bookmark
+                                                : Icons.bookmark_border,
+                                            color: ProjectColor().white,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              if (_isSaved(map)) {
+                                                _removeMap(map);
+                                              } else {
+                                                _saveMap(map);
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "Side: ${map['side']}",
+                                      style: TextStyle(
+                                        color: ProjectColor()
+                                            .white
+                                            .withOpacity(0.7),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                );
+                      );
+                    },
+                  );
+                }
               },
             ),
           ),
