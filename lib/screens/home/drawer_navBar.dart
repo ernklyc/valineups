@@ -9,7 +9,6 @@ import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/generated/locale_keys.g.dart';
 import 'package:valineups/screens/lineups/lineupsHome.dart';
 import 'package:valineups/screens/maps/maps_screen.dart';
-import 'package:valineups/screens/home/agents.dart';
 import 'package:valineups/screens/agents/agents_info.dart';
 import 'package:valineups/screens/player_items/bundles.dart';
 import 'package:valineups/screens/home/chat.dart';

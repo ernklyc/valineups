@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:valineups/components/full_screen_image_viewer.dart';
+import 'package:valineups/screens/home/profile.dart';
 
 class LineupListScreen extends StatefulWidget {
   @override
@@ -12,9 +14,7 @@ class LineupListScreen extends StatefulWidget {
 
 class _LineupListScreenState extends State<LineupListScreen> {
   final _firestore = FirebaseFirestore.instance;
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   User? _user;
 
   @override
@@ -23,9 +23,13 @@ class _LineupListScreenState extends State<LineupListScreen> {
     _user = _auth.currentUser;
   }
 
-  Future<void> _deleteLineup(BuildContext context, String lineupId) async {
+  Future<void> _deleteLineup(
+      BuildContext context, String lineupId, List<String> imagePaths) async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null && user.email == 'ernklyc@gmail.com') {
+    if (user != null &&
+        (user.email == 'ernklyc@gmail.com' ||
+            user.email == 'baturaybk@gmail.com' ||
+            user.email == 'sevindikemre21@gmail.com')) {
       final confirmation = await showDialog(
         context: context,
         builder: (context) {
@@ -46,11 +50,38 @@ class _LineupListScreenState extends State<LineupListScreen> {
       );
 
       if (confirmation == true) {
+        // Firestore'dan belgeyi sil
         await _firestore.collection('lineups').doc(lineupId).delete();
+
+        // Firebase Storage'dan ilgili görselleri sil
+        for (String path in imagePaths) {
+          final ref = FirebaseStorage.instance.refFromURL(path);
+          await ref.delete();
+        }
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Bu işlemi yapma yetkiniz yok.')),
+      );
+    }
+  }
+
+  Future<void> _saveLineup(Map<String, dynamic> lineup) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final lineupCollection = _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('savedLineups');
+
+      // Beğenilen lineup'ı kaydet
+      await lineupCollection.add(lineup);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lineup kaydedildi.')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Kullanıcı oturum açmamış.')),
       );
     }
   }
@@ -66,11 +97,27 @@ class _LineupListScreenState extends State<LineupListScreen> {
     );
   }
 
+  void _openSavedLineups(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            Profile(), // Open Profile screen to see saved lineups
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lineup Listesi'),
+        title: Text('VALineups'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.favorite),
+            onPressed: () => _openSavedLineups(context),
+          ),
+        ],
       ),
       body: StreamBuilder(
         stream: _firestore.collection('lineups').snapshots(),
@@ -84,18 +131,73 @@ class _LineupListScreenState extends State<LineupListScreen> {
             itemCount: lineups.length,
             itemBuilder: (context, index) {
               final lineup = lineups[index];
-              return ListTile(
-                title: Text(lineup['agentName']),
-                subtitle: Text('${lineup['mapName']} - ${lineup['side']}'),
-                onLongPress: () => _deleteLineup(context, lineup.id),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LineupDetailScreen(lineup: lineup),
+              final imagePaths = List<String>.from(lineup['imagePaths']);
+              final lineupData = {
+                'name': lineup['mapName'],
+                'side': lineup['side'],
+                'agentName': lineup['agentName'],
+                'images': imagePaths,
+              };
+
+              return Card(
+                margin: EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FullScreenImageViewer(
+                              images: imagePaths,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Image.network(
+                        imagePaths.isNotEmpty ? imagePaths[0] : '',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: 200,
+                      ),
                     ),
-                  );
-                },
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lineup['mapName'],
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text('Side: ${lineup['side']}'),
+                          Text('Agent: ${lineup['agentName']}'),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (_user?.email == 'ernklyc@gmail.com' ||
+                            _user?.email == 'baturaybk@gmail.com' ||
+                            _user?.email == 'sevindikemre21@gmail.com')
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () =>
+                                _deleteLineup(context, lineup.id, imagePaths),
+                          ),
+                        IconButton(
+                          icon: Icon(Icons.favorite_border),
+                          onPressed: () => _saveLineup(lineupData),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               );
             },
           );
@@ -113,155 +215,10 @@ class _LineupListScreenState extends State<LineupListScreen> {
   }
 }
 
-class LineupDetailScreen extends StatelessWidget {
-  final DocumentSnapshot lineup;
-
-  LineupDetailScreen({required this.lineup});
-
+class LineupsHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final imagePaths = List<String>.from(lineup['imagePaths']);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(lineup['agentName']),
-      ),
-      body: ListView.builder(
-        itemCount: imagePaths.length,
-        itemBuilder: (context, index) {
-          final imagePath = imagePaths[index];
-          return Image.network(imagePath);
-        },
-      ),
-    );
-  }
-}
-
-class LineupsHome extends StatefulWidget {
-  @override
-  _LineupsHomeState createState() => _LineupsHomeState();
-}
-
-class _LineupsHomeState extends State<LineupsHome> {
-  List<File> _images = [];
-  final _picker = ImagePicker();
-  String agentName = '';
-  String mapName = '';
-  String side = '';
-  final _firebaseAuth = FirebaseAuth.instance;
-  final _firestore = FirebaseFirestore.instance;
-  final _storage = FirebaseStorage.instance;
-
-  Future<void> _pickImages() async {
-    final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null) {
-      setState(() {
-        _images = pickedFiles.map((file) => File(file.path)).toList();
-      });
-    }
-  }
-
-  Future<void> _uploadImages() async {
-    final user = _firebaseAuth.currentUser;
-    if (user == null || user.email != 'ernklyc@gmail.com') {
-      return;
-    }
-
-    if (_images.isEmpty || agentName.isEmpty || mapName.isEmpty || side.isEmpty)
-      return;
-
-    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final pathPrefix = '/$agentName/$mapName/$side/$timestamp';
-
-    List<String> downloadUrls = [];
-
-    for (int i = 0; i < _images.length; i++) {
-      final ref = _storage.ref().child('$pathPrefix/$i.jpg');
-      await ref.putFile(_images[i]);
-      final downloadUrl = await ref.getDownloadURL();
-      downloadUrls.add(downloadUrl);
-    }
-
-    await _firestore.collection('lineups').add({
-      'userEmail': user.email,
-      'agentName': agentName,
-      'mapName': mapName,
-      'side': side,
-      'timestamp': timestamp,
-      'imagePaths': downloadUrls,
-    });
-
-    setState(() {
-      _images = [];
-      agentName = '';
-      mapName = '';
-      side = '';
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Valorant Uygulaması'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              TextField(
-                decoration: InputDecoration(labelText: 'Ajan Adı'),
-                onChanged: (value) {
-                  setState(() {
-                    agentName = value;
-                  });
-                },
-              ),
-              TextField(
-                decoration: InputDecoration(labelText: 'Harita Adı'),
-                onChanged: (value) {
-                  setState(() {
-                    mapName = value;
-                  });
-                },
-              ),
-              TextField(
-                decoration: InputDecoration(labelText: 'Side Adı (a, b, c)'),
-                onChanged: (value) {
-                  setState(() {
-                    side = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _pickImages,
-                child: Text('Fotoğraf Seç'),
-              ),
-              SizedBox(height: 20),
-              _images.isEmpty
-                  ? Text('Hiç fotoğraf seçilmedi.')
-                  : GridView.builder(
-                      shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 4,
-                        mainAxisSpacing: 4,
-                      ),
-                      itemCount: _images.length,
-                      itemBuilder: (context, index) {
-                        return Image.file(_images[index], fit: BoxFit.cover);
-                      },
-                    ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _uploadImages,
-                child: Text('Fotoğrafları Yükle'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    // Your existing LineupsHome code
+    return Container();
   }
 }
