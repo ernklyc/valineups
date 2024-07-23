@@ -90,7 +90,6 @@ class _ProfileState extends State<Profile> {
                       );
                     },
                     child: Card(
-                      margin: const EdgeInsets.all(8.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -103,9 +102,8 @@ class _ProfileState extends State<Profile> {
                                 top: Radius.circular(12.0)),
                             child: Image.asset(
                               map['images'][0],
-                              fit: BoxFit.cover,
+                              fit: BoxFit.fitWidth,
                               width: double.infinity,
-                              height: 200,
                             ),
                           ),
                           Padding(

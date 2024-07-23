@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,13 +52,15 @@ class _AgentPageState extends State<AgentPage> {
   }
 
   Future<void> _loadSavedMaps() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? savedMapsString = prefs.getString('savedMaps');
-    if (savedMapsString != null) {
-      List<Map<String, dynamic>> mapsList =
-          List<Map<String, dynamic>>.from(json.decode(savedMapsString));
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('lineups')
+          .where('agentName', isEqualTo: widget.agentName)
+          .get();
+
       List<Map<String, dynamic>> validMapsList = [];
-      for (var map in mapsList) {
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> map = doc.data() as Map<String, dynamic>;
         bool allImagesExist = true;
         for (String url in map['images']) {
           bool exists = await _checkImageExistence(url);
@@ -73,15 +76,20 @@ class _AgentPageState extends State<AgentPage> {
       setState(() {
         savedMaps = validMapsList;
       });
+    } catch (e) {
+      print("Error loading maps from Firestore: $e");
     }
   }
 
   Future<void> _saveMap(Map<String, dynamic> map) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      savedMaps.add(map);
-    });
-    await prefs.setString('savedMaps', json.encode(savedMaps));
+    try {
+      await FirebaseFirestore.instance.collection('lineups').add(map);
+      setState(() {
+        savedMaps.add(map);
+      });
+    } catch (e) {
+      print("Error saving map to Firestore: $e");
+    }
   }
 
   Future<void> _removeMap(Map<String, dynamic> map) async {
@@ -128,11 +136,12 @@ class _AgentPageState extends State<AgentPage> {
       Map<String, dynamic> map = {
         'name': '${selectedMap}_${selectedSide}_group_${groupNumber}',
         'side': selectedSide,
+        'agentName': widget.agentName,
         'images': uploadedUrls,
       };
 
       // Save to local storage
-      _saveMap(map);
+      await _saveMap(map);
     } else {
       // Show an error if no images are selected
       ScaffoldMessenger.of(context).showSnackBar(
@@ -153,6 +162,9 @@ class _AgentPageState extends State<AgentPage> {
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredMaps = savedMaps.where((map) {
+      if (map['agentName'] != widget.agentName) {
+        return false;
+      }
       if (selectedMap != 'Maps' && map['name'].split('_')[0] != selectedMap) {
         return false;
       }

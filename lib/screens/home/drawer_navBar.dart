@@ -7,6 +7,7 @@ import 'package:random_avatar/random_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/generated/locale_keys.g.dart';
+import 'package:valineups/screens/lineups/lineupsHome.dart';
 import 'package:valineups/screens/maps/maps_screen.dart';
 import 'package:valineups/screens/home/agents.dart';
 import 'package:valineups/screens/agents/agents_info.dart';
@@ -308,6 +309,19 @@ class _ControlPageState extends State<ControlPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => const SprayListScreen()));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.sprayCanSparkles,
+                      size: 16,
+                    ),
+                  ),
+                  _createDrawerItem(
+                    text: LocaleKeys.sprays.tr(),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LineupsHome()));
                     },
                     iconDrawerr: const FaIcon(
                       FontAwesomeIcons.sprayCanSparkles,
