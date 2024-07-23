@@ -321,7 +321,7 @@ class _ControlPageState extends State<ControlPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => LineupsHome()));
+                              builder: (context) => LineupListScreen()));
                     },
                     iconDrawerr: const FaIcon(
                       FontAwesomeIcons.sprayCanSparkles,
