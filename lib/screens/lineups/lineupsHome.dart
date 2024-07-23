@@ -25,9 +25,14 @@ class _LineupListScreenState extends State<LineupListScreen> {
   User? _user;
   Set<String> _savedLineups = Set<String>();
 
-  String selectedMap = '';
-  String selectedSide = 'Side';
+  String selectedMap = 'All';
+  String selectedSide = 'All';
+  String selectedAgent = 'All';
   List<dynamic> maps = [];
+  List<String> agents = [];
+
+  bool isLoadingMaps = true;
+  bool isLoadingAgents = true;
 
   @override
   void initState() {
@@ -35,6 +40,7 @@ class _LineupListScreenState extends State<LineupListScreen> {
     _user = _auth.currentUser;
     _loadSavedLineups();
     _fetchMaps();
+    _fetchAgents();
   }
 
   Future<void> _loadSavedLineups() async {
@@ -60,12 +66,27 @@ class _LineupListScreenState extends State<LineupListScreen> {
       final data = json.decode(response.body);
       setState(() {
         maps = data['data'];
-        if (maps.isNotEmpty) {
-          selectedMap = maps[0]['displayName'];
-        }
+        isLoadingMaps = false;
       });
     } else {
       throw Exception('Failed to load maps');
+    }
+  }
+
+  Future<void> _fetchAgents() async {
+    final response = await http.get(Uri.parse(
+        'https://valorant-api.com/v1/agents?isPlayableCharacter=true'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['data'];
+      setState(() {
+        agents = ['All'];
+        for (var agent in data) {
+          agents.add(agent['displayName']);
+        }
+        isLoadingAgents = false;
+      });
+    } else {
+      throw Exception('Failed to load agents');
     }
   }
 
@@ -177,8 +198,9 @@ class _LineupListScreenState extends State<LineupListScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                maps.isNotEmpty
-                    ? DropdownButton<String>(
+                isLoadingMaps
+                    ? Center(child: CircularProgressIndicator())
+                    : DropdownButton<String>(
                         underline: Container(
                           height: 0,
                         ),
@@ -192,58 +214,76 @@ class _LineupListScreenState extends State<LineupListScreen> {
                             selectedMap = newValue!;
                           });
                         },
-                        items: maps.map<DropdownMenuItem<String>>((map) {
+                        items: ['All', ...maps.map((map) => map['displayName'])]
+                            .map<DropdownMenuItem<String>>((map) {
                           return DropdownMenuItem<String>(
-                            value: map['displayName'],
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: ClipRRect(
-                                    borderRadius:
-                                        ProjectBorderRadius().circular12,
-                                    child: Container(
-                                      width:
-                                          MediaQuery.of(context).size.width / 2,
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: NetworkImage(map['splash']),
-                                          fit: BoxFit.cover,
-                                        ),
+                            value: map,
+                            child: map == 'All'
+                                ? Center(
+                                    child: Text(
+                                      map,
+                                      style: TextStyle(
+                                        color: ProjectColor().white,
+                                        fontFamily: Fonts().valFonts,
                                       ),
                                     ),
-                                  ),
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width / 2,
-                                  height: 150,
-                                  color: ProjectColor().dark.withOpacity(0.5),
-                                ),
-                                Text(
-                                  map['displayName'],
-                                  style: TextStyle(
-                                    fontFamily: Fonts().valFonts,
-                                    shadows: [
-                                      Shadow(
-                                        color: ProjectColor().white,
-                                        blurRadius: 50,
+                                  )
+                                : Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(2.0),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              ProjectBorderRadius().circular12,
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2,
+                                            height: 150,
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                    maps.firstWhere((element) =>
+                                                        element[
+                                                            'displayName'] ==
+                                                        map)['splash']),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                2,
+                                        height: 150,
+                                        color: ProjectColor()
+                                            .dark
+                                            .withOpacity(0.5),
+                                      ),
+                                      Text(
+                                        map,
+                                        style: TextStyle(
+                                          fontFamily: Fonts().valFonts,
+                                          shadows: [
+                                            Shadow(
+                                              color: ProjectColor().white,
+                                              blurRadius: 50,
+                                            ),
+                                          ],
+                                          color: ProjectColor().white,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 10,
+                                        ),
                                       ),
                                     ],
-                                    color: ProjectColor().white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 10,
                                   ),
-                                ),
-                              ],
-                            ),
                           );
                         }).toList(),
-                      )
-                    : Center(
-                        child: CircularProgressIndicator(),
                       ),
                 const SizedBox(width: 10),
                 Center(
@@ -261,71 +301,57 @@ class _LineupListScreenState extends State<LineupListScreen> {
                         selectedSide = newValue!;
                       });
                     },
-                    items: sides.map<DropdownMenuItem<String>>((side) {
+                    items: ['All', ...sides.map((side) => side['name'])]
+                        .map<DropdownMenuItem<String>>((side) {
                       return DropdownMenuItem<String>(
-                        value: side['name']!,
-                        child: side['name'] == 'Side'
-                            ? Center(
+                        value: side,
+                        child: Center(
+                          child: Text(
+                            side!,
+                            style: TextStyle(
+                              color: ProjectColor().white,
+                              fontFamily: Fonts().valFonts,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                isLoadingAgents
+                    ? Center(child: CircularProgressIndicator())
+                    : Center(
+                        child: DropdownButton<String>(
+                          underline: Container(
+                            height: 0,
+                          ),
+                          value: selectedAgent,
+                          alignment: Alignment.center,
+                          elevation: 10,
+                          icon: const Icon(Icons.arrow_drop_down_rounded),
+                          dropdownColor: ProjectColor().dark,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedAgent = newValue!;
+                            });
+                          },
+                          items: agents.map<DropdownMenuItem<String>>((agent) {
+                            return DropdownMenuItem<String>(
+                              value: agent,
+                              child: Center(
                                 child: Text(
-                                  side['name']!,
+                                  agent,
                                   style: TextStyle(
                                     color: ProjectColor().white,
                                     fontFamily: Fonts().valFonts,
                                   ),
                                 ),
-                              )
-                            : Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: ClipRRect(
-                                      borderRadius:
-                                          ProjectBorderRadius().circular12,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                2,
-                                        height: 150,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: AssetImage(
-                                              side['image']!,
-                                            ),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 2,
-                                    height: 150,
-                                    color: ProjectColor().dark.withOpacity(0.5),
-                                  ),
-                                  Text(
-                                    side['name']!,
-                                    style: TextStyle(
-                                      fontFamily: Fonts().valFonts,
-                                      shadows: [
-                                        Shadow(
-                                          color: ProjectColor().white,
-                                          blurRadius: 50,
-                                        ),
-                                      ],
-                                      color: ProjectColor().white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 10,
-                                    ),
-                                  ),
-                                ],
                               ),
-                      );
-                    }).toList(),
-                  ),
-                ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
               ],
             ),
           ),
@@ -340,17 +366,22 @@ class _LineupListScreenState extends State<LineupListScreen> {
                 final lineups = snapshot.data?.docs ?? [];
                 final filteredLineups = lineups.where((lineup) {
                   final data = lineup.data() as Map<String, dynamic>;
-                  final mapMatches = selectedMap == '' ||
+                  final mapMatches = selectedMap == 'All' ||
                       data['mapName']
                           .toString()
                           .toLowerCase()
                           .contains(selectedMap.toLowerCase());
-                  final sideMatches = selectedSide == 'Side' ||
+                  final sideMatches = selectedSide == 'All' ||
                       data['side']
                           .toString()
                           .toLowerCase()
                           .contains(selectedSide.toLowerCase());
-                  return mapMatches && sideMatches;
+                  final agentMatches = selectedAgent == 'All' ||
+                      data['agentName']
+                          .toString()
+                          .toLowerCase()
+                          .contains(selectedAgent.toLowerCase());
+                  return mapMatches && sideMatches && agentMatches;
                 }).toList();
 
                 return GridView.builder(
