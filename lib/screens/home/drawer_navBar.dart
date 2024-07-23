@@ -351,8 +351,8 @@ class _ControlPageState extends State<ControlPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildTopNavigationItem(Icons.people, "LINEUPS", 0),
-                _buildTopNavigationItem(Icons.map, "MAPS", 1),
-                _buildTopNavigationItem(Icons.bookmark, "SAVED", 2),
+                _buildTopNavigationItem(Icons.people, "SAVED", 1),
+                _buildTopNavigationItem(Icons.map, "MAPS", 2),
                 _buildTopNavigationItem(Icons.chat, "CHAT", 3),
                 _buildTopNavigationItem(Icons.chat, "NEWS", 4),
               ],
@@ -368,8 +368,8 @@ class _ControlPageState extends State<ControlPage> {
               },
               children: [
                 LineupListScreen(),
-                const MapListScreen(),
                 const Profile(),
+                const MapListScreen(),
                 const Chat(),
                 const News(),
               ],

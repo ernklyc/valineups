@@ -1,19 +1,10 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:random_avatar/random_avatar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -36,11 +27,10 @@ class _ProfileState extends State<Profile> {
   Future<void> _loadSavedLineups() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final lineupCollection = _firestore
+      final lineupCollection = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('savedLineups');
-
       final querySnapshot = await lineupCollection.get();
       setState(() {
         savedMaps = querySnapshot.docs
@@ -50,39 +40,18 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  Future<void> _saveLineup(Map<String, dynamic> lineup) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final lineupCollection = _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('savedLineups');
-
-      await lineupCollection.add(lineup);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lineup kaydedildi.')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Kullanıcı oturum açmamış.')),
-      );
-    }
-  }
-
   Future<void> _removeMap(Map<String, dynamic> map) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final lineupCollection = _firestore
+      final lineupCollection = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('savedLineups');
-
       final querySnapshot =
           await lineupCollection.where('name', isEqualTo: map['name']).get();
       for (var doc in querySnapshot.docs) {
         await doc.reference.delete();
       }
-
       setState(() {
         savedMaps.remove(map);
       });
@@ -138,6 +107,8 @@ class _ProfileState extends State<Profile> {
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     color: ProjectColor().dark.withOpacity(0.8),
+                    elevation: 5,
+                    shadowColor: Colors.black45,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -146,12 +117,29 @@ class _ProfileState extends State<Profile> {
                               top: Radius.circular(12.0)),
                           child: Image.network(
                             map['images'][0],
-                            fit: BoxFit.fitWidth,
+                            fit: BoxFit.cover,
                             width: double.infinity,
+                            height: 200,
+                            loadingBuilder: (context, child, progress) {
+                              return progress == null
+                                  ? child
+                                  : Center(child: CircularProgressIndicator());
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey,
+                                alignment: Alignment.center,
+                                child: const Icon(
+                                  Icons.broken_image,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              );
+                            },
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(12.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -159,13 +147,17 @@ class _ProfileState extends State<Profile> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    map['name'],
-                                    style: TextStyle(
-                                      fontFamily: Fonts().valFonts,
-                                      color: ProjectColor().white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                  Expanded(
+                                    child: Text(
+                                      map['name'],
+                                      style: TextStyle(
+                                        fontFamily: Fonts().valFonts,
+                                        color: ProjectColor().white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      maxLines: 1,
                                     ),
                                   ),
                                   IconButton(
@@ -179,7 +171,7 @@ class _ProfileState extends State<Profile> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 8),
                               Text(
                                 "Side: ${map['side']}",
                                 style: TextStyle(
