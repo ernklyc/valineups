@@ -1,15 +1,18 @@
+import 'dart:io';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:valineups/components/sides.dart';
+import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:valineups/utils/constants.dart';
 
 class LineupListScreen extends StatefulWidget {
   @override
@@ -22,11 +25,8 @@ class _LineupListScreenState extends State<LineupListScreen> {
   User? _user;
   Set<String> _savedLineups = Set<String>();
 
-  // Yeni değişkenler
-  String agentName = '';
-  String mapName = '';
-  String side = '';
-  List<dynamic> agents = [];
+  String selectedMap = '';
+  String selectedSide = 'Side';
   List<dynamic> maps = [];
 
   @override
@@ -34,7 +34,6 @@ class _LineupListScreenState extends State<LineupListScreen> {
     super.initState();
     _user = _auth.currentUser;
     _loadSavedLineups();
-    _fetchAgents();
     _fetchMaps();
   }
 
@@ -54,19 +53,6 @@ class _LineupListScreenState extends State<LineupListScreen> {
     }
   }
 
-  Future<void> _fetchAgents() async {
-    final response = await http
-        .get(Uri.parse('https://valorant-api.com/v1/agents?language=en-US'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        agents = data['data'];
-      });
-    } else {
-      throw Exception('Failed to load agents');
-    }
-  }
-
   Future<void> _fetchMaps() async {
     final response =
         await http.get(Uri.parse('https://valorant-api.com/v1/maps'));
@@ -74,6 +60,9 @@ class _LineupListScreenState extends State<LineupListScreen> {
       final data = json.decode(response.body);
       setState(() {
         maps = data['data'];
+        if (maps.isNotEmpty) {
+          selectedMap = maps[0]['displayName'];
+        }
       });
     } else {
       throw Exception('Failed to load maps');
@@ -188,61 +177,154 @@ class _LineupListScreenState extends State<LineupListScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Ajan Adı',
-                    labelStyle: TextStyle(color: ProjectColor().white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: ProjectColor().white),
+                maps.isNotEmpty
+                    ? DropdownButton<String>(
+                        underline: Container(
+                          height: 0,
+                        ),
+                        value: selectedMap,
+                        alignment: Alignment.center,
+                        elevation: 10,
+                        icon: const Icon(Icons.arrow_drop_down_rounded),
+                        dropdownColor: ProjectColor().dark,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedMap = newValue!;
+                          });
+                        },
+                        items: maps.map<DropdownMenuItem<String>>((map) {
+                          return DropdownMenuItem<String>(
+                            value: map['displayName'],
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        ProjectBorderRadius().circular12,
+                                    child: Container(
+                                      width:
+                                          MediaQuery.of(context).size.width / 2,
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(map['splash']),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  height: 150,
+                                  color: ProjectColor().dark.withOpacity(0.5),
+                                ),
+                                Text(
+                                  map['displayName'],
+                                  style: TextStyle(
+                                    fontFamily: Fonts().valFonts,
+                                    shadows: [
+                                      Shadow(
+                                        color: ProjectColor().white,
+                                        blurRadius: 50,
+                                      ),
+                                    ],
+                                    color: ProjectColor().white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      )
+                    : Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                const SizedBox(width: 10),
+                Center(
+                  child: DropdownButton<String>(
+                    underline: Container(
+                      height: 0,
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: ProjectColor().valoRed),
-                    ),
+                    value: selectedSide,
+                    alignment: Alignment.center,
+                    elevation: 10,
+                    icon: const Icon(Icons.arrow_drop_down_rounded),
+                    dropdownColor: ProjectColor().dark,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedSide = newValue!;
+                      });
+                    },
+                    items: sides.map<DropdownMenuItem<String>>((side) {
+                      return DropdownMenuItem<String>(
+                        value: side['name']!,
+                        child: side['name'] == 'Side'
+                            ? Center(
+                                child: Text(
+                                  side['name']!,
+                                  style: TextStyle(
+                                    color: ProjectColor().white,
+                                    fontFamily: Fonts().valFonts,
+                                  ),
+                                ),
+                              )
+                            : Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: ClipRRect(
+                                      borderRadius:
+                                          ProjectBorderRadius().circular12,
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                2,
+                                        height: 150,
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: AssetImage(
+                                              side['image']!,
+                                            ),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width / 2,
+                                    height: 150,
+                                    color: ProjectColor().dark.withOpacity(0.5),
+                                  ),
+                                  Text(
+                                    side['name']!,
+                                    style: TextStyle(
+                                      fontFamily: Fonts().valFonts,
+                                      shadows: [
+                                        Shadow(
+                                          color: ProjectColor().white,
+                                          blurRadius: 50,
+                                        ),
+                                      ],
+                                      color: ProjectColor().white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 10,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      );
+                    }).toList(),
                   ),
-                  style: TextStyle(color: ProjectColor().white),
-                  onChanged: (value) {
-                    setState(() {
-                      agentName = value;
-                    });
-                  },
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Harita Adı',
-                    labelStyle: TextStyle(color: ProjectColor().white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: ProjectColor().white),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: ProjectColor().valoRed),
-                    ),
-                  ),
-                  style: TextStyle(color: ProjectColor().white),
-                  onChanged: (value) {
-                    setState(() {
-                      mapName = value;
-                    });
-                  },
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Side Adı (a, b, c)',
-                    labelStyle: TextStyle(color: ProjectColor().white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: ProjectColor().white),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: ProjectColor().valoRed),
-                    ),
-                  ),
-                  style: TextStyle(color: ProjectColor().white),
-                  onChanged: (value) {
-                    setState(() {
-                      side = value;
-                    });
-                  },
                 ),
               ],
             ),
@@ -258,22 +340,17 @@ class _LineupListScreenState extends State<LineupListScreen> {
                 final lineups = snapshot.data?.docs ?? [];
                 final filteredLineups = lineups.where((lineup) {
                   final data = lineup.data() as Map<String, dynamic>;
-                  final agentMatches = agentName.isEmpty ||
-                      data['agentName']
-                          .toString()
-                          .toLowerCase()
-                          .contains(agentName.toLowerCase());
-                  final mapMatches = mapName.isEmpty ||
+                  final mapMatches = selectedMap == '' ||
                       data['mapName']
                           .toString()
                           .toLowerCase()
-                          .contains(mapName.toLowerCase());
-                  final sideMatches = side.isEmpty ||
+                          .contains(selectedMap.toLowerCase());
+                  final sideMatches = selectedSide == 'Side' ||
                       data['side']
                           .toString()
                           .toLowerCase()
-                          .contains(side.toLowerCase());
-                  return agentMatches && mapMatches && sideMatches;
+                          .contains(selectedSide.toLowerCase());
+                  return mapMatches && sideMatches;
                 }).toList();
 
                 return GridView.builder(
@@ -511,7 +588,7 @@ class _LineupDetailScreenState extends State<LineupDetailScreen> {
                     return Builder(
                       builder: (BuildContext context) {
                         return Container(
-                          width: MediaQuery.of(context).size.width,
+                          width: MediaQuery.of(context).size.width / 2,
                           margin: EdgeInsets.symmetric(horizontal: 5.0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12.0),
