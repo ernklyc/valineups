@@ -315,19 +315,6 @@ class _ControlPageState extends State<ControlPage> {
                       size: 16,
                     ),
                   ),
-                  _createDrawerItem(
-                    text: LocaleKeys.sprays.tr(),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LineupListScreen()));
-                    },
-                    iconDrawerr: const FaIcon(
-                      FontAwesomeIcons.sprayCanSparkles,
-                      size: 16,
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -364,7 +351,7 @@ class _ControlPageState extends State<ControlPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildTopNavigationItem(Icons.people, "AGENTS", 0),
+                _buildTopNavigationItem(Icons.people, "LINEUPS", 0),
                 _buildTopNavigationItem(Icons.map, "MAPS", 1),
                 _buildTopNavigationItem(Icons.bookmark, "SAVED", 2),
                 _buildTopNavigationItem(Icons.chat, "CHAT", 3),
@@ -380,12 +367,12 @@ class _ControlPageState extends State<ControlPage> {
                   _currentIndex = newIndex;
                 });
               },
-              children: const [
-                Agents(),
-                MapListScreen(),
-                Profile(),
-                Chat(),
-                News(),
+              children: [
+                LineupListScreen(),
+                const MapListScreen(),
+                const Profile(),
+                const Chat(),
+                const News(),
               ],
             ),
           ),

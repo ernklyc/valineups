@@ -5,8 +5,55 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-class LineupListScreen extends StatelessWidget {
+class LineupListScreen extends StatefulWidget {
+  @override
+  State<LineupListScreen> createState() => _LineupListScreenState();
+}
+
+class _LineupListScreenState extends State<LineupListScreen> {
   final _firestore = FirebaseFirestore.instance;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  User? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _user = _auth.currentUser;
+  }
+
+  Future<void> _deleteLineup(BuildContext context, String lineupId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null && user.email == 'ernklyc@gmail.com') {
+      final confirmation = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Silmek istediğinize emin misiniz?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('Hayır'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Evet'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirmation == true) {
+        await _firestore.collection('lineups').doc(lineupId).delete();
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Bu işlemi yapma yetkiniz yok.')),
+      );
+    }
+  }
 
   void _openLineupsHome(BuildContext context) {
     showDialog(
@@ -40,6 +87,7 @@ class LineupListScreen extends StatelessWidget {
               return ListTile(
                 title: Text(lineup['agentName']),
                 subtitle: Text('${lineup['mapName']} - ${lineup['side']}'),
+                onLongPress: () => _deleteLineup(context, lineup.id),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -53,10 +101,14 @@ class LineupListScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openLineupsHome(context),
-        child: Icon(Icons.add),
-      ),
+      floatingActionButton: (_user?.email == 'ernklyc@gmail.com' ||
+              _user?.email == 'baturaybk@gmail.com' ||
+              _user?.email == 'sevindikemre21@gmail.com')
+          ? FloatingActionButton(
+              onPressed: () => _openLineupsHome(context),
+              child: Icon(Icons.add),
+            )
+          : null,
     );
   }
 }
@@ -109,11 +161,13 @@ class _LineupsHomeState extends State<LineupsHome> {
   }
 
   Future<void> _uploadImages() async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null || user.email != 'ernklyc@gmail.com') {
+      return;
+    }
+
     if (_images.isEmpty || agentName.isEmpty || mapName.isEmpty || side.isEmpty)
       return;
-
-    final user = _firebaseAuth.currentUser;
-    if (user == null) return;
 
     final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     final pathPrefix = '/$agentName/$mapName/$side/$timestamp';
