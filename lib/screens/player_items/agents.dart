@@ -4,8 +4,6 @@ import 'package:flutter_swiper_view/flutter_swiper_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:valineups/localization/strings.dart';
-import 'package:valineups/screens/agents/AgentPage.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:valineups/utils/constants.dart';
@@ -23,6 +21,7 @@ class _AgentsState extends State<Agents> {
   SharedPreferences? _prefs;
   List<String>? _agents;
   List<String>? _agentImages;
+  String selectedLanguage = 'en-US';
 
   @override
   void initState() {
@@ -40,7 +39,7 @@ class _AgentsState extends State<Agents> {
 
   Future<void> _fetchAgentsFromApi() async {
     final response = await http.get(Uri.parse(
-        'https://valorant-api.com/v1/agents?isPlayableCharacter=true'));
+        'https://valorant-api.com/v1/agents?isPlayableCharacter=true&language=$selectedLanguage'));
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body)['data'];
       final List<String> agents = [];
@@ -99,6 +98,58 @@ class _AgentsState extends State<Agents> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: AppBar(
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: DropdownButton<String>(
+                underline: Container(
+                  height: 2,
+                  color: ProjectColor().transparent,
+                ),
+                value: selectedLanguage,
+                dropdownColor: Colors.grey[900], // Dropdown arka plan rengi
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedLanguage = newValue!;
+                    _fetchAgentsFromApi(); // Dil değiştirildiğinde ajanları tekrar yükle
+                  });
+                },
+                items: <String>['en-US', 'tr-TR']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value == 'en-US' ? 'English' : 'Turkish',
+                      style: const TextStyle(
+                          color: Colors.white), // Yazı rengi beyaz
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new_outlined,
+                color: ProjectColor().white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          centerTitle: true,
+          elevation: 0,
+          backgroundColor: ProjectColor().dark,
+          title: Text(
+            'AGENTS',
+            style: TextStyle(
+              fontFamily: Fonts().valFonts,
+              color: ProjectColor().white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
         backgroundColor: ProjectColor().dark,
         body: Stack(
           children: [
@@ -125,12 +176,11 @@ class _AgentsState extends State<Agents> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AgentPage(
+                                builder: (context) => AgentDetailPage(
                                   agentName: displayAgents[agentIndex],
                                   agentImage: displayAgentImages[agentIndex],
-                                  maps: AgentList().agentMaps[
-                                          displayAgents[agentIndex]] ??
-                                      [],
+                                  selectedLanguage:
+                                      selectedLanguage, // Language parameter added
                                 ),
                               ),
                             );
@@ -238,12 +288,11 @@ class _AgentsState extends State<Agents> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AgentPage(
+                                  builder: (context) => AgentDetailPage(
                                     agentName: displayAgents[index],
                                     agentImage: displayAgentImages[index],
-                                    maps: AgentList()
-                                            .agentMaps[displayAgents[index]] ??
-                                        [],
+                                    selectedLanguage:
+                                        selectedLanguage, // Language parameter added
                                   ),
                                 ),
                               );
@@ -273,6 +322,142 @@ class _AgentsState extends State<Agents> {
             color: ProjectColor().valoRed,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class AgentDetailPage extends StatelessWidget {
+  final String agentName;
+  final String agentImage;
+  final String selectedLanguage;
+
+  const AgentDetailPage({
+    super.key,
+    required this.agentName,
+    required this.agentImage,
+    required this.selectedLanguage, // Language parameter added
+  });
+
+  Future<Map<String, dynamic>> fetchAgentDetails(String agentName) async {
+    final response = await http.get(Uri.parse(
+        'https://valorant-api.com/v1/agents?isPlayableCharacter=true&language=$selectedLanguage'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body)['data'];
+      return data.firstWhere((agent) => agent['displayName'] == agentName,
+          orElse: () => null);
+    } else {
+      throw Exception('Failed to load agent details');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: ProjectColor().dark,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_outlined,
+              color: ProjectColor().white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ProjectColor().dark,
+        title: Text(
+          agentName,
+          style: TextStyle(
+            fontFamily: Fonts().valFonts,
+            color: ProjectColor().white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
+      ),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: fetchAgentDetails(agentName),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text('No data available'));
+          } else {
+            final agent = snapshot.data!;
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(child: Image.network(agent['fullPortrait'])),
+                    const SizedBox(height: 16),
+                    Text(
+                      agent['description'],
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: ProjectColor().white.withOpacity(
+                              0.7,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Role: ${agent['role']['displayName']}',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: ProjectColor().white),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      agent['role']['description'],
+                      style: TextStyle(
+                        color: ProjectColor().white.withOpacity(
+                              0.7,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Abilities:',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: ProjectColor().white),
+                    ),
+                    ...agent['abilities'].map<Widget>((ability) {
+                      return ListTile(
+                        leading: Image.network(ability['displayIcon']),
+                        title: Text(
+                          ability['displayName'],
+                          style: TextStyle(
+                            color: ProjectColor().white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          ability['description'],
+                          style: TextStyle(
+                            color: ProjectColor().white.withOpacity(
+                                  0.7,
+                                ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    const SizedBox(height: 50),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
       ),
     );
   }

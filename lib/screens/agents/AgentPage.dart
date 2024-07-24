@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
 import 'package:valineups/components/sides.dart';
-import 'package:valineups/screens/home/agents.dart';
+import 'package:valineups/screens/player_items/agents.dart';
 import 'package:valineups/screens/maps/maps_api.dart';
 import 'package:valineups/screens/maps/maps_model.dart';
 import 'package:valineups/styles/fonts.dart';

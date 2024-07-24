@@ -18,10 +18,6 @@ abstract class  LocaleKeys {
   static const cards = 'cards';
   static const sprays = 'sprays';
   static const logout = 'logout';
-  static const agentsNav = 'agentsNav';
   static const maps = 'maps';
-  static const saved = 'saved';
-  static const chat = 'chat';
-  static const news = 'news';
 
 }

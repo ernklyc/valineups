@@ -103,6 +103,30 @@ class _MapListScreenState extends State<MapListScreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new_outlined,
+              color: ProjectColor().white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          centerTitle: true,
+          elevation: 0,
+          backgroundColor: ProjectColor().dark,
+          title: Text(
+            'MAPS',
+            style: TextStyle(
+              fontFamily: Fonts().valFonts,
+              color: ProjectColor().white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
         backgroundColor: ProjectColor().dark,
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),

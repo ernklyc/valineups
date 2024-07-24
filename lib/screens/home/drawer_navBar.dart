@@ -7,6 +7,7 @@ import 'package:random_avatar/random_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/generated/locale_keys.g.dart';
+import 'package:valineups/screens/player_items/agents.dart';
 import 'package:valineups/screens/lineups/lineups.dart';
 import 'package:valineups/screens/maps/maps_screen.dart';
 import 'package:valineups/screens/agents/agents_info.dart';
@@ -228,10 +229,24 @@ class _ControlPageState extends State<ControlPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const AgentsInfo()));
+                              builder: (context) => const Agents()));
                     },
                     iconDrawerr: const FaIcon(
                       FontAwesomeIcons.userNinja,
+                      size: 16,
+                    ),
+                  ),
+                  _createDrawerItem(
+                    text: LocaleKeys.maps.tr(),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MapListScreen(),
+                          ));
+                    },
+                    iconDrawerr: const FaIcon(
+                      FontAwesomeIcons.mapMarkedAlt,
                       size: 16,
                     ),
                   ),
@@ -354,7 +369,6 @@ class _ControlPageState extends State<ControlPage> {
                 _buildTopNavigationItem(Icons.people, "SAVED", 1),
                 _buildTopNavigationItem(Icons.chat, "CHAT", 2),
                 _buildTopNavigationItem(Icons.chat, "NEWS", 3),
-                _buildTopNavigationItem(Icons.map, "MAPS", 4),
               ],
             ),
           ),
@@ -371,7 +385,6 @@ class _ControlPageState extends State<ControlPage> {
                 const Profile(),
                 const Chat(),
                 const News(),
-                const MapListScreen(),
               ],
             ),
           ),
