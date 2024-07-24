@@ -290,7 +290,7 @@ class _NewsState extends State<News> {
     final double mediaQueryHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: _user?.email == 'ernklyc@gmail.com'
+      appBar: _user?.email == 'valineupstr@gmail.com'
           ? AppBar(
               centerTitle: true,
               elevation: 0,
@@ -531,7 +531,7 @@ class _NewsState extends State<News> {
                                       ],
                                     ),
                                   ),
-                                  if (_user?.email == 'ernklyc@gmail.com')
+                                  if (_user?.email == 'valineupstr@gmail.com')
                                     Positioned(
                                       top: 10,
                                       right: 10,
@@ -572,9 +572,7 @@ class _NewsState extends State<News> {
           ),
         ],
       ),
-      floatingActionButton: (_user?.email == 'ernklyc@gmail.com' ||
-              _user?.email == 'baturaybk@gmail.com' ||
-              _user?.email == 'sevindikemre21@gmail.com')
+      floatingActionButton: (_user?.email == 'valineupstr@gmail.com')
           ? FloatingActionButton(
               backgroundColor: ProjectColor().valoRed,
               onPressed: _addNews,

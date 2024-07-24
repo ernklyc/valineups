@@ -144,7 +144,7 @@ class _LineupListScreenState extends State<LineupListScreen> {
   Future<void> _deleteLineup(
       BuildContext context, String lineupId, List<String> imagePaths) async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null && user.email == 'ernklyc@gmail.com') {
+    if (user != null && user.email == 'valineupstr@gmail.com') {
       final confirmation = await showDialog(
         context: context,
         builder: (context) {
@@ -505,10 +505,7 @@ class _LineupListScreenState extends State<LineupListScreen> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  if (_user?.email == 'ernklyc@gmail.com' ||
-                                      _user?.email == 'baturaybk@gmail.com' ||
-                                      _user?.email ==
-                                          'sevindikemre21@gmail.com')
+                                  if (_user?.email == 'valineupstr@gmail.com')
                                     IconButton(
                                       icon: Icon(
                                         Icons.delete,
@@ -541,9 +538,7 @@ class _LineupListScreenState extends State<LineupListScreen> {
           ),
         ],
       ),
-      floatingActionButton: (_user?.email == 'ernklyc@gmail.com' ||
-              _user?.email == 'baturaybk@gmail.com' ||
-              _user?.email == 'sevindikemre21@gmail.com')
+      floatingActionButton: (_user?.email == 'valineupstr@gmail.com')
           ? FloatingActionButton(
               backgroundColor: ProjectColor().valoRed,
               onPressed: () => _openLineupsHome(context),
@@ -730,7 +725,7 @@ class _LineupsHomeState extends State<LineupsHome> {
     });
 
     final user = _firebaseAuth.currentUser;
-    if (user == null || user.email != 'ernklyc@gmail.com') {
+    if (user == null || user.email != 'valineupstr@gmail.com') {
       return;
     }
 

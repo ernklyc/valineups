@@ -25,11 +25,7 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
   String? _replyToSender;
   late TabController _tabController;
 
-  final List<String> _adminEmails = [
-    'ernklyc@gmail.com',
-    'sevindikemre21@gmail.com',
-    'baturaybk@gmail.com'
-  ];
+  final List<String> _adminEmails = ['valineupstr@gmail.com'];
 
   Map<String, GlobalKey> messageKeys = {};
 
