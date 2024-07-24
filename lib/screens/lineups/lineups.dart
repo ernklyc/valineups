@@ -1,19 +1,14 @@
-import 'dart:io';
-import 'package:carousel_slider/carousel_options.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:valineups/components/sides.dart';
+import 'package:valineups/screens/lineups/lineups_detail.dart';
+import 'package:valineups/screens/lineups/lineups_home.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:valineups/utils/constants.dart';
 
 class LineupListScreen extends StatefulWidget {
   @override
@@ -65,10 +60,12 @@ class _LineupListScreenState extends State<LineupListScreen> {
         await http.get(Uri.parse('https://valorant-api.com/v1/maps'));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      setState(() {
-        maps = data['data'];
-        isLoadingMaps = false;
-      });
+      if (mounted) {
+        setState(() {
+          maps = data['data'];
+          isLoadingMaps = false;
+        });
+      }
     } else {
       throw Exception('Failed to load maps');
     }
@@ -79,13 +76,15 @@ class _LineupListScreenState extends State<LineupListScreen> {
         'https://valorant-api.com/v1/agents?isPlayableCharacter=true'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)['data'];
-      setState(() {
-        agents = ['All'];
-        for (var agent in data) {
-          agents.add(agent['displayName']);
-        }
-        isLoadingAgents = false;
-      });
+      if (mounted) {
+        setState(() {
+          agents = ['All'];
+          for (var agent in data) {
+            agents.add(agent['displayName']);
+          }
+          isLoadingAgents = false;
+        });
+      }
     } else {
       throw Exception('Failed to load agents');
     }
@@ -105,7 +104,7 @@ class _LineupListScreenState extends State<LineupListScreen> {
         });
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lineup kaydedildi.')),
+        SnackBar(content: Text('Lineup Saved.')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -190,6 +189,11 @@ class _LineupListScreenState extends State<LineupListScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ProjectColor().dark,
@@ -232,9 +236,11 @@ class _LineupListScreenState extends State<LineupListScreen> {
                                 color: ProjectColor().white,
                               ),
                               onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedMap = newValue!;
-                                });
+                                if (mounted) {
+                                  setState(() {
+                                    selectedMap = newValue!;
+                                  });
+                                }
                               },
                               items: [
                                 DropdownMenuItem<String>(
@@ -297,9 +303,11 @@ class _LineupListScreenState extends State<LineupListScreen> {
                           color: ProjectColor().white,
                         ),
                         onChanged: (String? newValue) {
-                          setState(() {
-                            selectedSide = newValue!;
-                          });
+                          if (mounted) {
+                            setState(() {
+                              selectedSide = newValue!;
+                            });
+                          }
                         },
                         items: [
                           DropdownMenuItem<String>(
@@ -365,9 +373,11 @@ class _LineupListScreenState extends State<LineupListScreen> {
                                 color: ProjectColor().white,
                               ),
                               onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedAgent = newValue!;
-                                });
+                                if (mounted) {
+                                  setState(() {
+                                    selectedAgent = newValue!;
+                                  });
+                                }
                               },
                               items: agents.map((agent) {
                                 return DropdownMenuItem<String>(
@@ -548,412 +558,6 @@ class _LineupListScreenState extends State<LineupListScreen> {
               ),
             )
           : null,
-    );
-  }
-}
-
-class LineupDetailScreen extends StatefulWidget {
-  final DocumentSnapshot lineup;
-
-  LineupDetailScreen({required this.lineup});
-
-  @override
-  _LineupDetailScreenState createState() => _LineupDetailScreenState();
-}
-
-class _LineupDetailScreenState extends State<LineupDetailScreen> {
-  int _currentImageIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final imagePaths = List<String>.from(widget.lineup['imagePaths']);
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.circle, color: ProjectColor().dark),
-            onPressed: () {},
-          ),
-        ],
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: ProjectColor().white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-              widget.lineup['mapName'].toString().toUpperCase(),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-            Text(
-              "|",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-            Text(
-              widget.lineup['side'].toString().toUpperCase(),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-            Text(
-              "|",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-            Text(
-              widget.lineup['agentName'].toString().toUpperCase(),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: ProjectColor().dark,
-      ),
-      backgroundColor: ProjectColor().dark,
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              children: [
-                CarouselSlider(
-                  options: CarouselOptions(
-                    height: 400.0,
-                    viewportFraction: 1.0,
-                    enlargeCenterPage: false,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _currentImageIndex = index;
-                      });
-                    },
-                  ),
-                  items: imagePaths.map((imagePath) {
-                    return Builder(
-                      builder: (BuildContext context) {
-                        return Container(
-                          width: MediaQuery.of(context).size.width / 2,
-                          margin: EdgeInsets.symmetric(horizontal: 5.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12.0),
-                            image: DecorationImage(
-                              image: NetworkImage(imagePath),
-                              fit: BoxFit.fitWidth,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  }).toList(),
-                ),
-                SizedBox(height: 10),
-                Center(
-                  child: AnimatedSmoothIndicator(
-                    activeIndex: _currentImageIndex,
-                    count: imagePaths.length,
-                    effect: ScrollingDotsEffect(
-                      activeDotColor: ProjectColor().white,
-                      dotColor: ProjectColor().white.withOpacity(0.5),
-                      dotHeight: 8.0,
-                      dotWidth: 8.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class LineupsHome extends StatefulWidget {
-  @override
-  _LineupsHomeState createState() => _LineupsHomeState();
-}
-
-class _LineupsHomeState extends State<LineupsHome> {
-  List<File> _images = [];
-  final _picker = ImagePicker();
-  String agentName = '';
-  String mapName = '';
-  String side = '';
-  final _firebaseAuth = FirebaseAuth.instance;
-  final _firestore = FirebaseFirestore.instance;
-  final _storage = FirebaseStorage.instance;
-  bool isLoading = false;
-  bool isUploading = false;
-
-  Future<void> _pickImages() async {
-    final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null) {
-      setState(() {
-        _images = pickedFiles.map((file) => File(file.path)).toList();
-        isUploading = true; // Start showing shimmer effect
-      });
-
-      // Simulate delay for shimmer effect
-      await Future.delayed(Duration(seconds: 2));
-      setState(() {
-        isUploading = false; // Stop shimmer effect after delay
-      });
-    }
-  }
-
-  Future<void> _uploadImages() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    final user = _firebaseAuth.currentUser;
-    if (user == null || user.email != 'valineupstr@gmail.com') {
-      return;
-    }
-
-    if (_images.isEmpty ||
-        agentName.isEmpty ||
-        mapName.isEmpty ||
-        side.isEmpty) {
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
-
-    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final pathPrefix = '/$agentName/$mapName/$side/$timestamp';
-
-    List<String> downloadUrls = [];
-
-    for (int i = 0; i < _images.length; i++) {
-      final ref = _storage.ref().child('$pathPrefix/$i.jpg');
-      await ref.putFile(_images[i]);
-      final downloadUrl = await ref.getDownloadURL();
-      downloadUrls.add(downloadUrl);
-    }
-
-    await _firestore.collection('lineups').add({
-      'userEmail': user.email,
-      'agentName': agentName,
-      'mapName': mapName,
-      'side': side,
-      'timestamp': timestamp,
-      'imagePaths': downloadUrls,
-    });
-
-    setState(() {
-      _images = [];
-      agentName = '';
-      mapName = '';
-      side = '';
-      isLoading = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: ProjectColor().dark,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: ProjectColor().dark,
-          ),
-          onPressed: () {},
-        ),
-      ),
-      backgroundColor: ProjectColor().dark,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              _buildTextField('Ajan Adı', (value) {
-                setState(() {
-                  agentName = value;
-                });
-              }),
-              SizedBox(height: 10),
-              _buildTextField('Harita Adı', (value) {
-                setState(() {
-                  mapName = value;
-                });
-              }),
-              SizedBox(height: 10),
-              _buildTextField('Side Adı (a, b, c)', (value) {
-                setState(() {
-                  side = value;
-                });
-              }),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: isLoading ? null : _pickImages,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isLoading ? Colors.grey : ProjectColor().valoRed,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  minimumSize: Size(double.infinity, 0),
-                ),
-                child: Text(
-                  'PICK PHOTOS',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: ProjectColor().white,
-                    fontFamily: Fonts().valFonts,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              _images.isEmpty
-                  ? Text(
-                      'No images selected',
-                      style: TextStyle(
-                        color: ProjectColor().white.withOpacity(0.5),
-                        fontSize: 14,
-                      ),
-                    )
-                  : isUploading
-                      ? _buildShimmerEffect()
-                      : GridView.builder(
-                          shrinkWrap: true,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 4,
-                            mainAxisSpacing: 4,
-                          ),
-                          itemCount: _images.length,
-                          itemBuilder: (context, index) {
-                            return Image.file(_images[index],
-                                fit: BoxFit.cover);
-                          },
-                        ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: isLoading ? null : _uploadImages,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isLoading ? Colors.grey : ProjectColor().valoRed,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  minimumSize: Size(double.infinity, 0),
-                ),
-                child: isLoading
-                    ? CircularProgressIndicator(
-                        color: ProjectColor().white,
-                      )
-                    : Text(
-                        'UPLOAD LINEUP',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: ProjectColor().white,
-                          fontFamily: Fonts().valFonts,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 150),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ProjectColor().valoRed,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Icon(Icons.cancel, color: ProjectColor().white),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String labelText, Function(String) onChanged) {
-    return TextField(
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: TextStyle(
-          color: ProjectColor().white.withOpacity(0.5),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: ProjectColor().white,
-          ),
-        ),
-        focusedErrorBorder: UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: ProjectColor().white,
-          ),
-        ),
-      ),
-      style: TextStyle(
-        color: ProjectColor().white,
-      ),
-      onChanged: onChanged,
-    );
-  }
-
-  Widget _buildShimmerEffect() {
-    return GridView.builder(
-      shrinkWrap: true,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8.0,
-        mainAxisSpacing: 8.0,
-        childAspectRatio: 0.7,
-      ),
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return Card(
-          color: ProjectColor().dark,
-          margin: const EdgeInsets.all(8.0),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Shimmer.fromColors(
-              baseColor: Colors.grey.shade300,
-              highlightColor: Colors.grey.shade100,
-              enabled: true,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Container(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  Container(
-                    height: 20.0,
-                    color: Colors.grey,
-                    margin: const EdgeInsets.only(top: 8.0),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }

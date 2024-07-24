@@ -32,11 +32,13 @@ class _ProfileState extends State<Profile> {
           .doc(user.uid)
           .collection('savedLineups');
       final querySnapshot = await lineupCollection.get();
-      setState(() {
-        savedMaps = querySnapshot.docs
-            .map((doc) => doc.data() as Map<String, dynamic>)
-            .toList();
-      });
+      if (mounted) {
+        setState(() {
+          savedMaps = querySnapshot.docs
+              .map((doc) => doc.data() as Map<String, dynamic>)
+              .toList();
+        });
+      }
     }
   }
 
@@ -52,9 +54,11 @@ class _ProfileState extends State<Profile> {
       for (var doc in querySnapshot.docs) {
         await doc.reference.delete();
       }
-      setState(() {
-        savedMaps.remove(map);
-      });
+      if (mounted) {
+        setState(() {
+          savedMaps.remove(map);
+        });
+      }
     }
   }
 
