@@ -352,9 +352,9 @@ class _ControlPageState extends State<ControlPage> {
               children: [
                 _buildTopNavigationItem(Icons.people, "LINEUPS", 0),
                 _buildTopNavigationItem(Icons.people, "SAVED", 1),
-                _buildTopNavigationItem(Icons.map, "MAPS", 2),
-                _buildTopNavigationItem(Icons.chat, "CHAT", 3),
-                _buildTopNavigationItem(Icons.chat, "NEWS", 4),
+                _buildTopNavigationItem(Icons.chat, "CHAT", 2),
+                _buildTopNavigationItem(Icons.chat, "NEWS", 3),
+                _buildTopNavigationItem(Icons.map, "MAPS", 4),
               ],
             ),
           ),
@@ -369,9 +369,9 @@ class _ControlPageState extends State<ControlPage> {
               children: [
                 LineupListScreen(),
                 const Profile(),
-                const MapListScreen(),
                 const Chat(),
                 const News(),
+                const MapListScreen(),
               ],
             ),
           ),

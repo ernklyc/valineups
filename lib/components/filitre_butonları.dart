@@ -30,7 +30,8 @@ class CategoryButton extends StatelessWidget {
   final String title;
   final VoidCallback onPressed;
 
-  const CategoryButton({super.key, required this.title, required this.onPressed});
+  const CategoryButton(
+      {super.key, required this.title, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

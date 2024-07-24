@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:valineups/components/sides.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
@@ -195,153 +196,130 @@ class _LineupListScreenState extends State<LineupListScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
+            padding: const EdgeInsets.only(top: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                isLoadingMaps
-                    ? Center(child: CircularProgressIndicator())
-                    : DropdownButton<String>(
-                        underline: Container(
-                          height: 0,
-                        ),
-                        value: selectedMap,
-                        alignment: Alignment.center,
-                        elevation: 10,
-                        icon: const Icon(Icons.arrow_drop_down_rounded),
-                        dropdownColor: ProjectColor().dark,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedMap = newValue!;
-                          });
-                        },
-                        items: ['All', ...maps.map((map) => map['displayName'])]
-                            .map<DropdownMenuItem<String>>((map) {
-                          return DropdownMenuItem<String>(
-                            value: map,
-                            child: map == 'All'
-                                ? Center(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    isLoadingMaps
+                        ? Center(child: CircularProgressIndicator())
+                        : Container(
+                            decoration: BoxDecoration(
+                              color: ProjectColor().dark,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: Offset(
+                                      0, 3), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: DropdownButton<String>(
+                              underline: Container(
+                                height: 1,
+                                color: ProjectColor().white,
+                              ),
+                              alignment: Alignment.center,
+                              value: selectedMap,
+                              icon: Icon(
+                                Icons.arrow_drop_down_rounded,
+                                color: ProjectColor().white,
+                              ),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedMap = newValue!;
+                                });
+                              },
+                              items: [
+                                DropdownMenuItem<String>(
+                                  value: 'All',
+                                  child: Center(
                                     child: Text(
-                                      map,
+                                      'MAP',
                                       style: TextStyle(
                                         color: ProjectColor().white,
                                         fontFamily: Fonts().valFonts,
                                       ),
                                     ),
-                                  )
-                                : Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(2.0),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              ProjectBorderRadius().circular12,
-                                          child: Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                2,
-                                            height: 150,
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                    maps.firstWhere((element) =>
-                                                        element[
-                                                            'displayName'] ==
-                                                        map)['splash']),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                2,
-                                        height: 150,
-                                        color: ProjectColor()
-                                            .dark
-                                            .withOpacity(0.5),
-                                      ),
-                                      Text(
-                                        map,
-                                        style: TextStyle(
-                                          fontFamily: Fonts().valFonts,
-                                          shadows: [
-                                            Shadow(
-                                              color: ProjectColor().white,
-                                              blurRadius: 50,
-                                            ),
-                                          ],
-                                          color: ProjectColor().white,
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 10,
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                          );
-                        }).toList(),
-                      ),
-                const SizedBox(width: 10),
-                Center(
-                  child: DropdownButton<String>(
-                    underline: Container(
-                      height: 0,
-                    ),
-                    value: selectedSide,
-                    alignment: Alignment.center,
-                    elevation: 10,
-                    icon: const Icon(Icons.arrow_drop_down_rounded),
-                    dropdownColor: ProjectColor().dark,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedSide = newValue!;
-                      });
-                    },
-                    items: ['All', ...sides.map((side) => side['name'])]
-                        .map<DropdownMenuItem<String>>((side) {
-                      return DropdownMenuItem<String>(
-                        value: side,
-                        child: Center(
-                          child: Text(
-                            side!,
-                            style: TextStyle(
-                              color: ProjectColor().white,
-                              fontFamily: Fonts().valFonts,
+                                ),
+                                ...maps.map((map) {
+                                  return DropdownMenuItem<String>(
+                                    value: map['displayName'],
+                                    child: Center(
+                                      child: Text(
+                                        map['displayName'],
+                                        style: TextStyle(
+                                          color: ProjectColor().white,
+                                          fontFamily: Fonts().valFonts,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList()
+                              ],
+                              dropdownColor: ProjectColor().dark,
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                isLoadingAgents
-                    ? Center(child: CircularProgressIndicator())
-                    : Center(
-                        child: DropdownButton<String>(
-                          underline: Container(
-                            height: 0,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: ProjectColor().dark,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: Offset(0, 3), // changes position of shadow
                           ),
-                          value: selectedAgent,
-                          alignment: Alignment.center,
-                          elevation: 10,
-                          icon: const Icon(Icons.arrow_drop_down_rounded),
-                          dropdownColor: ProjectColor().dark,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedAgent = newValue!;
-                            });
-                          },
-                          items: agents.map<DropdownMenuItem<String>>((agent) {
+                        ],
+                      ),
+                      child: DropdownButton<String>(
+                        underline: Container(
+                          height: 1,
+                          color: ProjectColor().white,
+                        ),
+                        alignment: Alignment.center,
+                        value: selectedSide,
+                        icon: Icon(
+                          Icons.arrow_drop_down_rounded,
+                          color: ProjectColor().white,
+                        ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedSide = newValue!;
+                          });
+                        },
+                        items: [
+                          DropdownMenuItem<String>(
+                            value: 'All',
+                            child: Center(
+                              child: Text(
+                                'SIDE',
+                                style: TextStyle(
+                                  color: ProjectColor().white,
+                                  fontFamily: Fonts().valFonts,
+                                ),
+                              ),
+                            ),
+                          ),
+                          ...sides.map((side) {
                             return DropdownMenuItem<String>(
-                              value: agent,
+                              value: side['name'],
                               child: Center(
                                 child: Text(
-                                  agent,
+                                  side['name']!,
                                   style: TextStyle(
                                     color: ProjectColor().white,
                                     fontFamily: Fonts().valFonts,
@@ -349,9 +327,67 @@ class _LineupListScreenState extends State<LineupListScreen> {
                                 ),
                               ),
                             );
-                          }).toList(),
-                        ),
+                          }).toList()
+                        ],
+                        dropdownColor: ProjectColor().dark,
                       ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    isLoadingAgents
+                        ? Center(child: CircularProgressIndicator())
+                        : Container(
+                            decoration: BoxDecoration(
+                              color: ProjectColor().dark,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: Offset(
+                                      0, 3), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: DropdownButton<String>(
+                              underline: Container(
+                                height: 1,
+                                color: ProjectColor().white,
+                              ),
+                              alignment: Alignment.center,
+                              value: selectedAgent,
+                              icon: Icon(
+                                Icons.arrow_drop_down_rounded,
+                                color: ProjectColor().white,
+                              ),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedAgent = newValue!;
+                                });
+                              },
+                              items: agents.map((agent) {
+                                return DropdownMenuItem<String>(
+                                  value: agent,
+                                  child: Center(
+                                    child: Text(
+                                      agent,
+                                      style: TextStyle(
+                                        color: ProjectColor().white,
+                                        fontFamily: Fonts().valFonts,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              dropdownColor: ProjectColor().dark,
+                            ),
+                          ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -476,7 +512,7 @@ class _LineupListScreenState extends State<LineupListScreen> {
                                     IconButton(
                                       icon: Icon(
                                         Icons.delete,
-                                        color: ProjectColor().valoRed,
+                                        color: ProjectColor().white,
                                       ),
                                       onPressed: () => _deleteLineup(
                                           context, lineupId, imagePaths),
@@ -540,7 +576,7 @@ class _LineupDetailScreenState extends State<LineupDetailScreen> {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: Icon(Icons.photo, color: ProjectColor().white),
+            icon: Icon(Icons.circle, color: ProjectColor().dark),
             onPressed: () {},
           ),
         ],
@@ -669,24 +705,44 @@ class _LineupsHomeState extends State<LineupsHome> {
   final _firebaseAuth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
+  bool isLoading = false;
+  bool isUploading = false;
 
   Future<void> _pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles != null) {
       setState(() {
         _images = pickedFiles.map((file) => File(file.path)).toList();
+        isUploading = true; // Start showing shimmer effect
+      });
+
+      // Simulate delay for shimmer effect
+      await Future.delayed(Duration(seconds: 2));
+      setState(() {
+        isUploading = false; // Stop shimmer effect after delay
       });
     }
   }
 
   Future<void> _uploadImages() async {
+    setState(() {
+      isLoading = true;
+    });
+
     final user = _firebaseAuth.currentUser;
     if (user == null || user.email != 'ernklyc@gmail.com') {
       return;
     }
 
-    if (_images.isEmpty || agentName.isEmpty || mapName.isEmpty || side.isEmpty)
+    if (_images.isEmpty ||
+        agentName.isEmpty ||
+        mapName.isEmpty ||
+        side.isEmpty) {
+      setState(() {
+        isLoading = false;
+      });
       return;
+    }
 
     final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     final pathPrefix = '/$agentName/$mapName/$side/$timestamp';
@@ -714,6 +770,7 @@ class _LineupsHomeState extends State<LineupsHome> {
       agentName = '';
       mapName = '';
       side = '';
+      isLoading = false;
     });
   }
 
@@ -721,8 +778,14 @@ class _LineupsHomeState extends State<LineupsHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Valorant Uygulaması'),
         backgroundColor: ProjectColor().dark,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: ProjectColor().dark,
+          ),
+          onPressed: () {},
+        ),
       ),
       backgroundColor: ProjectColor().dark,
       body: SingleChildScrollView(
@@ -730,98 +793,172 @@ class _LineupsHomeState extends State<LineupsHome> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Ajan Adı',
-                  labelStyle: TextStyle(color: ProjectColor().white),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: ProjectColor().white),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: ProjectColor().valoRed),
-                  ),
-                ),
-                style: TextStyle(color: ProjectColor().white),
-                onChanged: (value) {
-                  setState(() {
-                    agentName = value;
-                  });
-                },
-              ),
+              _buildTextField('Ajan Adı', (value) {
+                setState(() {
+                  agentName = value;
+                });
+              }),
               SizedBox(height: 10),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Harita Adı',
-                  labelStyle: TextStyle(color: ProjectColor().white),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: ProjectColor().white),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: ProjectColor().valoRed),
-                  ),
-                ),
-                style: TextStyle(color: ProjectColor().white),
-                onChanged: (value) {
-                  setState(() {
-                    mapName = value;
-                  });
-                },
-              ),
+              _buildTextField('Harita Adı', (value) {
+                setState(() {
+                  mapName = value;
+                });
+              }),
               SizedBox(height: 10),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Side Adı (a, b, c)',
-                  labelStyle: TextStyle(color: ProjectColor().white),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: ProjectColor().white),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: ProjectColor().valoRed),
-                  ),
-                ),
-                style: TextStyle(color: ProjectColor().white),
-                onChanged: (value) {
-                  setState(() {
-                    side = value;
-                  });
-                },
-              ),
+              _buildTextField('Side Adı (a, b, c)', (value) {
+                setState(() {
+                  side = value;
+                });
+              }),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _pickImages,
+                onPressed: isLoading ? null : _pickImages,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ProjectColor().valoRed,
+                  backgroundColor:
+                      isLoading ? Colors.grey : ProjectColor().valoRed,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  minimumSize: Size(double.infinity, 0),
                 ),
-                child: Text('Fotoğraf Seç'),
+                child: Text(
+                  'PICK PHOTOS',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: ProjectColor().white,
+                    fontFamily: Fonts().valFonts,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
               ),
               SizedBox(height: 20),
               _images.isEmpty
-                  ? Text('Hiç fotoğraf seçilmedi.',
-                      style: TextStyle(color: ProjectColor().white))
-                  : GridView.builder(
-                      shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 4,
-                        mainAxisSpacing: 4,
+                  ? Text(
+                      'No images selected',
+                      style: TextStyle(
+                        color: ProjectColor().white.withOpacity(0.5),
+                        fontSize: 14,
                       ),
-                      itemCount: _images.length,
-                      itemBuilder: (context, index) {
-                        return Image.file(_images[index], fit: BoxFit.cover);
-                      },
-                    ),
+                    )
+                  : isUploading
+                      ? _buildShimmerEffect()
+                      : GridView.builder(
+                          shrinkWrap: true,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 4,
+                            mainAxisSpacing: 4,
+                          ),
+                          itemCount: _images.length,
+                          itemBuilder: (context, index) {
+                            return Image.file(_images[index],
+                                fit: BoxFit.cover);
+                          },
+                        ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _uploadImages,
+                onPressed: isLoading ? null : _uploadImages,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ProjectColor().valoRed,
+                  backgroundColor:
+                      isLoading ? Colors.grey : ProjectColor().valoRed,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  minimumSize: Size(double.infinity, 0),
                 ),
-                child: Text('Fotoğrafları Yükle'),
+                child: isLoading
+                    ? CircularProgressIndicator(
+                        color: ProjectColor().white,
+                      )
+                    : Text(
+                        'UPLOAD LINEUP',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: ProjectColor().white,
+                          fontFamily: Fonts().valFonts,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 150),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ProjectColor().valoRed,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Icon(Icons.cancel, color: ProjectColor().white),
+                ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(String labelText, Function(String) onChanged) {
+    return TextField(
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(
+          color: ProjectColor().white.withOpacity(0.5),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: ProjectColor().white,
+          ),
+        ),
+        focusedErrorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: ProjectColor().white,
+          ),
+        ),
+      ),
+      style: TextStyle(
+        color: ProjectColor().white,
+      ),
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildShimmerEffect() {
+    return GridView.builder(
+      shrinkWrap: true,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+        childAspectRatio: 0.7,
+      ),
+      itemCount: 3,
+      itemBuilder: (context, index) {
+        return Card(
+          color: ProjectColor().dark,
+          margin: const EdgeInsets.all(8.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              enabled: true,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Container(
+                    height: 20.0,
+                    color: Colors.grey,
+                    margin: const EdgeInsets.only(top: 8.0),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
