@@ -445,17 +445,6 @@ class _ProfileState extends State<Profile> {
                                         fontSize: 14,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "Agent: ${map['agentName']}",
-                                      style: TextStyle(
-                                        fontFamily: Fonts().valFonts,
-                                        color: ProjectColor()
-                                            .white
-                                            .withOpacity(0.7),
-                                        fontSize: 14,
-                                      ),
-                                    ),
                                   ],
                                 ),
                               ),
