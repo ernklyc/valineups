@@ -205,6 +205,88 @@ class _LineupsUserState extends State<LineupsUser> {
     );
   }
 
+  void _showAllUserImages() async {
+    final snapshots = await _firestore.collection('lineups_user').get();
+
+    List<Map<String, dynamic>> allUserImages = [];
+    for (var doc in snapshots.docs) {
+      allUserImages.add(doc.data());
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('All Uploaded Images'),
+          content: Container(
+            width: double.maxFinite,
+            height: 300,
+            child: allUserImages.isEmpty
+                ? Center(child: Text('No images found'))
+                : ListView.builder(
+                    itemCount: allUserImages.length,
+                    itemBuilder: (context, index) {
+                      final userImages = allUserImages[index];
+                      return ListTile(
+                        title: Text(userImages['senderName'] ?? 'Unknown'),
+                        subtitle:
+                            Text(userImages['agentName'] ?? 'No agent name'),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          _showImagesDialog(userImages['imagePaths']);
+                        },
+                      );
+                    },
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showImagesDialog(List<dynamic> imagePaths) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Images'),
+          content: Container(
+            width: double.maxFinite,
+            height: 300,
+            child: imagePaths.isEmpty
+                ? Center(child: Text('No images found'))
+                : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: imagePaths.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.network(imagePaths[index]),
+                      );
+                    },
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = _firebaseAuth.currentUser;
@@ -224,7 +306,7 @@ class _LineupsUserState extends State<LineupsUser> {
       body: user == null ? _buildNotAuthorizedView() : _buildAuthorizedView(),
       floatingActionButton: isAdmin
           ? FloatingActionButton(
-              onPressed: _showUserImages,
+              onPressed: _showAllUserImages,
               backgroundColor: ProjectColor().valoRed,
               child: Icon(Icons.image, color: ProjectColor().white),
             )
