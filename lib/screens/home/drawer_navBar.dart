@@ -7,6 +7,7 @@ import 'package:random_avatar/random_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/generated/locale_keys.g.dart';
+import 'package:valineups/screens/lineups/user_lineups/lineups_user.dart';
 import 'package:valineups/screens/player_items/agents.dart';
 import 'package:valineups/screens/lineups/lineups.dart';
 import 'package:valineups/screens/maps/maps_screen.dart';
@@ -366,9 +367,10 @@ class _ControlPageState extends State<ControlPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildTopNavigationItem(Icons.people, "LINEUPS", 0),
-                _buildTopNavigationItem(Icons.people, "SAVED", 1),
-                _buildTopNavigationItem(Icons.chat, "CHAT", 2),
-                _buildTopNavigationItem(Icons.chat, "NEWS", 3),
+                _buildTopNavigationItem(Icons.people, "SHARE", 1),
+                _buildTopNavigationItem(Icons.people, "SAVED", 2),
+                _buildTopNavigationItem(Icons.chat, "CHAT", 3),
+                _buildTopNavigationItem(Icons.chat, "NEWS", 4),
               ],
             ),
           ),
@@ -382,6 +384,7 @@ class _ControlPageState extends State<ControlPage> {
               },
               children: [
                 LineupListScreen(),
+                LineupsUser(),
                 const Profile(),
                 const Chat(),
                 const News(),
