@@ -21,6 +21,8 @@ class _LineupListScreenState extends State<LineupListScreen> {
   User? _user;
   Set<String> _savedLineups = Set<String>();
 
+  String searchText = '';
+
   String selectedMap = 'All';
   String selectedSide = 'All';
   String selectedAgent = 'All';
@@ -144,24 +146,89 @@ class _LineupListScreenState extends State<LineupListScreen> {
       BuildContext context, String lineupId, List<String> imagePaths) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null && user.email == 'valineupstr@gmail.com') {
-      final confirmation = await showDialog(
+      final confirmation = await showDialog<bool>(
         context: context,
-        builder: (context) {
+        builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Silmek istediğinize emin misiniz?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text('Hayır'),
+            backgroundColor: ProjectColor().valoRed,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Text(
+              'Silmek istediginine misiniz?',
+              style: TextStyle(
+                color: ProjectColor().white,
+                fontFamily: Fonts().valFonts,
+                fontWeight: FontWeight.bold,
               ),
-              TextButton(
+            ),
+            content: Text(
+              'Bu işlem geri alınamaz.',
+              style: TextStyle(
+                color: ProjectColor().white.withOpacity(0.8),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            actions: [
+              ElevatedButton(
+                child: Text(
+                  'Hayır',
+                  style: TextStyle(
+                    color: ProjectColor().valoRed,
+                    fontFamily: Fonts().valFonts,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ProjectColor().white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+              ElevatedButton(
+                child: Text(
+                  'Evet',
+                  style: TextStyle(
+                    color: ProjectColor().white,
+                    fontFamily: Fonts().valFonts,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ProjectColor().dark,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 onPressed: () => Navigator.of(context).pop(true),
-                child: Text('Evet'),
               ),
             ],
           );
         },
       );
+
+      if (confirmation == true) {
+        // Silme işlemi burada gerçekleştirilir
+        await _firestore.collection('lineups').doc(lineupId).delete();
+        for (String path in imagePaths) {
+          final ref = FirebaseStorage.instance.refFromURL(path);
+          await ref.delete();
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Lineup başarıyla silindi.',
+              style: TextStyle(
+                fontFamily: Fonts().valFonts,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            backgroundColor: ProjectColor().valoRed,
+          ),
+        );
+      }
 
       if (confirmation == true) {
         await _firestore.collection('lineups').doc(lineupId).delete();
@@ -199,6 +266,33 @@ class _LineupListScreenState extends State<LineupListScreen> {
       backgroundColor: ProjectColor().dark,
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+            child: TextField(
+              style: TextStyle(color: ProjectColor().white),
+              decoration: InputDecoration(
+                hintText: 'Search lineups or your name...',
+                hintStyle:
+                    TextStyle(color: ProjectColor().white.withOpacity(0.5)),
+                prefixIcon: Icon(Icons.search, color: ProjectColor().white),
+                filled: true,
+                fillColor: ProjectColor().dark,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: ProjectColor().white),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: ProjectColor().valoRed),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  searchText = value;
+                });
+              },
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 15),
             child: Row(
@@ -413,21 +507,25 @@ class _LineupListScreenState extends State<LineupListScreen> {
                 final filteredLineups = lineups.where((lineup) {
                   final data = lineup.data() as Map<String, dynamic>;
                   final mapMatches = selectedMap == 'All' ||
-                      data['mapName']
-                          .toString()
-                          .toLowerCase()
+                      (data['mapName']?.toString().toLowerCase() ?? '')
                           .contains(selectedMap.toLowerCase());
                   final sideMatches = selectedSide == 'All' ||
-                      data['side']
-                          .toString()
-                          .toLowerCase()
+                      (data['side']?.toString().toLowerCase() ?? '')
                           .contains(selectedSide.toLowerCase());
                   final agentMatches = selectedAgent == 'All' ||
-                      data['agentName']
-                          .toString()
-                          .toLowerCase()
+                      (data['agentName']?.toString().toLowerCase() ?? '')
                           .contains(selectedAgent.toLowerCase());
-                  return mapMatches && sideMatches && agentMatches;
+                  final searchMatches = searchText.isEmpty ||
+                      (data['mapName']?.toString().toLowerCase() ?? '')
+                          .contains(searchText.toLowerCase()) ||
+                      (data['side']?.toString().toLowerCase() ?? '')
+                          .contains(searchText.toLowerCase()) ||
+                      (data['agentName']?.toString().toLowerCase() ?? '')
+                          .contains(searchText.toLowerCase());
+                  return mapMatches &&
+                      sideMatches &&
+                      agentMatches &&
+                      searchMatches;
                 }).toList();
 
                 return GridView.builder(
@@ -444,9 +542,9 @@ class _LineupListScreenState extends State<LineupListScreen> {
                     final lineupId = lineup.id;
                     final imagePaths = List<String>.from(lineup['imagePaths']);
                     final lineupData = {
-                      'name': lineup['mapName'],
-                      'side': lineup['side'],
-                      'agentName': lineup['agentName'],
+                      'name': lineup['mapName'] ?? 'Unknown',
+                      'side': lineup['side'] ?? 'Unknown',
+                      'agentName': lineup['agentName'] ?? 'Unknown',
                       'images': imagePaths,
                     };
 
@@ -487,7 +585,10 @@ class _LineupListScreenState extends State<LineupListScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    lineup['mapName'].toString().toUpperCase(),
+                                    lineup['mapName']
+                                            ?.toString()
+                                            .toUpperCase() ??
+                                        'UNKNOWN',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -496,12 +597,12 @@ class _LineupListScreenState extends State<LineupListScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    'Side: ${lineup['side'].toString().toUpperCase()}',
+                                    'Side: ${lineup['side']?.toString().toUpperCase() ?? 'UNKNOWN'}',
                                     style:
                                         TextStyle(color: ProjectColor().white),
                                   ),
                                   Text(
-                                    'Agent: ${lineup['agentName'].toString().toUpperCase()}',
+                                    'Agent: ${lineup['agentName']?.toString().toUpperCase() ?? 'UNKNOWN'}',
                                     style:
                                         TextStyle(color: ProjectColor().white),
                                   ),

@@ -210,31 +210,133 @@ class _LineupsUserState extends State<LineupsUser> {
 
     List<Map<String, dynamic>> allUserImages = [];
     for (var doc in snapshots.docs) {
-      allUserImages.add(doc.data());
+      allUserImages.add({...doc.data(), 'id': doc.id}); // Include document ID
     }
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('All Uploaded Images'),
+          backgroundColor: ProjectColor().dark,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+          ),
+          title: Text(
+            'L I N E U P S',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: Fonts().valFonts,
+              color: ProjectColor().white,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
           content: Container(
             width: double.maxFinite,
-            height: 300,
+            height: 400,
             child: allUserImages.isEmpty
-                ? Center(child: Text('No images found'))
+                ? Center(
+                    child: Text(
+                      'No images found',
+                      style: TextStyle(
+                        color: ProjectColor().white,
+                        fontFamily: Fonts().valFonts,
+                      ),
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: allUserImages.length,
                     itemBuilder: (context, index) {
                       final userImages = allUserImages[index];
-                      return ListTile(
-                        title: Text(userImages['senderName'] ?? 'Unknown'),
-                        subtitle:
-                            Text(userImages['agentName'] ?? 'No agent name'),
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          _showImagesDialog(userImages['imagePaths']);
-                        },
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(
+                              userImages['mapName'] ?? 'Unknown',
+                              style: TextStyle(
+                                color: ProjectColor().white,
+                                fontFamily: Fonts().valFonts,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Agent: ${userImages['agentName'] ?? 'No agent name'}\nSide: ${userImages['side'] ?? 'No side name'}',
+                              style: TextStyle(
+                                color: ProjectColor().white.withOpacity(0.7),
+                                fontFamily: Fonts().valFonts,
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              _showImagesDialog(userImages);
+                            },
+                            onLongPress: () async {
+                              bool? confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: ProjectColor().valoRed,
+                                    title: Text(
+                                      "Delete Lineup",
+                                      style: TextStyle(
+                                        color: ProjectColor().white,
+                                        fontFamily: Fonts().valFonts,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    content: Text(
+                                      "Are you sure you want to delete this lineup?",
+                                      style: TextStyle(
+                                        color: ProjectColor()
+                                            .white
+                                            .withOpacity(0.8),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text("Cancel",
+                                            style: TextStyle(
+                                              color: ProjectColor().white,
+                                              fontFamily: Fonts().valFonts,
+                                              fontWeight: FontWeight.w900,
+                                            )),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                      ),
+                                      TextButton(
+                                        child: Text(
+                                          "Delete",
+                                          style: TextStyle(
+                                            color: ProjectColor().white,
+                                            fontFamily: Fonts().valFonts,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (confirm == true) {
+                                await _firestore
+                                    .collection('lineups_user')
+                                    .doc(userImages['id'])
+                                    .delete();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text('Lineup deleted successfully')),
+                                );
+                                Navigator.of(context).pop(); // Close the dialog
+                                _showAllUserImages(); // Refresh the list
+                              }
+                            },
+                          ),
+                          Divider(color: ProjectColor().white),
+                        ],
                       );
                     },
                   ),
@@ -244,7 +346,14 @@ class _LineupsUserState extends State<LineupsUser> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: ProjectColor().valoRed,
+                  fontFamily: Fonts().valFonts,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
@@ -252,26 +361,99 @@ class _LineupsUserState extends State<LineupsUser> {
     );
   }
 
-  void _showImagesDialog(List<dynamic> imagePaths) {
+  void _showImagesDialog(Map<String, dynamic> userImages) {
+    List<dynamic> imagePaths = userImages['imagePaths'];
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Images'),
+          backgroundColor: ProjectColor().dark,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+          ),
+          title: Text(
+            'Images',
+            style: TextStyle(
+              color: ProjectColor().white,
+              fontFamily: Fonts().valFonts,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           content: Container(
             width: double.maxFinite,
             height: 300,
             child: imagePaths.isEmpty
-                ? Center(child: Text('No images found'))
-                : ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: imagePaths.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Image.network(imagePaths[index]),
-                      );
-                    },
+                ? Center(
+                    child: Text(
+                      'No images found',
+                      style: TextStyle(
+                        color: ProjectColor().white,
+                        fontFamily: Fonts().valFonts,
+                      ),
+                    ),
+                  )
+                : Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: imagePaths.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Image.network(
+                                  imagePaths[index],
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (BuildContext context,
+                                      Widget child,
+                                      ImageChunkEvent? loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                (loadingProgress
+                                                        .expectedTotalBytes ??
+                                                    1)
+                                            : null,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          _sendToLineupsCollection(userImages);
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ProjectColor().valoRed,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 24.0),
+                        ),
+                        child: Text(
+                          'Send',
+                          style: TextStyle(
+                            color: ProjectColor().white,
+                            fontFamily: Fonts().valFonts,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
           ),
           actions: [
@@ -279,12 +461,44 @@ class _LineupsUserState extends State<LineupsUser> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: ProjectColor().valoRed,
+                  fontFamily: Fonts().valFonts,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
       },
     );
+  }
+
+  Future<void> _sendToLineupsCollection(Map<String, dynamic> userImages) async {
+    try {
+      String combinedField =
+          '${userImages['mapName']} - ${userImages['senderName']}';
+
+      await _firestore.collection('lineups').add({
+        'userEmail': userImages['userEmail'],
+        'agentName': userImages['agentName'],
+        'mapName': userImages['mapName'],
+        'side': userImages['side'],
+        'senderName': combinedField,
+        'timestamp': userImages['timestamp'],
+        'imagePaths': userImages['imagePaths'],
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Başarıyla gönderildi!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gönderme işlemi başarısız: $e')),
+      );
+    }
   }
 
   @override
@@ -335,7 +549,7 @@ class _LineupsUserState extends State<LineupsUser> {
               });
             }),
             SizedBox(height: 10),
-            _buildTextField('Harita Adı', (value) {
+            _buildTextField('Harita Adı & Gönderen Kişi', (value) {
               setState(() {
                 mapName = value;
               });

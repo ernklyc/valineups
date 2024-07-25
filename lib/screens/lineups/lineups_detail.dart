@@ -33,51 +33,6 @@ class _LineupDetailScreenState extends State<LineupDetailScreen> {
           icon: Icon(Icons.arrow_back, color: ProjectColor().white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-              widget.lineup['mapName'].toString().toUpperCase(),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-            Text(
-              "|",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-            Text(
-              widget.lineup['side'].toString().toUpperCase(),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-            Text(
-              "|",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-            Text(
-              widget.lineup['agentName'].toString().toUpperCase(),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ProjectColor().white,
-              ),
-            ),
-          ],
-        ),
         backgroundColor: ProjectColor().dark,
       ),
       backgroundColor: ProjectColor().dark,
