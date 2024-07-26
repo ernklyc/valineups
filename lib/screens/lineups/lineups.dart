@@ -123,6 +123,10 @@ class _LineupListScreenState extends State<LineupListScreen> {
           .doc(user.uid)
           .collection('savedLineups');
       await lineupCollection.doc(lineupId).delete();
+
+      // 'lineups' koleksiyonundaki ilgili dokümanı da silin
+      await _firestore.collection('lineups').doc(lineupId).delete();
+
       if (mounted) {
         setState(() {
           _savedLineups.remove(lineupId);
@@ -210,12 +214,21 @@ class _LineupListScreenState extends State<LineupListScreen> {
       );
 
       if (confirmation == true) {
-        // Silme işlemi burada gerçekleştirilir
+        // 'lineups' koleksiyonundaki ilgili dokümanı silin
         await _firestore.collection('lineups').doc(lineupId).delete();
+
         for (String path in imagePaths) {
           final ref = FirebaseStorage.instance.refFromURL(path);
           await ref.delete();
         }
+
+        // Kullanıcı koleksiyonundan ilgili savedLineup'ları silin
+        final lineupCollection = _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('savedLineups');
+        await lineupCollection.doc(lineupId).delete();
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -228,13 +241,11 @@ class _LineupListScreenState extends State<LineupListScreen> {
             backgroundColor: ProjectColor().valoRed,
           ),
         );
-      }
 
-      if (confirmation == true) {
-        await _firestore.collection('lineups').doc(lineupId).delete();
-        for (String path in imagePaths) {
-          final ref = FirebaseStorage.instance.refFromURL(path);
-          await ref.delete();
+        if (mounted) {
+          setState(() {
+            _savedLineups.remove(lineupId);
+          });
         }
       }
     } else {
