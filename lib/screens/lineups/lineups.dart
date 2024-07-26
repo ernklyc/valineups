@@ -20,6 +20,7 @@ class _LineupListScreenState extends State<LineupListScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? _user;
   Set<String> _savedLineups = Set<String>();
+  TextEditingController _searchController = TextEditingController();
 
   String searchText = '';
 
@@ -281,12 +282,27 @@ class _LineupListScreenState extends State<LineupListScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
             child: TextField(
-              style: TextStyle(color: ProjectColor().white),
+              controller: _searchController,
+              style: TextStyle(
+                color: ProjectColor().white,
+              ),
               decoration: InputDecoration(
-                hintText: 'Search lineups or your name...',
-                hintStyle:
-                    TextStyle(color: ProjectColor().white.withOpacity(0.5)),
+                hintText: 'Lineups or Your Name...',
+                hintStyle: TextStyle(
+                  color: ProjectColor().white.withOpacity(0.5),
+                ),
                 prefixIcon: Icon(Icons.search, color: ProjectColor().white),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.clear, color: ProjectColor().white),
+                        onPressed: () {
+                          setState(() {
+                            _searchController.clear();
+                            searchText = '';
+                          });
+                        },
+                      )
+                    : null,
                 filled: true,
                 fillColor: ProjectColor().dark,
                 enabledBorder: OutlineInputBorder(
