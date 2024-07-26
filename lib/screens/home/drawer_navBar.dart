@@ -7,7 +7,7 @@ import 'package:random_avatar/random_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:valineups/components/valineups_text.dart';
 import 'package:valineups/generated/locale_keys.g.dart';
-import 'package:valineups/screens/lineups/user_lineups/lineups_user.dart';
+import 'package:valineups/screens/user_lineups/lineups_user.dart';
 import 'package:valineups/screens/player_items/agents.dart';
 import 'package:valineups/screens/lineups/lineups.dart';
 import 'package:valineups/screens/maps/maps_screen.dart';
