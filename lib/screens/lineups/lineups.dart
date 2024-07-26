@@ -154,22 +154,23 @@ class _LineupListScreenState extends State<LineupListScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: ProjectColor().valoRed,
+            backgroundColor: ProjectColor().white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
             title: Text(
-              'Silmek istediginine misiniz?',
+              'LINEUP SİLMEK ÜZERESİN',
               style: TextStyle(
-                color: ProjectColor().white,
-                fontFamily: Fonts().valFonts,
+                fontSize: 20,
+                color: ProjectColor().dark.withOpacity(0.8),
                 fontWeight: FontWeight.bold,
               ),
             ),
             content: Text(
-              'Bu işlem geri alınamaz.',
+              'Bu işlem geri alınamaz',
               style: TextStyle(
-                color: ProjectColor().white.withOpacity(0.8),
+                fontSize: 16,
+                color: ProjectColor().dark.withOpacity(0.8),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -178,13 +179,13 @@ class _LineupListScreenState extends State<LineupListScreen> {
                 child: Text(
                   'Hayır',
                   style: TextStyle(
-                    color: ProjectColor().valoRed,
+                    color: ProjectColor().white,
                     fontFamily: Fonts().valFonts,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ProjectColor().white,
+                  backgroundColor: ProjectColor().valoRed,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -232,13 +233,13 @@ class _LineupListScreenState extends State<LineupListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Lineup başarıyla silindi.',
+              'LINEUP DELETED',
               style: TextStyle(
-                fontFamily: Fonts().valFonts,
-                fontWeight: FontWeight.w500,
+                color: ProjectColor().white,
+                fontWeight: FontWeight.w400,
               ),
             ),
-            backgroundColor: ProjectColor().valoRed,
+            backgroundColor: Colors.grey[800],
           ),
         );
 
@@ -250,7 +251,7 @@ class _LineupListScreenState extends State<LineupListScreen> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bu işlemi yapma yetkiniz yok.')),
+        SnackBar(content: Text('YOU DO NOT HAVE PERMISSION')),
       );
     }
   }
@@ -609,13 +610,17 @@ class _LineupListScreenState extends State<LineupListScreen> {
                                   SizedBox(height: 4),
                                   Text(
                                     'Side: ${lineup['side']?.toString().toUpperCase() ?? 'UNKNOWN'}',
-                                    style:
-                                        TextStyle(color: ProjectColor().white),
+                                    style: TextStyle(
+                                      color: ProjectColor().white,
+                                      fontFamily: Fonts().valFonts,
+                                    ),
                                   ),
                                   Text(
                                     'Agent: ${lineup['agentName']?.toString().toUpperCase() ?? 'UNKNOWN'}',
-                                    style:
-                                        TextStyle(color: ProjectColor().white),
+                                    style: TextStyle(
+                                      color: ProjectColor().white,
+                                      fontFamily: Fonts().valFonts,
+                                    ),
                                   ),
                                 ],
                               ),

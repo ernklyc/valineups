@@ -35,6 +35,7 @@ class _LineupsHomeState extends State<LineupsHome> {
     }
 
     final pickedFiles = await _picker.pickMultiImage();
+    // ignore: unnecessary_null_comparison
     if (pickedFiles != null) {
       setState(() {
         _images = pickedFiles
@@ -100,12 +101,6 @@ class _LineupsHomeState extends State<LineupsHome> {
       mapName = '';
       side = '';
       isLoading = false;
-    });
-  }
-
-  void _clearImages() {
-    setState(() {
-      _images = [];
     });
   }
 
@@ -191,24 +186,6 @@ class _LineupsHomeState extends State<LineupsHome> {
                                 return Image.file(_images[index],
                                     fit: BoxFit.cover);
                               },
-                            ),
-                            SizedBox(height: 10),
-                            ElevatedButton(
-                              onPressed: _clearImages,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ProjectColor().valoRed,
-                                padding: EdgeInsets.symmetric(vertical: 16),
-                                minimumSize: Size(double.infinity, 0),
-                              ),
-                              child: Text(
-                                'CLEAR IMAGES',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: ProjectColor().white,
-                                  fontFamily: Fonts().valFonts,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
                             ),
                           ],
                         ),

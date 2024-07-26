@@ -32,7 +32,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Expanded(
                   child: _buildPageView(),
                 ),
-                _buildDotsIndicator(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 32),
+                  child: _buildDotsIndicator(),
+                ),
                 _buildNavigationButtons(),
               ],
             );
