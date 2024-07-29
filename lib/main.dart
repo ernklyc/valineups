@@ -19,7 +19,7 @@ void main() async {
     EasyLocalization(
       supportedLocales: [Locale('en', 'US'), Locale('tr', 'TR')],
       path:
-          'assets/translations', // <-- change the path of the translation files
+          'assets/translations',
       fallbackLocale: Locale('en', 'US'),
       child: MyApp(
         seenOnboarding: seenOnboarding,
