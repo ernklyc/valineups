@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:valineups/banner_ads.dart';
 import 'package:valineups/components/news_custom_text_field.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:intl/intl.dart';
@@ -570,6 +571,7 @@ class _NewsState extends State<News> {
               },
             ),
           ),
+          GoogleAdsPage(),
         ],
       ),
       floatingActionButton: (_user?.email == 'valineupstr@gmail.com')

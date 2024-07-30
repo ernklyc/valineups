@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:valineups/banner_ads.dart';
 import 'package:valineups/components/custom_button.dart';
 import 'package:valineups/localization/strings.dart';
 import 'package:valineups/screens/first/login_and_guest.dart';
@@ -175,7 +176,8 @@ class _ChatState extends State<Chat> with SingleTickerProviderStateMixin {
                       )
                     : null,
               )
-            : null,
+            : AppBar(
+                title: GoogleAdsPage(), backgroundColor: ProjectColor().dark),
         body: isAdmin
             ? TabBarView(
                 controller: _tabController,

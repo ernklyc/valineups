@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:valineups/google_ads.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -34,12 +35,20 @@ class _LineupsUserState extends State<LineupsUser> {
   RewardedAd? _rewardedAd;
   bool _isRewardedAdReady = false;
 
+  BannerAd? _bannerAd;
+  final GoogleAds _googleAds = GoogleAds();
+
   @override
   void initState() {
     super.initState();
     _fetchUserData();
     _checkIfAdmin();
     _loadRewardedAd();
+    _googleAds.loadBannerAd(onAdLoaded: (ad) {
+      setState(() {
+        _bannerAd = ad;
+      });
+    });
   }
 
   void _fetchUserData() {
@@ -557,12 +566,29 @@ class _LineupsUserState extends State<LineupsUser> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ProjectColor().dark,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: ProjectColor().dark,
-          ),
-          onPressed: () {},
+        title: Column(
+          children: [
+            Stack(
+              children: [
+                Column(
+                  children: [
+                    // ... mevcut UI bileşenleri ...
+                  ],
+                ),
+                if (_bannerAd != null)
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SafeArea(
+                      child: Container(
+                        width: _bannerAd!.size.width.toDouble(),
+                        height: _bannerAd!.size.height.toDouble(),
+                        child: AdWidget(ad: _bannerAd!),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ),
       ),
       backgroundColor: ProjectColor().dark,

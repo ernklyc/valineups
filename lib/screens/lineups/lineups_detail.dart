@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:valineups/banner_ads.dart';
+import 'package:valineups/google_ads.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -17,11 +20,18 @@ class LineupDetailScreen extends StatefulWidget {
 class _LineupDetailScreenState extends State<LineupDetailScreen> {
   late PageController _pageController;
   int _currentImageIndex = 0;
+  BannerAd? _bannerAd;
+  final GoogleAds _googleAds = GoogleAds();
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentImageIndex);
+    _googleAds.loadBannerAd(onAdLoaded: (ad) {
+      setState(() {
+        _bannerAd = ad;
+      });
+    });
   }
 
   @override
@@ -49,6 +59,21 @@ class _LineupDetailScreenState extends State<LineupDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Stack(
+              children: [
+                if (_bannerAd != null)
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SafeArea(
+                      child: Container(
+                        width: _bannerAd!.size.width.toDouble(),
+                        height: _bannerAd!.size.height.toDouble(),
+                        child: AdWidget(ad: _bannerAd!),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             Expanded(
               child: PhotoViewGallery.builder(
                 pageController: _pageController,
@@ -72,19 +97,22 @@ class _LineupDetailScreenState extends State<LineupDetailScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 10),
-            Center(
-              child: AnimatedSmoothIndicator(
-                activeIndex: _currentImageIndex,
-                count: imagePaths.length,
-                effect: ScrollingDotsEffect(
-                  activeDotColor: ProjectColor().white,
-                  dotColor: ProjectColor().white.withOpacity(0.5),
-                  dotHeight: 8.0,
-                  dotWidth: 8.0,
+            SafeArea(
+              child: Center(
+                child: AnimatedSmoothIndicator(
+                  activeIndex: _currentImageIndex,
+                  count: imagePaths.length,
+                  effect: ScrollingDotsEffect(
+                    activeDotColor: ProjectColor().white,
+                    dotColor: ProjectColor().white.withOpacity(0.5),
+                    dotHeight: 8.0,
+                    dotWidth: 8.0,
+                  ),
                 ),
               ),
             ),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+            GoogleAdsPage()
           ],
         ),
       ),

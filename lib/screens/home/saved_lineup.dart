@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:valineups/banner_ads.dart';
 import 'package:valineups/components/full_screen_image_viewer.dart';
 import 'package:valineups/components/sides.dart';
 import 'package:valineups/styles/fonts.dart';
@@ -397,6 +398,7 @@ class _ProfileState extends State<Profile> {
               },
             ),
           ),
+          GoogleAdsPage(),
         ],
       ),
     );
@@ -447,6 +449,7 @@ class _LineupDetailScreenState extends State<LineupDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            GoogleAdsPage(),
             Expanded(
               child: PhotoViewGallery.builder(
                 pageController: _pageController,
@@ -470,19 +473,22 @@ class _LineupDetailScreenState extends State<LineupDetailScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 10),
-            Center(
-              child: AnimatedSmoothIndicator(
-                activeIndex: _currentImageIndex,
-                count: imagePaths.length,
-                effect: ScrollingDotsEffect(
-                  activeDotColor: ProjectColor().white,
-                  dotColor: ProjectColor().white.withOpacity(0.5),
-                  dotHeight: 8.0,
-                  dotWidth: 8.0,
+            SafeArea(
+              child: Center(
+                child: AnimatedSmoothIndicator(
+                  activeIndex: _currentImageIndex,
+                  count: imagePaths.length,
+                  effect: ScrollingDotsEffect(
+                    activeDotColor: ProjectColor().white,
+                    dotColor: ProjectColor().white.withOpacity(0.5),
+                    dotHeight: 8.0,
+                    dotWidth: 8.0,
+                  ),
                 ),
               ),
             ),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+            GoogleAdsPage()
           ],
         ),
       ),
