@@ -9,6 +9,8 @@ import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:valineups/google_ads.dart';
 
 class LineupListScreen extends StatefulWidget {
   @override
@@ -33,6 +35,9 @@ class _LineupListScreenState extends State<LineupListScreen> {
   bool isLoadingMaps = true;
   bool isLoadingAgents = true;
 
+  BannerAd? _bannerAd;
+  final GoogleAds _googleAds = GoogleAds();
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +45,17 @@ class _LineupListScreenState extends State<LineupListScreen> {
     _loadSavedLineups();
     _fetchMaps();
     _fetchAgents();
+    _googleAds.loadBannerAd(onAdLoaded: (ad) {
+      setState(() {
+        _bannerAd = ad;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   Future<void> _loadSavedLineups() async {
@@ -269,244 +285,186 @@ class _LineupListScreenState extends State<LineupListScreen> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ProjectColor().dark,
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
-            child: TextField(
-              controller: _searchController,
-              style: TextStyle(
-                color: ProjectColor().white,
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+                child: TextField(
+                  controller: _searchController,
+                  style: TextStyle(
+                    color: ProjectColor().white,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Lineups or Your Name...',
+                    hintStyle: TextStyle(
+                      color: ProjectColor().white.withOpacity(0.5),
+                    ),
+                    prefixIcon: Icon(Icons.search, color: ProjectColor().white),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon:
+                                Icon(Icons.clear, color: ProjectColor().white),
+                            onPressed: () {
+                              setState(() {
+                                _searchController.clear();
+                                searchText = '';
+                              });
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: ProjectColor().dark,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: ProjectColor().white),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: ProjectColor().valoRed),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      searchText = value;
+                    });
+                  },
+                ),
               ),
-              decoration: InputDecoration(
-                hintText: 'Lineups or Your Name...',
-                hintStyle: TextStyle(
-                  color: ProjectColor().white.withOpacity(0.5),
-                ),
-                prefixIcon: Icon(Icons.search, color: ProjectColor().white),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(Icons.clear, color: ProjectColor().white),
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                            searchText = '';
-                          });
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: ProjectColor().dark,
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: ProjectColor().white),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: ProjectColor().valoRed),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  searchText = value;
-                });
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Padding(
+                padding: const EdgeInsets.only(top: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    isLoadingMaps
-                        ? Center(child: CircularProgressIndicator())
-                        : Container(
-                            decoration: BoxDecoration(
-                              color: ProjectColor().dark,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  spreadRadius: 1,
-                                  blurRadius: 5,
-                                  offset: Offset(
-                                      0, 3), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: DropdownButton<String>(
-                              underline: Container(
-                                height: 1,
-                                color: ProjectColor().white,
-                              ),
-                              alignment: Alignment.center,
-                              value: selectedMap,
-                              icon: Icon(
-                                Icons.arrow_drop_down_rounded,
-                                color: ProjectColor().white,
-                              ),
-                              onChanged: (String? newValue) {
-                                if (mounted) {
-                                  setState(() {
-                                    selectedMap = newValue!;
-                                  });
-                                }
-                              },
-                              items: [
-                                DropdownMenuItem<String>(
-                                  value: 'All',
-                                  child: Center(
-                                    child: Text(
-                                      'MAP',
-                                      style: TextStyle(
-                                        color: ProjectColor().white,
-                                        fontFamily: Fonts().valFonts,
-                                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        isLoadingMaps
+                            ? Center(child: CircularProgressIndicator())
+                            : Container(
+                                decoration: BoxDecoration(
+                                  color: ProjectColor().dark,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 5,
+                                      offset: Offset(
+                                          0, 3), // changes position of shadow
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                ...maps.map((map) {
-                                  return DropdownMenuItem<String>(
-                                    value: map['displayName'],
-                                    child: Center(
-                                      child: Text(
-                                        map['displayName'],
-                                        style: TextStyle(
-                                          color: ProjectColor().white,
-                                          fontFamily: Fonts().valFonts,
+                                child: DropdownButton<String>(
+                                  underline: Container(
+                                    height: 1,
+                                    color: ProjectColor().white,
+                                  ),
+                                  alignment: Alignment.center,
+                                  value: selectedMap,
+                                  icon: Icon(
+                                    Icons.arrow_drop_down_rounded,
+                                    color: ProjectColor().white,
+                                  ),
+                                  onChanged: (String? newValue) {
+                                    if (mounted) {
+                                      setState(() {
+                                        selectedMap = newValue!;
+                                      });
+                                    }
+                                  },
+                                  items: [
+                                    DropdownMenuItem<String>(
+                                      value: 'All',
+                                      child: Center(
+                                        child: Text(
+                                          'MAP',
+                                          style: TextStyle(
+                                            color: ProjectColor().white,
+                                            fontFamily: Fonts().valFonts,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  );
-                                }).toList()
-                              ],
-                              dropdownColor: ProjectColor().dark,
-                            ),
-                          ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: ProjectColor().dark,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            spreadRadius: 1,
-                            blurRadius: 5,
-                            offset: Offset(0, 3), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: DropdownButton<String>(
-                        underline: Container(
-                          height: 1,
-                          color: ProjectColor().white,
-                        ),
-                        alignment: Alignment.center,
-                        value: selectedSide,
-                        icon: Icon(
-                          Icons.arrow_drop_down_rounded,
-                          color: ProjectColor().white,
-                        ),
-                        onChanged: (String? newValue) {
-                          if (mounted) {
-                            setState(() {
-                              selectedSide = newValue!;
-                            });
-                          }
-                        },
-                        items: [
-                          DropdownMenuItem<String>(
-                            value: 'All',
-                            child: Center(
-                              child: Text(
-                                'SIDE',
-                                style: TextStyle(
-                                  color: ProjectColor().white,
-                                  fontFamily: Fonts().valFonts,
+                                    ...maps.map((map) {
+                                      return DropdownMenuItem<String>(
+                                        value: map['displayName'],
+                                        child: Center(
+                                          child: Text(
+                                            map['displayName'],
+                                            style: TextStyle(
+                                              color: ProjectColor().white,
+                                              fontFamily: Fonts().valFonts,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList()
+                                  ],
+                                  dropdownColor: ProjectColor().dark,
                                 ),
                               ),
-                            ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: ProjectColor().dark,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 1,
+                                blurRadius: 5,
+                                offset:
+                                    Offset(0, 3), // changes position of shadow
+                              ),
+                            ],
                           ),
-                          ...sides.map((side) {
-                            return DropdownMenuItem<String>(
-                              value: side['name'],
-                              child: Center(
-                                child: Text(
-                                  side['name']!,
-                                  style: TextStyle(
-                                    color: ProjectColor().white,
-                                    fontFamily: Fonts().valFonts,
+                          child: DropdownButton<String>(
+                            underline: Container(
+                              height: 1,
+                              color: ProjectColor().white,
+                            ),
+                            alignment: Alignment.center,
+                            value: selectedSide,
+                            icon: Icon(
+                              Icons.arrow_drop_down_rounded,
+                              color: ProjectColor().white,
+                            ),
+                            onChanged: (String? newValue) {
+                              if (mounted) {
+                                setState(() {
+                                  selectedSide = newValue!;
+                                });
+                              }
+                            },
+                            items: [
+                              DropdownMenuItem<String>(
+                                value: 'All',
+                                child: Center(
+                                  child: Text(
+                                    'SIDE',
+                                    style: TextStyle(
+                                      color: ProjectColor().white,
+                                      fontFamily: Fonts().valFonts,
+                                    ),
                                   ),
                                 ),
                               ),
-                            );
-                          }).toList()
-                        ],
-                        dropdownColor: ProjectColor().dark,
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    isLoadingAgents
-                        ? Center(child: CircularProgressIndicator())
-                        : Container(
-                            decoration: BoxDecoration(
-                              color: ProjectColor().dark,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  spreadRadius: 1,
-                                  blurRadius: 5,
-                                  offset: Offset(
-                                      0, 3), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: DropdownButton<String>(
-                              underline: Container(
-                                height: 1,
-                                color: ProjectColor().white,
-                              ),
-                              alignment: Alignment.center,
-                              value: selectedAgent,
-                              icon: Icon(
-                                Icons.arrow_drop_down_rounded,
-                                color: ProjectColor().white,
-                              ),
-                              onChanged: (String? newValue) {
-                                if (mounted) {
-                                  setState(() {
-                                    selectedAgent = newValue!;
-                                  });
-                                }
-                              },
-                              items: agents.map((agent) {
+                              ...sides.map((side) {
                                 return DropdownMenuItem<String>(
-                                  value: agent,
+                                  value: side['name'],
                                   child: Center(
                                     child: Text(
-                                      agent,
+                                      side['name']!,
                                       style: TextStyle(
                                         color: ProjectColor().white,
                                         fontFamily: Fonts().valFonts,
@@ -514,171 +472,246 @@ class _LineupListScreenState extends State<LineupListScreen> {
                                     ),
                                   ),
                                 );
-                              }).toList(),
-                              dropdownColor: ProjectColor().dark,
-                            ),
+                              }).toList()
+                            ],
+                            dropdownColor: ProjectColor().dark,
                           ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: StreamBuilder(
-              stream: _firestore.collection('lineups').snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                final lineups = snapshot.data?.docs ?? [];
-                final filteredLineups = lineups.where((lineup) {
-                  final data = lineup.data() as Map<String, dynamic>;
-                  final mapMatches = selectedMap == 'All' ||
-                      (data['mapName']?.toString().toLowerCase() ?? '')
-                          .contains(selectedMap.toLowerCase());
-                  final sideMatches = selectedSide == 'All' ||
-                      (data['side']?.toString().toLowerCase() ?? '')
-                          .contains(selectedSide.toLowerCase());
-                  final agentMatches = selectedAgent == 'All' ||
-                      (data['agentName']?.toString().toLowerCase() ?? '')
-                          .contains(selectedAgent.toLowerCase());
-                  final searchMatches = searchText.isEmpty ||
-                      (data['mapName']?.toString().toLowerCase() ?? '')
-                          .contains(searchText.toLowerCase()) ||
-                      (data['side']?.toString().toLowerCase() ?? '')
-                          .contains(searchText.toLowerCase()) ||
-                      (data['agentName']?.toString().toLowerCase() ?? '')
-                          .contains(searchText.toLowerCase());
-                  return mapMatches &&
-                      sideMatches &&
-                      agentMatches &&
-                      searchMatches;
-                }).toList();
-
-                return GridView.builder(
-                  padding: EdgeInsets.all(8.0),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                    childAspectRatio: 0.75,
-                  ),
-                  itemCount: filteredLineups.length,
-                  itemBuilder: (context, index) {
-                    final lineup = filteredLineups[index];
-                    final lineupId = lineup.id;
-                    final imagePaths = List<String>.from(lineup['imagePaths']);
-                    final lineupData = {
-                      'name': lineup['mapName'] ?? 'Unknown',
-                      'side': lineup['side'] ?? 'Unknown',
-                      'agentName': lineup['agentName'] ?? 'Unknown',
-                      'images': imagePaths,
-                    };
-
-                    final isSaved = _savedLineups.contains(lineupId);
-
-                    return Card(
-                      color: ProjectColor().dark,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  LineupDetailScreen(lineup: lineup),
-                            ),
-                          );
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(12.0)),
-                                child: Image.network(
-                                  imagePaths.isNotEmpty ? imagePaths[0] : '',
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        isLoadingAgents
+                            ? Center(child: CircularProgressIndicator())
+                            : Container(
+                                decoration: BoxDecoration(
+                                  color: ProjectColor().dark,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 5,
+                                      offset: Offset(
+                                          0, 3), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: DropdownButton<String>(
+                                  underline: Container(
+                                    height: 1,
+                                    color: ProjectColor().white,
+                                  ),
+                                  alignment: Alignment.center,
+                                  value: selectedAgent,
+                                  icon: Icon(
+                                    Icons.arrow_drop_down_rounded,
+                                    color: ProjectColor().white,
+                                  ),
+                                  onChanged: (String? newValue) {
+                                    if (mounted) {
+                                      setState(() {
+                                        selectedAgent = newValue!;
+                                      });
+                                    }
+                                  },
+                                  items: agents.map((agent) {
+                                    return DropdownMenuItem<String>(
+                                      value: agent,
+                                      child: Center(
+                                        child: Text(
+                                          agent,
+                                          style: TextStyle(
+                                            color: ProjectColor().white,
+                                            fontFamily: Fonts().valFonts,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  dropdownColor: ProjectColor().dark,
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    lineup['mapName']
-                                            ?.toString()
-                                            .toUpperCase() ??
-                                        'UNKNOWN',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: ProjectColor().white,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    'Side: ${lineup['side']?.toString().toUpperCase() ?? 'UNKNOWN'}',
-                                    style: TextStyle(
-                                      color: ProjectColor().white,
-                                      fontFamily: Fonts().valFonts,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Agent: ${lineup['agentName']?.toString().toUpperCase() ?? 'UNKNOWN'}',
-                                    style: TextStyle(
-                                      color: ProjectColor().white,
-                                      fontFamily: Fonts().valFonts,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  if (_user?.email == 'valineupstr@gmail.com')
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: ProjectColor().white,
-                                      ),
-                                      onPressed: () => _deleteLineup(
-                                          context, lineupId, imagePaths),
-                                    ),
-                                  IconButton(
-                                    icon: Icon(
-                                      isSaved
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color: ProjectColor().valoRed,
-                                    ),
-                                    onPressed: () =>
-                                        _toggleSaveLineup(lineupId, lineupData),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: StreamBuilder(
+                  stream: _firestore.collection('lineups').snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+
+                    final lineups = snapshot.data?.docs ?? [];
+                    final filteredLineups = lineups.where((lineup) {
+                      final data = lineup.data() as Map<String, dynamic>;
+                      final mapMatches = selectedMap == 'All' ||
+                          (data['mapName']?.toString().toLowerCase() ?? '')
+                              .contains(selectedMap.toLowerCase());
+                      final sideMatches = selectedSide == 'All' ||
+                          (data['side']?.toString().toLowerCase() ?? '')
+                              .contains(selectedSide.toLowerCase());
+                      final agentMatches = selectedAgent == 'All' ||
+                          (data['agentName']?.toString().toLowerCase() ?? '')
+                              .contains(selectedAgent.toLowerCase());
+                      final searchMatches = searchText.isEmpty ||
+                          (data['mapName']?.toString().toLowerCase() ?? '')
+                              .contains(searchText.toLowerCase()) ||
+                          (data['side']?.toString().toLowerCase() ?? '')
+                              .contains(searchText.toLowerCase()) ||
+                          (data['agentName']?.toString().toLowerCase() ?? '')
+                              .contains(searchText.toLowerCase());
+                      return mapMatches &&
+                          sideMatches &&
+                          agentMatches &&
+                          searchMatches;
+                    }).toList();
+
+                    return GridView.builder(
+                      padding: EdgeInsets.all(8.0),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 8.0,
+                        mainAxisSpacing: 8.0,
+                        childAspectRatio: 0.75,
                       ),
+                      itemCount: filteredLineups.length,
+                      itemBuilder: (context, index) {
+                        final lineup = filteredLineups[index];
+                        final lineupId = lineup.id;
+                        final imagePaths =
+                            List<String>.from(lineup['imagePaths']);
+                        final lineupData = {
+                          'name': lineup['mapName'] ?? 'Unknown',
+                          'side': lineup['side'] ?? 'Unknown',
+                          'agentName': lineup['agentName'] ?? 'Unknown',
+                          'images': imagePaths,
+                        };
+
+                        final isSaved = _savedLineups.contains(lineupId);
+
+                        return Card(
+                          color: ProjectColor().dark,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      LineupDetailScreen(lineup: lineup),
+                                ),
+                              );
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(12.0)),
+                                    child: Image.network(
+                                      imagePaths.isNotEmpty
+                                          ? imagePaths[0]
+                                          : '',
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        lineup['mapName']
+                                                ?.toString()
+                                                .toUpperCase() ??
+                                            'UNKNOWN',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: ProjectColor().white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Side: ${lineup['side']?.toString().toUpperCase() ?? 'UNKNOWN'}',
+                                        style: TextStyle(
+                                          color: ProjectColor().white,
+                                          fontFamily: Fonts().valFonts,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Agent: ${lineup['agentName']?.toString().toUpperCase() ?? 'UNKNOWN'}',
+                                        style: TextStyle(
+                                          color: ProjectColor().white,
+                                          fontFamily: Fonts().valFonts,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      if (_user?.email ==
+                                          'valineupstr@gmail.com')
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color: ProjectColor().white,
+                                          ),
+                                          onPressed: () => _deleteLineup(
+                                              context, lineupId, imagePaths),
+                                        ),
+                                      IconButton(
+                                        icon: Icon(
+                                          isSaved
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: ProjectColor().valoRed,
+                                        ),
+                                        onPressed: () => _toggleSaveLineup(
+                                            lineupId, lineupData),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
-                );
-              },
-            ),
+                ),
+              ),
+            ],
           ),
+          if (_bannerAd != null)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: Container(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+              ),
+            ),
         ],
       ),
       floatingActionButton: (_user?.email == 'valineupstr@gmail.com')
