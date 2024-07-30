@@ -10,6 +10,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:valineups/styles/fonts.dart';
 import 'package:valineups/styles/project_color.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class LineupsUser extends StatefulWidget {
   @override
@@ -30,12 +31,15 @@ class _LineupsUserState extends State<LineupsUser> {
   bool isLoading = false;
   bool isUploading = false;
   bool isAdmin = false;
+  RewardedAd? _rewardedAd;
+  bool _isRewardedAdReady = false;
 
   @override
   void initState() {
     super.initState();
     _fetchUserData();
     _checkIfAdmin();
+    _loadRewardedAd();
   }
 
   void _fetchUserData() {
@@ -58,6 +62,29 @@ class _LineupsUserState extends State<LineupsUser> {
         isAdmin = user.email == 'valineupstr@gmail.com';
       });
     }
+  }
+
+  void _loadRewardedAd() {
+    RewardedAd.load(
+      adUnitId: Platform.isAndroid
+          ? 'ca-app-pub-3940256099942544/5224354917'
+          : 'ca-app-pub-3940256099942544/1712485313',
+      request: AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          setState(() {
+            _rewardedAd = ad;
+            _isRewardedAdReady = true;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load a rewarded ad: ${err.message}');
+          setState(() {
+            _isRewardedAdReady = false;
+          });
+        },
+      ),
+    );
   }
 
   Future<void> _pickImages() async {
@@ -499,6 +526,30 @@ class _LineupsUserState extends State<LineupsUser> {
     }
   }
 
+  void _showRewardedAd() {
+    if (_isRewardedAdReady) {
+      _rewardedAd?.show(
+          onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+        // Reklam izlenip ödül kazanıldığında yapılacak işlemler burada
+        _uploadImages();
+        setState(() {
+          agentName = '';
+          mapName = '';
+          side = '';
+          senderName = '';
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Reklam İzlendi, Gönderim İçin Onay Alınmadı!')),
+        );
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Reklam yüklenemedi, lütfen tekrar deneyin.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = _firebaseAuth.currentUser;
@@ -592,7 +643,7 @@ class _LineupsUserState extends State<LineupsUser> {
                       side.isEmpty ||
                       senderName.isEmpty
                   ? null
-                  : _uploadImages,
+                  : _showRewardedAd,
               style: ElevatedButton.styleFrom(
                 backgroundColor:
                     isLoading ? Colors.grey : ProjectColor().valoRed,
