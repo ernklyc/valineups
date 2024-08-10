@@ -124,6 +124,10 @@ class _LineupsUserState extends State<LineupsUser> {
   }
 
   Future<void> _uploadImages() async {
+    print("Agent Name: $agentName");
+    print("Map Name: $mapName");
+    print("Side: $side");
+    print("Sender Name: $senderName");  
     if (_images.isEmpty ||
         agentName.isEmpty ||
         mapName.isEmpty ||
@@ -495,6 +499,20 @@ class _LineupsUserState extends State<LineupsUser> {
                   },
                   child: Text(
                     'Close',
+                    style: TextStyle(
+                      color: ProjectColor().valoRed,
+                      fontFamily: Fonts().valFonts,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await _sendToLineupsCollection(userImages);
+                    Navigator.of(context).pop(); // Dialog'u kapat
+                  },
+                  child: Text(
+                    'Lineups\'a Gönder',
                     style: TextStyle(
                       color: ProjectColor().valoRed,
                       fontFamily: Fonts().valFonts,
